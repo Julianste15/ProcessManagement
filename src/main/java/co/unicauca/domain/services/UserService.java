@@ -1,43 +1,49 @@
 package co.unicauca.domain.services;
-
 import co.unicauca.domain.entities.User;
-import co.unicauca.domain.repositories.IUserRepositoriy;
-import java.util.Optional;
-
+import co.unicauca.domain.repositories.UserRepository;
+import co.unicauca.domain.exceptions.UserException;
+import co.unicauca.domain.exceptions.UserExceptionEnum;
+import co.unicauca.infrastructure.security.iEncryptor;
+import co.unicauca.infrastructure.validation.iValidator;
+import co.unicauca.infrastructure.dependency_injection.Controller;
+import co.unicauca.infrastructure.dependency_injection.FactoryAutowired;
+@Controller
 public class UserService {
-    private final IUserRepositoriy repository;
-    private final PasswordValidator passwordValidator;
-    private final PasswordEncryptor passwordEncryptor;
-    private final EmailValidator emailValidator;
-
-    public UserService(IUserRepositoriy repository, PasswordValidator passwordValidator, PasswordEncryptor passwordEncryptor, EmailValidator emailValidator) {
-        this.repository = repository;
-        this.passwordValidator = passwordValidator;
-        this.passwordEncryptor = passwordEncryptor;
-        this.emailValidator = emailValidator;
+    @FactoryAutowired
+    private UserRepository userRepository;
+    @FactoryAutowired
+    private iValidator userValidator;
+    @FactoryAutowired
+    private iEncryptor encryptor;
+    public User registerUser(User user) throws UserException {
+        if (user == null) {
+            UserException.throwException(UserExceptionEnum.NAMES, "User cannot be null");
+        }
+        try {
+            userValidator.validate(user);//Validar usuario
+        } catch (Exception ex) {
+            UserException.throwException(UserExceptionEnum.NAMES, ex.getMessage());
+        }
+        if (userRepository.findByEmail(user.getEmail()) != null) {// Verificar que no exista
+            UserException.throwException(UserExceptionEnum.EMAIL, "El usuario ya existe");
+        }
+        user.setPassword(encryptor.encrypt(user.getPassword()));// Encriptar password
+        User savedUser = userRepository.save(user);// Guardar usuario
+        if (savedUser == null) {
+            UserException.throwException(UserExceptionEnum.NAMES, "Error al guardar usuario");
+        }
+        return savedUser;
     }
-    
-    public void registerUser(User user) {
-        if (user == null) throw new IllegalArgumentException("User cannot be null");
-        if (!emailValidator.isInstitutional(user.getEmail()))
-            throw new IllegalArgumentException("Email must be @unicauca.edu.co");
-        if (!passwordValidator.isValid(user.getPassword()))
-            throw new IllegalArgumentException("Weak password");
-
-        if (repository.existsByEmail(user.getEmail()))
-            throw new IllegalArgumentException("Email already registered");
-
-        user.setPassword(passwordEncryptor.encrypt(user.getPassword()));
-        repository.save(user);
+    public User getUserByEmail(String email) throws UserException {
+        if (email == null || email.isEmpty()) {
+            UserException.throwException(UserExceptionEnum.EMAIL, "Email cannot be empty");
+        }
+        return userRepository.findByEmail(email);
     }
-    
-    public Optional<User> login(String email, String rawPassword) {
-        Optional<User> userOpt = repository.findByEmail(email);
-        if (userOpt.isEmpty()) return Optional.empty();
-
-        User user = userOpt.get();
-        boolean ok = passwordEncryptor.matches(rawPassword, user.getPassword());
-        return ok ? Optional.of(user) : Optional.empty();
+    public User getUserById(Long id) throws UserException {
+        if (id == null || id <= 0) {
+            UserException.throwException(UserExceptionEnum.NAMES, "ID cannot be null or negative");
+        }
+        return userRepository.findById(id);
     }
-  
 }
