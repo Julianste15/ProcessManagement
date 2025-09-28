@@ -1,4 +1,5 @@
 package co.unicauca.presentation.controllers;
+
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.enums.Career;
 import co.unicauca.domain.enums.Role;
@@ -11,88 +12,120 @@ import co.unicauca.presentation.observer.iObserver;
 import co.unicauca.presentation.views.GUIRegister;
 import co.unicauca.presentation.observer.ObservableBase;
 import co.unicauca.presentation.views.GUILogin;
-import java.awt.EventQueue;
-import java.util.logging.Logger;
 
+import java.awt.EventQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+
 @Controller
 public class GUIRegisterController extends ObservableBase implements iGUIRegisterController, iObserver {
-    private static final Logger logger = Logger.getLogger(GUILogin.class.getName());
+    private static final Logger logger = Logger.getLogger(GUIRegisterController.class.getName());
     private final GUIRegister view;
     private boolean actionsLoaded;
+    
     @ControllerAutowired
     private UserService userService;   
+    
     @ControllerAutowired
     private GUILoginController loginController;   
+    
     public GUIRegisterController() {
         this.view = new GUIRegister();
         this.actionsLoaded = false;
     }
+    
     @Override
     public void observersLoader() {
         if (!this.hasNoObservers()) return;
         this.addObserver(loginController);
     }
+    
     @Override
     public void run() {
         observersLoader();
         view.setVisible(true);
+        setupEventHandlersOnce();
+    }
+    
+    private synchronized void setupEventHandlersOnce() {
         if (!actionsLoaded) {
             EventQueue.invokeLater(() -> {
-                view.getButtonRegister().addActionListener(event -> register(view));
-                view.getButtonBackLogin().addActionListener(event -> backToLogin(view));
+                view.getButtonRegister().addActionListener(event -> handleRegister());
+                view.getButtonBackLogin().addActionListener(event -> handleBackToLogin());
             });
             actionsLoaded = true;
         }
     }
-    @Override
-    public void register(GUIRegister prmGUIRegister) {
-        if (!prmGUIRegister.validateForm()) {
-            return; // Si la validación falla, no continuar
+    
+    private void handleRegister() {
+        if (!view.validateForm()) {
+            return;
         }
+        
         try {
-            // Validar campos vacíos primero
-            if (prmGUIRegister.getFieldName().getText().trim().isEmpty() ||
-                prmGUIRegister.getFieldSurname().getText().trim().isEmpty() ||
-                prmGUIRegister.getFieldEmail().getText().trim().isEmpty() ||
-                new String(prmGUIRegister.getFieldPassword().getPassword()).trim().isEmpty() ||
-                prmGUIRegister.getFieldPhone().getText().trim().isEmpty()) {
-                prmGUIRegister.showMessage("Todos los campos son obligatorios", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            User user = new User();
-            user.setNames(prmGUIRegister.getFieldName().getText().trim());
-            user.setSurnames(prmGUIRegister.getFieldSurname().getText().trim());
-            user.setEmail(prmGUIRegister.getFieldEmail().getText().trim());
-            user.setPassword(new String(prmGUIRegister.getFieldPassword().getPassword()));
-            user.setTelephone(Long.valueOf(prmGUIRegister.getFieldPhone().getText().trim()));
-            // Usar enums de dominio con manejo seguro
-            String careerDisplayName = prmGUIRegister.getFieldCareer().getSelectedItem().toString();
-            String roleDisplayName = prmGUIRegister.getFieldRole().getSelectedItem().toString();
-            user.setCareer(Career.fromDisplayName(careerDisplayName));
-            user.setRole(Role.fromDisplayName(roleDisplayName));
+            User user = createUserFromForm();
             User registeredUser = userService.registerUser(user);
-            // Si llegamos aquí, el registro fue exitoso
-            prmGUIRegister.showMessage("Usuario registrado con éxito!", JOptionPane.INFORMATION_MESSAGE);
-            prmGUIRegister.setVisible(false);
+            
+            logger.log(Level.INFO, "Usuario registrado exitosamente: {0}", registeredUser.getEmail());
+            view.showMessage("Usuario registrado con éxito!", JOptionPane.INFORMATION_MESSAGE);
+            view.setVisible(false);
+            view.clearForm();
+            
             this.notifyOnly(GUILoginController.class, registeredUser);
-            } catch (UserException ex) {
-                // Mostrar el mensaje de error completo
-                System.out.println("ERROR COMPLETO: " + ex.getMessage());
-                prmGUIRegister.showMessage(ex.getMessage(), JOptionPane.ERROR_MESSAGE);
-            } catch (Exception ex) {
-                System.out.println("EXCEPCIÓN GENERAL: " + ex.getMessage());
-                ex.printStackTrace();
-                prmGUIRegister.showMessage("Error inesperado: " + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
-            }
+            
+        } catch (UserException ex) {
+            logger.log(Level.WARNING, "Error en registro de usuario: {0}", ex.getMessage());
+            view.showMessage(ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, "Error inesperado durante el registro", ex);
+            view.showMessage("Error inesperado durante el registro. Por favor, intente nuevamente.", 
+                           JOptionPane.ERROR_MESSAGE);
+        }
     }
-    @Override
-    public void backToLogin(GUIRegister prmGUIRegister) {
-        prmGUIRegister.setVisible(false);
+    
+    private User createUserFromForm() {
+        User user = new User();
+        user.setNames(view.getFieldName().getText().trim());
+        user.setSurnames(view.getFieldSurname().getText().trim());
+        user.setEmail(view.getFieldEmail().getText().trim());
+        user.setPassword(new String(view.getFieldPassword().getPassword()));
+        user.setTelephone(Long.valueOf(view.getFieldPhone().getText().trim()));
+        
+        String careerDisplayName = view.getFieldCareer().getSelectedItem().toString();
+        String roleDisplayName = view.getFieldRole().getSelectedItem().toString();
+        user.setCareer(Career.fromDisplayName(careerDisplayName));
+        user.setRole(Role.fromDisplayName(roleDisplayName));
+        
+        return user;
+    }
+    
+    private void handleBackToLogin() {
+        logger.info("Volviendo a pantalla de login");
+        view.setVisible(false);
+        view.clearForm();
         this.notifyObservers(null);
     }
+    
+    @Override
+    public void register(GUIRegister prmGUIRegister) {
+        handleRegister();
+    }
+    
+    @Override
+    public void backToLogin(GUIRegister prmGUIRegister) {
+        handleBackToLogin();
+    }
+    
     @Override
     public void validateNotification(ObservableBase subject, Object model) {
-        this.run();
+        EventQueue.invokeLater(() -> {
+            this.run();
+        });
+    }
+    
+    // Método para testing
+    public GUIRegister getView() {
+        return view;
     }
 }

@@ -3,9 +3,9 @@ import co.unicauca.domain.entities.User;
 import co.unicauca.domain.repositories.UserRepository;
 import co.unicauca.domain.exceptions.UserException;
 import co.unicauca.domain.exceptions.UserExceptionEnum;
+import co.unicauca.infrastructure.dependency_injection.Controller;
 import co.unicauca.infrastructure.security.iEncryptor;
 import co.unicauca.infrastructure.validation.iValidator;
-import co.unicauca.infrastructure.dependency_injection.Controller;
 import co.unicauca.infrastructure.dependency_injection.FactoryAutowired;
 @Controller
 public class UserService {

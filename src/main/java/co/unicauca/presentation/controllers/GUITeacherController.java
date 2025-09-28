@@ -2,12 +2,14 @@ package co.unicauca.presentation.controllers;
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.enums.Role;
 import co.unicauca.domain.services.SessionService;
+import co.unicauca.infrastructure.dependency_injection.Controller;
 import co.unicauca.infrastructure.dependency_injection.ControllerAutowired;
 import co.unicauca.presentation.observer.ObservableBase;
 import co.unicauca.presentation.views.GUITeacher;
 import co.unicauca.presentation.observer.iObserver;
 import java.awt.EventQueue;
 import javax.swing.JOptionPane;
+@Controller
 public class GUITeacherController implements iObserver {
     private GUITeacher view;
     private User currentTeacher;
