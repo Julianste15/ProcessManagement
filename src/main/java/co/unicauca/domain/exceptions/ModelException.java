@@ -1,9 +1,8 @@
 package co.unicauca.domain.exceptions;
 import java.util.List;
-import java.util.LinkedList; // Importar LinkedList
+import java.util.LinkedList;
 public abstract class ModelException extends Exception {
     List<String> atrExceptionMessages;
-    // Asegurarse de inicializar la lista correctamente
     public ModelException() {
         this.atrExceptionMessages = new LinkedList<>();
     }

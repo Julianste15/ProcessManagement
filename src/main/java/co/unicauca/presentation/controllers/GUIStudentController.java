@@ -1,5 +1,4 @@
 package co.unicauca.presentation.controllers;
-
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.enums.Role;
 import co.unicauca.presentation.observer.ObservableBase;
@@ -8,14 +7,12 @@ import co.unicauca.presentation.observer.iObserver;
 import co.unicauca.domain.services.SessionService;
 import co.unicauca.infrastructure.dependency_injection.Controller;
 import co.unicauca.infrastructure.dependency_injection.ControllerAutowired;
-
 import java.awt.EventQueue;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
-
 @Controller
-public class GUIStudentController extends ObservableBase implements iObserver { // ✅ Extender ObservableBase
+public class GUIStudentController extends ObservableBase implements iObserver {
     private static final Logger logger = Logger.getLogger(GUIStudentController.class.getName());
     
     private GUIStudent view;

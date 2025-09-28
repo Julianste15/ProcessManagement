@@ -11,33 +11,33 @@ public class UserValidation implements iValidator {
     {
         atrException = new UserException();
     }
-@Override
-public void validate(User prmModel) throws UserException {
-    System.out.println("=== INICIO VALIDACIÓN ===");
-    System.out.println("Creando nueva excepción...");
-    atrException = new UserException();
-    
-    System.out.println("Mensajes iniciales: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
-    
-    validateNames(prmModel);
-    System.out.println("Después de validar nombres: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
-    
-    validateSurnames(prmModel);
-    System.out.println("Después de validar apellidos: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
-    
-    validateEmail(prmModel);
-    System.out.println("Después de validar email: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
-    
-    validatePassword(prmModel);
-    System.out.println("Después de validar contraseña: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
-    
-    validateTelephone(prmModel);
-    System.out.println("Después de validar teléfono: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
-    
-    System.out.println("Mensajes finales: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
-    
-    atrException.throwException();
-}
+    @Override
+    public void validate(User prmModel) throws UserException {
+        System.out.println("=== INICIO VALIDACIÓN ===");
+        System.out.println("Creando nueva excepción...");
+        atrException = new UserException();
+
+        System.out.println("Mensajes iniciales: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+
+        validateNames(prmModel);
+        System.out.println("Después de validar nombres: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+
+        validateSurnames(prmModel);
+        System.out.println("Después de validar apellidos: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+
+        validateEmail(prmModel);
+        System.out.println("Después de validar email: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+
+        validatePassword(prmModel);
+        System.out.println("Después de validar contraseña: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+
+        validateTelephone(prmModel);
+        System.out.println("Después de validar teléfono: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+
+        System.out.println("Mensajes finales: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+
+        atrException.throwException();
+    }
     protected boolean isNull(Object prmField, UserExceptionEnum prmFieldType)
     {
         if(prmField == null)

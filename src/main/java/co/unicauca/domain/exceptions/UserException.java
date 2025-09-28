@@ -3,7 +3,7 @@ import java.util.LinkedList;
 public class UserException extends ModelException {
     public UserException()
     {
-        super(); // Esto llama al constructor de ModelException que inicializa la lista
+        super();
         setExceptionMessages(new LinkedList<>());
     }
     public UserException(UserExceptionEnum prmField, String prmMessage)

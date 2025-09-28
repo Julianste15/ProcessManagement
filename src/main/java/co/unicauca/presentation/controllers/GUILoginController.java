@@ -1,6 +1,5 @@
 package co.unicauca.presentation.controllers;
 import co.unicauca.domain.entities.User;
-import co.unicauca.presentation.ClientMain;
 import co.unicauca.domain.services.SessionService;
 import co.unicauca.infrastructure.dependency_injection.Controller;
 import co.unicauca.infrastructure.dependency_injection.ControllerAutowired;

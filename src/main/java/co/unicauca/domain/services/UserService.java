@@ -7,7 +7,7 @@ import co.unicauca.infrastructure.dependency_injection.Controller;
 import co.unicauca.infrastructure.security.iEncryptor;
 import co.unicauca.infrastructure.validation.iValidator;
 import co.unicauca.infrastructure.dependency_injection.FactoryAutowired;
-@Controller
+@Controller//userService debe ser controller para que funcione
 public class UserService {
     @FactoryAutowired
     private UserRepository userRepository;
@@ -40,7 +40,22 @@ public class UserService {
         if (email == null || email.isEmpty()) {
             UserException.throwException(UserExceptionEnum.EMAIL, "Email cannot be empty");
         }
-        return userRepository.findByEmail(email);
+
+        try {
+            User user = userRepository.findByEmail(email);
+            
+            System.out.println("📦 Resultado búsqueda: " + (user != null ? "ENCONTRADO" : "NO ENCONTRADO"));
+            if (user != null) {
+                System.out.println("   Nombre: " + user.getNames());
+                System.out.println("   Email: " + user.getEmail());
+                System.out.println("   Password length: " + (user.getPassword() != null ? user.getPassword().length() : "null"));
+            }
+            return user;
+        } catch (Exception ex) {
+            System.out.println("💥 Error en getUserByEmail: " + ex.getMessage());
+            ex.printStackTrace();
+            throw new UserException(UserExceptionEnum.EMAIL, "Error al buscar usuario: " + ex.getMessage());
+        }
     }
     public User getUserById(Long id) throws UserException {
         if (id == null || id <= 0) {

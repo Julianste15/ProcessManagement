@@ -1,12 +1,10 @@
 package co.unicauca.presentation;
-
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import co.unicauca.presentation.controllers.GUILoginController;
 import co.unicauca.infrastructure.dependency_injection.ControllerAutowired;
 import co.unicauca.infrastructure.dependency_injection.ControllerScanner;

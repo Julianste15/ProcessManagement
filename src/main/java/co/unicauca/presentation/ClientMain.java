@@ -11,18 +11,21 @@ import co.unicauca.infrastructure.persistence.UserRepositoryImpl;
 
 @RepositoriesScan(packageName = "co.unicauca.infrastructure.persistence")
 @ControllersScan(packagesNames = {
+    "co.unicauca.domain.services",
     "co.unicauca.presentation.controllers"
 })
 public class ClientMain {   
     
     // Instancia compartida globalmente
     public static SessionService sharedSessionService;
+    public static UserService userService;
     
     public static void main(String[] args) { 
         try {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) {
-            // Ignorar error de look and feel
+            java.util.logging.Logger.getLogger(ClientMain.class.getName())
+            .warning("No se pudo cargar el look and feel del sistema: " + ex.getMessage());
         }
         
         System.out.println("=== INICIANDO APLICACIÓN CON INSTANCIA COMPARTIDA ===");
