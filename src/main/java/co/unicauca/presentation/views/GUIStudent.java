@@ -9,6 +9,9 @@ public class GUIStudent extends javax.swing.JFrame {
     private JLabel lblCareer;
     private JLabel lblStudentId;
     private JPanel pnlContent;
+    private JButton btnUserMenu;
+    private JButton btnMyProjects;
+    private JButton btnLogout;
     public GUIStudent() {
         initComponents();
         setupWindowProperties();
@@ -143,17 +146,17 @@ public class GUIStudent extends javax.swing.JFrame {
         lblStudentId = new JLabel("Código: ");
         lblStudentId.setAlignmentX(Component.CENTER_ALIGNMENT);
         // Botones de menú
-        JButton btnUserMenu = new JButton("Menú de Usuario");
+        btnUserMenu = new JButton("Menú de Usuario");
         btnUserMenu.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnUserMenu.setMaximumSize(new Dimension(150, 35));
-        JButton btnMyProjects = new JButton("Mis Proyectos");
+        btnMyProjects = new JButton("Mis Proyectos");
         btnMyProjects.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnMyProjects.setMaximumSize(new Dimension(150, 35));
+        btnMyProjects.setMaximumSize(new Dimension(150, 35)); 
         JComboBox<String> cmbRole = new JComboBox<>(new String[]{"Estudiante"});
         cmbRole.setAlignmentX(Component.CENTER_ALIGNMENT);
         cmbRole.setMaximumSize(new Dimension(150, 35));
         cmbRole.setEnabled(false); // Solo lectura
-        JButton btnLogout = new JButton("Cerrar Sesión");
+        btnLogout = new JButton("Cerrar Sesión");
         btnLogout.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLogout.setMaximumSize(new Dimension(150, 35));
         // Espaciado entre componentes
@@ -199,15 +202,16 @@ public class GUIStudent extends javax.swing.JFrame {
         panel.add(studentContent, BorderLayout.CENTER); 
         return panel;
     }
-    // Métodos públicos para que el controller pueda interactuar con la vista
     public JButton getBtnUserMenu() {
-        return (JButton) ((JPanel) getContentPane().getComponent(1)).getComponent(4);
+        return btnUserMenu;
     }
+
     public JButton getBtnMyProjects() {
-        return (JButton) ((JPanel) getContentPane().getComponent(1)).getComponent(5);
+        return btnMyProjects;
     }
+
     public JButton getBtnLogout() {
-        return (JButton) ((JPanel) getContentPane().getComponent(1)).getComponent(7);
+        return btnLogout;
     }
     public void setStudentInfo(String name, String email, String career, String studentId) {
         lblWelcome.setText("Bienvenido: " + name);

@@ -17,7 +17,9 @@ public class GUIStudentController extends ObservableBase implements iObserver {
     private GUIStudent view;
     private User currentStudent;    
     @ControllerAutowired
-    private SessionService sessionService; 
+    private SessionService sessionService;
+    @ControllerAutowired
+    private GUILoginController loginController;
     public GUIStudentController() {
         logger.info("StudentController constructor llamado");
         // La vista se crea cuando se necesita, no en el constructor
@@ -103,20 +105,17 @@ public class GUIStudentController extends ObservableBase implements iObserver {
                 logger.info("Cerrando sesión de estudiante: " + currentStudent.getNames());
                 
                 if (sessionService != null) {
-                    sessionService.logout();
-                } else {
-                    logger.warning("SessionService es null durante logout");
+                    sessionService.logout();           
                 }
-                
                 if (view != null) {
                     view.setVisible(false);
                     view.dispose();
                     view = null;
                 }
                 currentStudent = null;
-                logger.info("Sesión de estudiante cerrada");
-                // Notificar para volver al login
-                // this.notifyObservers(null); // Si necesitas notificar a alguien
+                if(loginController!=null){
+                    loginController.showLogin();
+                }
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error durante logout de estudiante", e);
