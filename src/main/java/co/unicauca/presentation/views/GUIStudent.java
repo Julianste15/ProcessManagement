@@ -60,10 +60,30 @@ public class GUIStudent extends javax.swing.JFrame {
         // Logo/Imagen
         JLabel lblLogo = new JLabel();
         lblLogo.setPreferredSize(new Dimension(100, 100));
-        lblLogo.setOpaque(true);
-        lblLogo.setBackground(Color.WHITE);
-        lblLogo.setText("LOGO");
-        lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
+        try{
+            java.net.URL imageUrl = getClass().getClassLoader().getResource("images/Logo-unicauca.png");
+            if (imageUrl != null) {
+            ImageIcon originalIcon = new ImageIcon(imageUrl);
+            // Escalar la imagen al tamaño deseado
+            Image scaledImage = originalIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            ImageIcon scaledIcon = new ImageIcon(scaledImage);
+            lblLogo.setIcon(scaledIcon);
+            lblLogo.setText(""); // Eliminar el texto "LOGO"
+            lblLogo.setOpaque(false); // Hacer el fondo transparente
+        }else{
+            lblLogo.setOpaque(true);
+            lblLogo.setBackground(Color.WHITE);
+            lblLogo.setText("LOGO");
+            lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
+            logger.warning("No se encontró la imagen del logo en: images/Logo-unicauca.png");
+            }  
+        }catch(Exception e){
+            lblLogo.setOpaque(true);
+            lblLogo.setBackground(Color.WHITE);
+            lblLogo.setText("LOGO");
+            lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
+            logger.warning("No se encontró la imagen del logo en: images/Logo-unicauca.png");
+        }
         // Textos de la universidad
         JLabel lblUniversity1 = new JLabel("Universidad");
         lblUniversity1.setFont(new Font("Sylfaen", Font.PLAIN, 24));

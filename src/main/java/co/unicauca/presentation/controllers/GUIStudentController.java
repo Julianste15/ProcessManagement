@@ -13,19 +13,15 @@ import java.util.logging.Level;
 import javax.swing.JOptionPane;
 @Controller
 public class GUIStudentController extends ObservableBase implements iObserver {
-    private static final Logger logger = Logger.getLogger(GUIStudentController.class.getName());
-    
+    private static final Logger logger = Logger.getLogger(GUIStudentController.class.getName());    
     private GUIStudent view;
-    private User currentStudent;
-    
+    private User currentStudent;    
     @ControllerAutowired
-    private SessionService sessionService;
-    
+    private SessionService sessionService; 
     public GUIStudentController() {
         logger.info("StudentController constructor llamado");
         // La vista se crea cuando se necesita, no en el constructor
     }
-    
     private void initializeView() {
         if (view == null) {
             try {
@@ -38,7 +34,6 @@ public class GUIStudentController extends ObservableBase implements iObserver {
             }
         }
     }   
-    
     private void setupEventHandlers() {
         try {
             view.setLogoutAction(this::handleLogout);
@@ -49,17 +44,14 @@ public class GUIStudentController extends ObservableBase implements iObserver {
             logger.log(Level.SEVERE, "Error configurando event handlers", e);
         }
     }
-    
     @Override
     public void validateNotification(ObservableBase subject, Object model) {
         logger.info("StudentController recibió notificación");
-        
         if (model instanceof User) {
             User user = (User) model;
             if (user.getRole() == Role.STUDENT) {
                 logger.info("Usuario estudiante recibido: " + user.getNames());
                 this.currentStudent = user;
-                
                 EventQueue.invokeLater(() -> {
                     try {
                         initializeView();
@@ -83,7 +75,6 @@ public class GUIStudentController extends ObservableBase implements iObserver {
             logger.warning("Model recibido no es User: " + (model != null ? model.getClass() : "null"));
         }
     }
-    
     private void loadStudentData(User student) {
         try {
             // Usar el ID como código de estudiante (se puede ajustar según el modelo)
@@ -99,7 +90,6 @@ public class GUIStudentController extends ObservableBase implements iObserver {
             logger.log(Level.SEVERE, "Error cargando datos de estudiante", e);
         }
     }
-    
     private void handleLogout() {
         try {
             int option = JOptionPane.showConfirmDialog(
@@ -123,10 +113,8 @@ public class GUIStudentController extends ObservableBase implements iObserver {
                     view.dispose();
                     view = null;
                 }
-                
                 currentStudent = null;
                 logger.info("Sesión de estudiante cerrada");
-                
                 // Notificar para volver al login
                 // this.notifyObservers(null); // Si necesitas notificar a alguien
             }
@@ -140,7 +128,6 @@ public class GUIStudentController extends ObservableBase implements iObserver {
             );
         }
     }
-    
     private void handleUserMenu() {
         try {
             JOptionPane.showMessageDialog(
@@ -153,7 +140,6 @@ public class GUIStudentController extends ObservableBase implements iObserver {
             logger.log(Level.SEVERE, "Error en menú de usuario", e);
         }
     }
-    
     private void handleMyProjects() {
         try {
             JOptionPane.showMessageDialog(
@@ -166,14 +152,12 @@ public class GUIStudentController extends ObservableBase implements iObserver {
             logger.log(Level.SEVERE, "Error en mis proyectos", e);
         }
     }
-    
     // Método para abrir la vista manualmente si es necesario
     public void showView(User student) {
         if (student != null && student.getRole() == Role.STUDENT) {
             validateNotification(null, student);
         }
     }
-
     @Override
     public void observersLoader() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody

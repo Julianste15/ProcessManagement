@@ -68,31 +68,47 @@ public class GUITeacher extends javax.swing.JFrame {
     private JPanel createHeaderPanel() {
         JPanel panel = new JPanel();
         panel.setBackground(new Color(15, 71, 151));
-        
-        // Logo/Imagen (puedes agregar una imagen real)
+        // Logo/Imagen
         JLabel lblLogo = new JLabel();
         lblLogo.setPreferredSize(new Dimension(100, 100));
-        lblLogo.setOpaque(true);
-        lblLogo.setBackground(Color.WHITE);
-        lblLogo.setText("LOGO");
-        lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
-        
+        try {
+            java.net.URL imageUrl = getClass().getClassLoader().getResource("images/Logo-unicauca.png");
+            if (imageUrl != null) {
+                ImageIcon originalIcon = new ImageIcon(imageUrl);
+                // Escalar la imagen al tamaño deseado
+                Image scaledImage = originalIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+                ImageIcon scaledIcon = new ImageIcon(scaledImage);
+                lblLogo.setIcon(scaledIcon);
+                lblLogo.setText(""); // Eliminar el texto "LOGO"
+                lblLogo.setOpaque(false); // Hacer el fondo transparente
+            } else {
+                // Si no encuentra la imagen, mantener el texto
+                lblLogo.setOpaque(true);
+                lblLogo.setBackground(Color.WHITE);
+                lblLogo.setText("LOGO");
+                lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
+                logger.warning("No se encontró la imagen del logo en: images/Logo-unicauca.png");
+            }
+        } catch (Exception e) {
+            // En caso de error, mantener el texto
+            lblLogo.setOpaque(true);
+            lblLogo.setBackground(Color.WHITE);
+            lblLogo.setText("LOGO");
+            lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
+            logger.warning("Error cargando el logo: " + e.getMessage());
+        }
         // Textos de la universidad
         JLabel lblUniversity1 = new JLabel("Universidad");
         lblUniversity1.setFont(new Font("Sylfaen", Font.PLAIN, 24));
         lblUniversity1.setForeground(Color.WHITE);
-        
         JLabel lblUniversity2 = new JLabel("del Cauca");
         lblUniversity2.setFont(new Font("Sylfaen", Font.PLAIN, 24));
         lblUniversity2.setForeground(Color.WHITE);
-        
         JLabel lblTitle = new JLabel("Gestión del Proceso de Trabajo de Grado");
         lblTitle.setFont(new Font("Baskerville Old Face", Font.BOLD, 24));
         lblTitle.setForeground(Color.WHITE);
-
         GroupLayout panelLayout = new GroupLayout(panel);
         panel.setLayout(panelLayout);
-        
         panelLayout.setHorizontalGroup(
             panelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(panelLayout.createSequentialGroup()
@@ -106,7 +122,6 @@ public class GUITeacher extends javax.swing.JFrame {
                 .addComponent(lblTitle)
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        
         panelLayout.setVerticalGroup(
             panelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(panelLayout.createSequentialGroup()
@@ -123,10 +138,8 @@ public class GUITeacher extends javax.swing.JFrame {
                         .addComponent(lblTitle)))
                 .addGap(25, 25, 25))
         );
-        
         return panel;
     }
-    
     private JPanel createSidebarPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
