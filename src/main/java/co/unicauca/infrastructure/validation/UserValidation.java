@@ -2,22 +2,42 @@ package co.unicauca.infrastructure.validation;
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.exceptions.UserException;
 import co.unicauca.domain.exceptions.UserExceptionEnum;
+import co.unicauca.infrastructure.dependency_injection.Service;
+
+@Service
 public class UserValidation implements iValidator {   
     private UserException atrException;
     public UserValidation()
     {
         atrException = new UserException();
     }
-    @Override
-    public void validate(User prmModel) throws UserException 
-    {
-        validateNames((User) prmModel);
-        validateSurnames((User) prmModel);
-        validateEmail((User) prmModel);
-        validatePassword((User) prmModel);
-        validateTelephone((User) prmModel);
-        atrException.throwException();
-    }
+@Override
+public void validate(User prmModel) throws UserException {
+    System.out.println("=== INICIO VALIDACIÓN ===");
+    System.out.println("Creando nueva excepción...");
+    atrException = new UserException();
+    
+    System.out.println("Mensajes iniciales: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+    
+    validateNames(prmModel);
+    System.out.println("Después de validar nombres: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+    
+    validateSurnames(prmModel);
+    System.out.println("Después de validar apellidos: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+    
+    validateEmail(prmModel);
+    System.out.println("Después de validar email: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+    
+    validatePassword(prmModel);
+    System.out.println("Después de validar contraseña: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+    
+    validateTelephone(prmModel);
+    System.out.println("Después de validar teléfono: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+    
+    System.out.println("Mensajes finales: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+    
+    atrException.throwException();
+}
     protected boolean isNull(Object prmField, UserExceptionEnum prmFieldType)
     {
         if(prmField == null)
@@ -64,25 +84,28 @@ public class UserValidation implements iValidator {
             );
         }
     }
-    public void validatePassword(User prmUser)
-    {
+    public void validatePassword(User prmUser) {
         if(isNull(prmUser.getPassword(), UserExceptionEnum.PASSWORD)) return;
-        if(prmUser.getPassword().length() < 6)
-        {
+
+        String password = prmUser.getPassword();
+
+        boolean hasError = false;
+
+        if(password.length() < 6) {
             atrException.addExceptionMessage(UserExceptionEnum.PASSWORD, "Debe contener por lo menos seis caracteres");
+            hasError = true;
         }
-        if(!prmUser.getPassword().matches(".*[0-9].*"))
-        {
+        if(!password.matches(".*[0-9].*")) {
             atrException.addExceptionMessage(UserExceptionEnum.PASSWORD, "Debe contener por lo menos un digito");
+            hasError = true;
         }
-        if(!prmUser.getPassword().matches(".*[!@#$%^&*(){}+=-_,./?].*"))
-        {
-            atrException.addExceptionMessage(UserExceptionEnum.PASSWORD, "Debe contener por lo menos un caracter especial"
-            );
+        if(!password.matches(".*[!@#$%^&*(){}+=-_,./?].*")) {
+            atrException.addExceptionMessage(UserExceptionEnum.PASSWORD, "Debe contener por lo menos un caracter especial");
+            hasError = true;
         }
-        if(!prmUser.getPassword().matches(".*[A-Z].*"))
-        {
+        if(!password.matches(".*[A-Z].*")) {
             atrException.addExceptionMessage(UserExceptionEnum.PASSWORD, "Debe contener por lo menos una letra en mayuscula");
+            hasError = true;
         }
     }
     public void validateTelephone(User prmUser)

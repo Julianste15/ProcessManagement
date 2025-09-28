@@ -1,5 +1,7 @@
 package co.unicauca.infrastructure.security;
+import co.unicauca.infrastructure.dependency_injection.Service;
 import org.mindrot.jbcrypt.BCrypt;
+@Service
 public class Encryptor implements iEncryptor {
     public Encryptor(){}
     @Override

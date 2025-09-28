@@ -3,10 +3,12 @@ import java.util.LinkedList;
 public class UserException extends ModelException {
     public UserException()
     {
+        super(); // Esto llama al constructor de ModelException que inicializa la lista
         setExceptionMessages(new LinkedList<>());
     }
     public UserException(UserExceptionEnum prmField, String prmMessage)
     {
+        super(); // Inicializar primero
         setExceptionMessages(new LinkedList<>());
         super.addExceptionMessage(prmField, prmMessage);
     }
@@ -16,15 +18,30 @@ public class UserException extends ModelException {
     }
     public void throwException() throws UserException
     {
-        if(getMessage() == null) return;
-        throw this;
+        String message = getMessage();
+        if(message == null || message.trim().isEmpty()) {
+            return;
+        }
+        
+        // Crear una NUEVA excepción con solo los mensajes actuales
+        UserException newException = new UserException();
+        // Copiar los mensajes actuales
+        if (this.atrExceptionMessages != null) {
+            newException.setExceptionMessages(new LinkedList<>(this.atrExceptionMessages));
+        }
+        
+        throw newException; // Lanzar la nueva excepción limpia
     }
     public static void throwException(UserExceptionEnum prmField, String prmMessage) throws UserException
     {
-        throw new UserException(prmField, prmMessage);
+        UserException exception = new UserException();
+        exception.addExceptionMessage(prmField, prmMessage);
+        throw exception;
     }
     public static void throwException(boolean prmCondition, UserExceptionEnum prmField, String prmMessage) throws UserException
     {
-        if(prmCondition) throw new UserException(prmField, prmMessage);
+        if(prmCondition) {
+            throwException(prmField, prmMessage);
+        }
     }
 }

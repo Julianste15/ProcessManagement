@@ -21,8 +21,10 @@ public class UserService {
         }
         try {
             userValidator.validate(user);//Validar usuario
+        } catch (UserException ex) {
+            throw ex;
         } catch (Exception ex) {
-            UserException.throwException(UserExceptionEnum.NAMES, ex.getMessage());
+            UserException.throwException(UserExceptionEnum.NAMES, "Error de validación: " + ex.getMessage());
         }
         if (userRepository.findByEmail(user.getEmail()) != null) {// Verificar que no exista
             UserException.throwException(UserExceptionEnum.EMAIL, "El usuario ya existe");

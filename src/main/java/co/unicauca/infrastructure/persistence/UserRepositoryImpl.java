@@ -3,11 +3,13 @@ package co.unicauca.infrastructure.persistence;
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.enums.Career;
 import co.unicauca.domain.enums.Role;
-import co.unicauca.domain.repositories.IUserRepositoriy;
+import co.unicauca.domain.repositories.UserRepository;
+import co.unicauca.infrastructure.dependency_injection.RepositoryFactory;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-public class UserRepositoryImpl implements IUserRepositoriy {
+@RepositoryFactory
+public class UserRepositoryImpl implements UserRepository {
     private final SQLiteConnection db;
     public UserRepositoryImpl() {
         this.db = new SQLiteConnection();

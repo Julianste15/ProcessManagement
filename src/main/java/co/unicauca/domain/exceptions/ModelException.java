@@ -1,20 +1,40 @@
 package co.unicauca.domain.exceptions;
 import java.util.List;
+import java.util.LinkedList; // Importar LinkedList
 public abstract class ModelException extends Exception {
-    private List<String> atrExceptionMessages;
-    protected void setExceptionMessages(List<String> prmList){atrExceptionMessages = prmList;}
-    @Override
-    public String getMessage() 
-    {
-        if((atrExceptionMessages == null) || atrExceptionMessages.isEmpty()) return null;
-        String varMessage = "";
-        for(String atrExceptionMessage: atrExceptionMessages)
-            varMessage += atrExceptionMessage + "\n";
-        return varMessage;
+    List<String> atrExceptionMessages;
+    // Asegurarse de inicializar la lista correctamente
+    public ModelException() {
+        this.atrExceptionMessages = new LinkedList<>();
     }
-    public void addExceptionMessage(iFieldEnum prmField, String prmMessage)
-    {
-        if(atrExceptionMessages == null) return;
+    protected void setExceptionMessages(List<String> prmList) {
+        if (prmList != null) {
+            atrExceptionMessages = prmList;
+        } else {
+            atrExceptionMessages = new LinkedList<>();
+        }
+    }
+    @Override
+    public String getMessage() {
+        if((atrExceptionMessages == null) || atrExceptionMessages.isEmpty()) {
+            return null;
+        }
+        StringBuilder varMessage = new StringBuilder();
+        for(String exceptionMessage : atrExceptionMessages) {
+            varMessage.append(exceptionMessage).append("\n");
+        }
+        return varMessage.toString().trim(); // Eliminar el último \n
+    }
+    public void addExceptionMessage(iFieldEnum prmField, String prmMessage) {
+        if(atrExceptionMessages == null) {
+            atrExceptionMessages = new LinkedList<>();
+        }
         atrExceptionMessages.add("El campo " + prmField.getFieldName() + ": " + prmMessage);
+    }
+    // Método para limpiar mensajes previos
+    public void clearMessages() {
+        if (atrExceptionMessages != null) {
+            atrExceptionMessages.clear();
+        }
     }
 }

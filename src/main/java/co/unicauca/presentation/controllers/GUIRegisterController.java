@@ -2,6 +2,7 @@ package co.unicauca.presentation.controllers;
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.enums.Career;
 import co.unicauca.domain.enums.Role;
+import co.unicauca.domain.exceptions.UserException;
 import co.unicauca.domain.services.UserService;
 import co.unicauca.infrastructure.dependency_injection.Controller;
 import co.unicauca.infrastructure.dependency_injection.ControllerAutowired;
@@ -10,15 +11,10 @@ import co.unicauca.presentation.observer.iObserver;
 import co.unicauca.presentation.views.GUIRegister;
 import co.unicauca.presentation.observer.ObservableBase;
 import co.unicauca.presentation.views.GUILogin;
-import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.Image;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+
 import javax.swing.JOptionPane;
-import javax.swing.SwingConstants;
 @Controller
 public class GUIRegisterController extends ObservableBase implements iGUIRegisterController, iObserver {
     private static final Logger logger = Logger.getLogger(GUILogin.class.getName());
@@ -71,18 +67,24 @@ public class GUIRegisterController extends ObservableBase implements iGUIRegiste
             user.setPassword(new String(prmGUIRegister.getFieldPassword().getPassword()));
             user.setTelephone(Long.valueOf(prmGUIRegister.getFieldPhone().getText().trim()));
             // Usar enums de dominio con manejo seguro
-            String careerStr = prmGUIRegister.getFieldCareer().getSelectedItem().toString().toUpperCase();
-            String roleStr = prmGUIRegister.getFieldRole().getSelectedItem().toString().toUpperCase();
-            user.setCareer(Career.valueOf(careerStr));
-            user.setRole(Role.valueOf(roleStr));
+            String careerDisplayName = prmGUIRegister.getFieldCareer().getSelectedItem().toString();
+            String roleDisplayName = prmGUIRegister.getFieldRole().getSelectedItem().toString();
+            user.setCareer(Career.fromDisplayName(careerDisplayName));
+            user.setRole(Role.fromDisplayName(roleDisplayName));
             User registeredUser = userService.registerUser(user);
             // Si llegamos aquí, el registro fue exitoso
             prmGUIRegister.showMessage("Usuario registrado con éxito!", JOptionPane.INFORMATION_MESSAGE);
             prmGUIRegister.setVisible(false);
             this.notifyOnly(GUILoginController.class, registeredUser);
-        } catch (Exception ex) {
-            prmGUIRegister.showMessage(ex.getMessage(), JOptionPane.ERROR_MESSAGE);
-        }
+            } catch (UserException ex) {
+                // Mostrar el mensaje de error completo
+                System.out.println("ERROR COMPLETO: " + ex.getMessage());
+                prmGUIRegister.showMessage(ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                System.out.println("EXCEPCIÓN GENERAL: " + ex.getMessage());
+                ex.printStackTrace();
+                prmGUIRegister.showMessage("Error inesperado: " + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+            }
     }
     @Override
     public void backToLogin(GUIRegister prmGUIRegister) {
