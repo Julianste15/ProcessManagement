@@ -11,7 +11,8 @@ public class GUITeacher extends javax.swing.JFrame {
     private JLabel lblEmail;
     private JLabel lblCareer;
     private JPanel pnlContent;
-    
+    private JButton btnUserMenu;
+    private JButton btnLogout;
     public GUITeacher() {
         initComponents();
         setupWindowProperties();
@@ -158,7 +159,7 @@ public class GUITeacher extends javax.swing.JFrame {
         lblCareer.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         // Botones de menú
-        JButton btnUserMenu = new JButton("Menú de Usuario");
+        btnUserMenu = new JButton("Menú de Usuario");
         btnUserMenu.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnUserMenu.setMaximumSize(new Dimension(150, 35));
         
@@ -167,7 +168,7 @@ public class GUITeacher extends javax.swing.JFrame {
         cmbRole.setMaximumSize(new Dimension(150, 35));
         cmbRole.setEnabled(false); // Solo lectura
         
-        JButton btnLogout = new JButton("Cerrar Sesión");
+        btnLogout = new JButton("Cerrar Sesión");
         btnLogout.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLogout.setMaximumSize(new Dimension(150, 35));
         
@@ -203,11 +204,11 @@ public class GUITeacher extends javax.swing.JFrame {
     
     // Métodos públicos para que el controller pueda interactuar con la vista
     public JButton getBtnUserMenu() {
-        return (JButton) ((JPanel) getContentPane().getComponent(1)).getComponent(4);
+        return btnUserMenu;
     }
     
     public JButton getBtnLogout() {
-        return (JButton) ((JPanel) getContentPane().getComponent(1)).getComponent(6);
+        return btnLogout;
     }
     
     public void setUserInfo(String name, String email, String career) {
