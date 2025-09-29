@@ -69,7 +69,7 @@ public class GUILogin extends javax.swing.JFrame {
         JLabel lblIcon = createAppIconLabel();
         lblIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(lblIcon);
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+        panel.add(Box.createRigidArea(new Dimension(0, 5)));
         
         // Título
         JLabel lblTitle = new JLabel("BIENVENIDO");
@@ -88,34 +88,45 @@ public class GUILogin extends javax.swing.JFrame {
         
         // Formulario de login
         panel.add(createEmailField());
-        panel.add(Box.createRigidArea(new Dimension(0, 15)));
+        panel.add(Box.createRigidArea(new Dimension(0, 1)));
         panel.add(createPasswordField());
-        panel.add(Box.createRigidArea(new Dimension(0, 30)));
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
         panel.add(createButtonPanel());
-        
+        panel.add(Box.createVerticalGlue());
         return panel;
     }
     
     private JLabel createAppIconLabel() {
         JLabel label;
         try {
-            // Intentar cargar la imagen del logo
             java.net.URL imageUrl = getClass().getClassLoader().getResource("images/Logo-unicauca.png");
             if (imageUrl != null) {
                 ImageIcon originalIcon = new ImageIcon(imageUrl);
-                Image scaledImage = originalIcon.getImage().getScaledInstance(90, 90, Image.SCALE_SMOOTH);
+
+                int maxWidth = 100;
+                int maxHeight = 107;
+
+                int originalWidth = originalIcon.getIconWidth();
+                int originalHeight = originalIcon.getIconHeight();
+
+                double widthRatio = (double) maxWidth / originalWidth;
+                double heightRatio = (double) maxHeight / originalHeight;
+                double scale = Math.min(widthRatio, heightRatio);
+
+                int newWidth = (int) (originalWidth * scale);
+                int newHeight = (int) (originalHeight * scale);
+
+                Image scaledImage = originalIcon.getImage()
+                        .getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
                 label = new JLabel(new ImageIcon(scaledImage));
             } else {
-                // Fallback a emoji si no encuentra la imagen
                 label = new JLabel("🎓", SwingConstants.CENTER);
                 label.setFont(new Font("Segoe UI", Font.PLAIN, 48));
             }
         } catch (Exception e) {
             label = new JLabel("🎓", SwingConstants.CENTER);
             label.setFont(new Font("Segoe UI", Font.PLAIN, 48));
-            logger.warning("No se pudo cargar el logo: " + e.getMessage());
         }
-        label.setPreferredSize(new Dimension(80, 80));
         return label;
     }
     
@@ -130,7 +141,7 @@ public class GUILogin extends javax.swing.JFrame {
         lblRequired1.setForeground(Color.RED);
         
         txtEmail = new JTextField();
-        txtEmail.setPreferredSize(new Dimension(200, 30));
+        txtEmail.setPreferredSize(new Dimension(250, 30));
         txtEmail.setToolTipText("Ingrese su email institucional (@unicauca.edu.co)");
         
         panel.add(lblEmail);
@@ -152,7 +163,7 @@ public class GUILogin extends javax.swing.JFrame {
         lblRequired2.setForeground(Color.RED);
         
         txtPassword = new JPasswordField();
-        txtPassword.setPreferredSize(new Dimension(200, 30));
+        txtPassword.setPreferredSize(new Dimension(250, 30));
         txtPassword.setToolTipText("Ingrese su contraseña");
         
         panel.add(lblPassword);
@@ -174,7 +185,7 @@ public class GUILogin extends javax.swing.JFrame {
         btnRegister = new JButton("Registrarse");
         btnRegister.setBackground(lightBlue); 
         btnRegister.setForeground(darkBlue);
-        btnRegister.setPreferredSize(new Dimension(120, 35));
+        btnRegister.setPreferredSize(new Dimension(120, 30));
         btnRegister.setFocusPainted(false);
         btnRegister.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         btnRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -183,7 +194,7 @@ public class GUILogin extends javax.swing.JFrame {
         btnLogin = new JButton("Iniciar Sesión");
         btnLogin.setBackground(lightBlue);
         btnLogin.setForeground(darkBlue);
-        btnLogin.setPreferredSize(new Dimension(120, 35));
+        btnLogin.setPreferredSize(new Dimension(120, 30));
         btnLogin.setFocusPainted(false);
         btnLogin.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
