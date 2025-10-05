@@ -110,10 +110,14 @@ public class UserValidation implements iValidator {
     }
     public void validateTelephone(User prmUser)
     {
-        if(isNull(prmUser.getTelephone(), UserExceptionEnum.TELEPHONE)) return;
+        // Si el teléfono es null, es válido (campo opcional)
+        if (prmUser.getTelephone() == null) {
+            return;
+        }
+        
         if(prmUser.getTelephone() <= 0)
         {
-            atrException.addExceptionMessage( UserExceptionEnum.TELEPHONE,"Debe ser positivo");
+            atrException.addExceptionMessage(UserExceptionEnum.TELEPHONE, "Debe ser positivo");
         }
     }
 }

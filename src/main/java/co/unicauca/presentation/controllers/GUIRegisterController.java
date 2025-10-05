@@ -74,11 +74,19 @@ public class GUIRegisterController extends ObservableBase implements iGUIRegiste
         user.setSurnames(view.getFieldSurname().getText().trim());
         user.setEmail(view.getFieldEmail().getText().trim());
         user.setPassword(new String(view.getFieldPassword().getPassword()));
-        user.setTelephone(Long.valueOf(view.getFieldPhone().getText().trim()));
+        
+        // Manejar teléfono opcional
+        String phoneText = view.getFieldPhone().getText().trim();
+        if (!phoneText.isEmpty()) {
+            user.setTelephone(Long.valueOf(phoneText));
+        } else {
+            user.setTelephone(null); // O 0L dependiendo de tu modelo
+        }
         String careerDisplayName = view.getFieldCareer().getSelectedItem().toString();
         String roleDisplayName = view.getFieldRole().getSelectedItem().toString();
         user.setCareer(Career.fromDisplayName(careerDisplayName));
         user.setRole(Role.fromDisplayName(roleDisplayName));
+        
         return user;
     }
     private void handleBackToLogin() {

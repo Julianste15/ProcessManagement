@@ -186,23 +186,23 @@ public class GUIRegister extends javax.swing.JFrame{
         
         // Campos del formulario 
         panel.add(createFieldPanel("Nombres*", txtName = new JTextField(20)));
-        panel.add(Box.createRigidArea(new Dimension(0, 8))); // Reducido de 10
+        panel.add(Box.createRigidArea(new Dimension(0, 8)));
         panel.add(createFieldPanel("Apellidos*", txtSurname = new JTextField(20)));
-        panel.add(Box.createRigidArea(new Dimension(0, 8))); // Reducido de 10
-        panel.add(createFieldPanel("Teléfono*", txtPhone = new JTextField(20)));
-        panel.add(Box.createRigidArea(new Dimension(0, 8))); // Reducido de 10
+        panel.add(Box.createRigidArea(new Dimension(0, 8)));
+        panel.add(createFieldPanel("Teléfono", txtPhone = new JTextField(20)));
+        panel.add(Box.createRigidArea(new Dimension(0, 8)));
         panel.add(createFieldPanel("Correo electrónico*", txtEmail = new JTextField(20)));
-        panel.add(Box.createRigidArea(new Dimension(0, 8))); // Reducido de 10
+        panel.add(Box.createRigidArea(new Dimension(0, 8)));
         panel.add(createFieldPanel("Contraseña*", txtPassword = new JPasswordField(20)));
-        panel.add(Box.createRigidArea(new Dimension(0, 12))); // Reducido de 15
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
         
         // Carrera y Rol
         panel.add(createCareerRolePanel());
-        panel.add(Box.createRigidArea(new Dimension(0, 15))); // Reducido de 20
+        panel.add(Box.createRigidArea(new Dimension(0, 15)));
         
         // Botón de registro 
         btnRegister = new JButton("Registrarse");
-        btnRegister.setBackground(lightBlue); // Color naranja para mejor visibilidad
+        btnRegister.setBackground(lightBlue);
         btnRegister.setForeground(darkBlue);
         btnRegister.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnRegister.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -211,7 +211,7 @@ public class GUIRegister extends javax.swing.JFrame{
         btnRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         panel.add(btnRegister);
-        panel.add(Box.createRigidArea(new Dimension(0, 8))); // Reducido de 10
+        panel.add(Box.createRigidArea(new Dimension(0, 8)));
         
         // Nota de campos obligatorios
         JLabel lblRequired = new JLabel("* Campos obligatorios");
@@ -244,7 +244,12 @@ public class GUIRegister extends javax.swing.JFrame{
             field.setToolTipText(tooltipText);
             label.setToolTipText(tooltipText);
         }
-
+        // Agregar tooltip para campo de teléfono (opcional)
+        if (labelText.equals("Teléfono")) {
+            String tooltipText = "Campo opcional - Solo números";
+            field.setToolTipText(tooltipText);
+            label.setToolTipText(tooltipText);
+        }
         panel.add(label);
         panel.add(field);
 
@@ -319,7 +324,6 @@ public class GUIRegister extends javax.swing.JFrame{
             txtSurname.getText().trim().isEmpty() ||
             txtEmail.getText().trim().isEmpty() ||
             new String(txtPassword.getPassword()).trim().isEmpty() ||
-            txtPhone.getText().trim().isEmpty() ||
             (cmbCareer.getSelectedIndex() < 0) ||
             (cmbRole.getSelectedIndex() < 0)) {
             
@@ -333,14 +337,16 @@ public class GUIRegister extends javax.swing.JFrame{
             return false;
         }
         
-        // Validar que el teléfono sea numérico
-        try {
-            Long.parseLong(txtPhone.getText().trim());
-        } catch (NumberFormatException e) {
-            showMessage("El teléfono debe contener solo números", JOptionPane.WARNING_MESSAGE);
-            return false;
+        // Validar que el teléfono sea numérico solo si no esta vacio
+        String phoneText = txtPhone.getText().trim();
+        if(!phoneText.isEmpty()){
+            try {
+                Long.parseLong(txtPhone.getText().trim());
+            } catch (NumberFormatException e) {
+                showMessage("El teléfono debe contener solo números", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
         }
-        
         return true;
     }
     
