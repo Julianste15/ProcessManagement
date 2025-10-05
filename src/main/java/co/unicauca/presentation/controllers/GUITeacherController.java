@@ -1,6 +1,7 @@
 package co.unicauca.presentation.controllers;
 import co.unicauca.domain.entities.Project;
 import co.unicauca.domain.entities.User;
+import co.unicauca.domain.enums.ProjectModality;
 import co.unicauca.domain.enums.Role;
 import co.unicauca.domain.exceptions.ProjectException;
 import co.unicauca.domain.services.ProjectService;
@@ -11,6 +12,7 @@ import co.unicauca.presentation.observer.ObservableBase;
 import co.unicauca.presentation.views.GUITeacher;
 import co.unicauca.presentation.observer.iObserver;
 import java.awt.EventQueue;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,12 +58,69 @@ public class GUITeacherController extends ObservableBase implements iObserver {
         try {
             logger.info("Mostrando formulario de Formato A");
             view.showProjectForm();
+    // CONECTAR el botón de enviar del formulario
+        view.setSubmitAction(this::handleSubmitForm);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error mostrando formulario de proyecto", e);
             JOptionPane.showMessageDialog(view, "Error al cargar el formulario", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+    // NUEVO método para manejar el envío del formulario
+    private void handleSubmitForm() {
+        try {
+            logger.info("Procesando envío de Formato A");
 
+            // Obtener datos del formulario y crear proyecto
+            Project project = createProjectFromFormData();
+
+            // Enviar el proyecto
+            Project savedProject = projectService.submitFormatA(project, currentTeacher);
+
+            JOptionPane.showMessageDialog(view, 
+                "¡Formato A enviado exitosamente!\n" +
+                "ID del Proyecto: " + savedProject.getId() + "\n" +
+                "Estado: " + savedProject.getStatus().getDisplayName(),
+                "Envío Exitoso", 
+                JOptionPane.INFORMATION_MESSAGE);
+
+            // Volver a la lista de proyectos
+            handleMyProjects();
+
+        } catch (ProjectException e) {
+            logger.log(Level.WARNING, "Error de validación en Formato A", e);
+            JOptionPane.showMessageDialog(view, 
+                "Error en el formulario:\n" + e.getMessage(), 
+                "Error de Validación", 
+                JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error inesperado enviando Formato A", e);
+            JOptionPane.showMessageDialog(view, 
+                "Error inesperado al enviar el formulario", 
+                "Error del Sistema", 
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    // NUEVO método para crear proyecto desde los datos del formulario
+    private Project createProjectFromFormData() throws ProjectException {
+        Project project = new Project();
+
+        // NOTA: Aquí necesitaríamos métodos en la vista para obtener los datos
+        // Por ahora usamos datos de ejemplo
+
+        project.setTitle("Proyecto de Ejemplo - " + System.currentTimeMillis());
+        project.setModality(ProjectModality.RESEARCH);
+        project.setGeneralObjective("Implementar un sistema de gestión de trabajos de grado");
+
+        List<String> specificObjectives = new ArrayList<>();
+        specificObjectives.add("Diseñar la arquitectura del sistema");
+        specificObjectives.add("Implementar el módulo de autenticación");
+        specificObjectives.add("Desarrollar la interfaz de usuario");
+        project.setSpecificObjectives(specificObjectives);
+
+        project.setPdfFilePath("/ruta/ejemplo/formato_a.pdf");
+
+        return project;
+    }
     private void handleMyProjects() {
         try {
             logger.info("Cargando proyectos del docente");
@@ -194,7 +253,23 @@ public class GUITeacherController extends ObservableBase implements iObserver {
             logger.log(Level.SEVERE, "Error en menú de usuario", e);
         }
     }
+    private void setupFormSubmitHandler() {
+        // Aquí conectarías el botón de enviar del formulario con la lógica del controller
+        // Esto depende de cómo implementes la comunicación vista-controller
 
+        // Ejemplo:
+        /*
+        view.setSubmitAction(e -> {
+            try {
+                Project project = createProjectFromForm();
+                handleSubmitFormatA(project);
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, "Error procesando formulario", ex);
+                JOptionPane.showMessageDialog(view, "Error en el formulario", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        */
+    }
     @Override
     public void observersLoader() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
