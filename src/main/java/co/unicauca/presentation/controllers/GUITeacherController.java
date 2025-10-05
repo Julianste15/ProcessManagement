@@ -1,6 +1,9 @@
 package co.unicauca.presentation.controllers;
+import co.unicauca.domain.entities.Project;
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.enums.Role;
+import co.unicauca.domain.exceptions.ProjectException;
+import co.unicauca.domain.services.ProjectService;
 import co.unicauca.domain.services.SessionService;
 import co.unicauca.infrastructure.dependency_injection.Controller;
 import co.unicauca.infrastructure.dependency_injection.ControllerAutowired;
@@ -8,6 +11,7 @@ import co.unicauca.presentation.observer.ObservableBase;
 import co.unicauca.presentation.views.GUITeacher;
 import co.unicauca.presentation.observer.iObserver;
 import java.awt.EventQueue;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -20,6 +24,8 @@ public class GUITeacherController extends ObservableBase implements iObserver {
     private SessionService sessionService;
     @ControllerAutowired
     private GUILoginController loginController;
+    @ControllerAutowired
+    private ProjectService projectService;
     public GUITeacherController() {
         // La vista se crea cuando se necesita
     }
@@ -39,9 +45,49 @@ public class GUITeacherController extends ObservableBase implements iObserver {
         try {
             view.setLogoutAction(this::handleLogout);
             view.setUserMenuAction(this::handleUserMenu);
-            logger.info("Event handlers de Teacher configurados");
+            view.setCreateProjectAction(this::handleCreateProject);
+            view.setMyProjectsAction(this::handleMyProjects);
+        logger.info("Event handlers de Teacher configurados");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error configurando event handlers", e);
+        }
+    }
+    private void handleCreateProject() {
+        try {
+            logger.info("Mostrando formulario de Formato A");
+            view.showProjectForm();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error mostrando formulario de proyecto", e);
+            JOptionPane.showMessageDialog(view, "Error al cargar el formulario", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void handleMyProjects() {
+        try {
+            logger.info("Cargando proyectos del docente");
+            List<Project> projects = projectService.getTeacherProjects(currentTeacher);
+            view.showMyProjects();
+            // Aquí actualizarías la tabla con los proyectos
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error cargando proyectos", e);
+            JOptionPane.showMessageDialog(view, "Error al cargar proyectos", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    // Método para manejar el envío del formulario (se llamaría desde la vista)
+    public void handleSubmitFormatA(Project project) {
+        try {
+            Project savedProject = projectService.submitFormatA(project, currentTeacher);
+            JOptionPane.showMessageDialog(view, 
+                "Formato A enviado exitosamente!\nID: " + savedProject.getId(), 
+                "Éxito", 
+                JOptionPane.INFORMATION_MESSAGE);
+            handleMyProjects(); // Volver a la lista de proyectos
+        } catch (ProjectException e) {
+            logger.log(Level.WARNING, "Error enviando Formato A", e);
+            JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error inesperado enviando Formato A", e);
+            JOptionPane.showMessageDialog(view, "Error inesperado al enviar el formulario", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     @Override

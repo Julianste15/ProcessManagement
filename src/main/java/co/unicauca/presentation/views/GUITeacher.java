@@ -13,6 +13,11 @@ public class GUITeacher extends javax.swing.JFrame {
     private JPanel pnlContent;
     private JButton btnUserMenu;
     private JButton btnLogout;
+    private JButton btnCreateProject;
+    private JButton btnMyProjects;
+    private JPanel pnlProjectForm;
+    private JPanel pnlMyProjects;
+    private JTable tblProjects;
     public GUITeacher() {
         initComponents();
         setupWindowProperties();
@@ -171,7 +176,14 @@ public class GUITeacher extends javax.swing.JFrame {
         btnLogout = new JButton("Cerrar Sesión");
         btnLogout.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLogout.setMaximumSize(new Dimension(150, 35));
-        
+        // NUEVOS BOTONES PARA PROYECTOS
+        btnCreateProject = new JButton("Nuevo Formato A");
+        btnCreateProject.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnCreateProject.setMaximumSize(new Dimension(150, 35));
+
+        btnMyProjects = new JButton("Mis Proyectos");
+        btnMyProjects.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnMyProjects.setMaximumSize(new Dimension(150, 35));
         // Espaciado entre componentes
         panel.add(lblWelcome);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -184,6 +196,10 @@ public class GUITeacher extends javax.swing.JFrame {
         panel.add(cmbRole);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(btnLogout);
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+        panel.add(btnCreateProject);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(btnMyProjects);
         
         return panel;
     }
@@ -201,7 +217,58 @@ public class GUITeacher extends javax.swing.JFrame {
         
         return panel;
     }
-    
+    // NUEVO: Panel de formulario de proyecto
+    private JPanel createProjectFormPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel lblTitle = new JLabel("Formulario Formato A", SwingConstants.CENTER);
+        lblTitle.setFont(new Font("Arial", Font.BOLD, 20));
+        panel.add(lblTitle, BorderLayout.NORTH);
+
+        // Aquí irían todos los campos del formulario
+        JPanel formPanel = new JPanel(new GridLayout(0, 2, 10, 10));
+        formPanel.setBackground(Color.WHITE);
+
+        // Campos del formulario (simplificado para el ejemplo)
+        formPanel.add(new JLabel("Título del Proyecto:"));
+        formPanel.add(new JTextField());
+
+        formPanel.add(new JLabel("Modalidad:"));
+        JComboBox<String> cmbModality = new JComboBox<>(new String[]{
+            "Investigación", "Práctica Profesional"
+        });
+        formPanel.add(cmbModality);
+
+        // ... más campos ...
+
+        JButton btnSubmit = new JButton("Enviar Formato A");
+        formPanel.add(btnSubmit);
+
+        panel.add(new JScrollPane(formPanel), BorderLayout.CENTER);
+
+        return panel;
+    }
+    // NUEVO: Panel de lista de proyectos
+    private JPanel createMyProjectsPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+
+        JLabel lblTitle = new JLabel("Mis Proyectos de Grado", SwingConstants.CENTER);
+        lblTitle.setFont(new Font("Arial", Font.BOLD, 20));
+        panel.add(lblTitle, BorderLayout.NORTH);
+
+        // Tabla de proyectos
+        String[] columnNames = {"Título", "Modalidad", "Estado", "Intento", "Fecha"};
+        Object[][] data = {}; // Datos vacíos inicialmente
+
+        tblProjects = new JTable(data, columnNames);
+        panel.add(new JScrollPane(tblProjects), BorderLayout.CENTER);
+
+        return panel;
+    }
     // Métodos públicos para que el controller pueda interactuar con la vista
     public JButton getBtnUserMenu() {
         return btnUserMenu;
@@ -224,7 +291,36 @@ public class GUITeacher extends javax.swing.JFrame {
     public void setUserMenuAction(Runnable action) {
         getBtnUserMenu().addActionListener(e -> action.run());
     }
-    
+    // NUEVOS métodos para el controller
+    public JButton getBtnCreateProject() {
+        return btnCreateProject;
+    }
+
+    public JButton getBtnMyProjects() {
+        return btnMyProjects;
+    }
+
+    public void setCreateProjectAction(Runnable action) {
+        getBtnCreateProject().addActionListener(e -> action.run());
+    }
+
+    public void setMyProjectsAction(Runnable action) {
+        getBtnMyProjects().addActionListener(e -> action.run());
+    }
+
+    public void showProjectForm() {
+        pnlContent.removeAll();
+        pnlContent.add(createProjectFormPanel());
+        pnlContent.revalidate();
+        pnlContent.repaint();
+    }
+
+    public void showMyProjects() {
+        pnlContent.removeAll();
+        pnlContent.add(createMyProjectsPanel());
+        pnlContent.revalidate();
+        pnlContent.repaint();
+    }
     // Main method mejorado
     public static void main(String[] args) {
             // Opción 1: Look and Feel específico
