@@ -1,29 +1,35 @@
 package co.unicauca.presentation.controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.enums.Role;
 import co.unicauca.presentation.observer.ObservableBase;
 import co.unicauca.presentation.views.GUIStudent;
 import co.unicauca.presentation.observer.iObserver;
 import co.unicauca.domain.services.SessionService;
-import co.unicauca.infrastructure.dependency_injection.Controller;
-import co.unicauca.infrastructure.dependency_injection.ControllerAutowired;
 import java.awt.EventQueue;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
-@Controller
+
+@Component
 public class GUIStudentController extends ObservableBase implements iObserver {
     private static final Logger logger = Logger.getLogger(GUIStudentController.class.getName());    
+    
     private GUIStudent view;
     private User currentStudent;    
-    @ControllerAutowired
-    private SessionService sessionService;
-    @ControllerAutowired
-    private GUILoginController loginController;
-    public GUIStudentController() {
-        logger.info("StudentController constructor llamado");
-        // La vista se crea cuando se necesita, no en el constructor
+    
+    private final SessionService sessionService;
+    private final GUILoginController loginController;
+
+    @Autowired
+    public GUIStudentController(SessionService sessionService, GUILoginController loginController) {
+        this.sessionService = sessionService;
+        this.loginController = loginController;
+        logger.info("StudentController constructor llamado e inyectado por Spring");
     }
+
     private void initializeView() {
         if (view == null) {
             try {
@@ -35,7 +41,8 @@ public class GUIStudentController extends ObservableBase implements iObserver {
                 throw new RuntimeException("Error creando vista de estudiante", e);
             }
         }
-    }   
+    }    
+    
     private void setupEventHandlers() {
         try {
             view.setLogoutAction(this::handleLogout);
@@ -46,9 +53,10 @@ public class GUIStudentController extends ObservableBase implements iObserver {
             logger.log(Level.SEVERE, "Error configurando event handlers", e);
         }
     }
+
     @Override
     public void validateNotification(ObservableBase subject, Object model) {
-        logger.info("StudentController recibió notificación");
+        logger.info("StudentController recibio notificacion");
         if (model instanceof User) {
             User user = (User) model;
             if (user.getRole() == Role.STUDENT) {
@@ -77,9 +85,9 @@ public class GUIStudentController extends ObservableBase implements iObserver {
             logger.warning("Model recibido no es User: " + (model != null ? model.getClass() : "null"));
         }
     }
+
     private void loadStudentData(User student) {
         try {
-            // Usar el ID como código de estudiante (se puede ajustar según el modelo)
             String studentId = student.getId() != null ? student.getId().toString() : "N/A";
             view.setStudentInfo(
                 student.getNames() + " " + student.getSurnames(),
@@ -92,20 +100,21 @@ public class GUIStudentController extends ObservableBase implements iObserver {
             logger.log(Level.SEVERE, "Error cargando datos de estudiante", e);
         }
     }
+
     private void handleLogout() {
         try {
             int option = JOptionPane.showConfirmDialog(
                 view, 
-                "¿Está seguro que desea cerrar sesión?", 
-                "Confirmar cierre de sesión", 
+                "¿Esta seguro que desea cerrar sesion?", 
+                "Confirmar cierre de sesion", 
                 JOptionPane.YES_NO_OPTION
             );
             
             if (option == JOptionPane.YES_OPTION) {
-                logger.info("Cerrando sesión de estudiante: " + currentStudent.getNames());
+                logger.info("Cerrando sesion de estudiante: " + currentStudent.getNames());
                 
                 if (sessionService != null) {
-                    sessionService.logout();           
+                    sessionService.logout();            
                 }
                 if (view != null) {
                     view.setVisible(false);
@@ -121,24 +130,26 @@ public class GUIStudentController extends ObservableBase implements iObserver {
             logger.log(Level.SEVERE, "Error durante logout de estudiante", e);
             JOptionPane.showMessageDialog(
                 view, 
-                "Error al cerrar sesión: " + e.getMessage(),
+                "Error al cerrar sesion: " + e.getMessage(),
                 "Error", 
                 JOptionPane.ERROR_MESSAGE
             );
         }
     }
+
     private void handleUserMenu() {
         try {
             JOptionPane.showMessageDialog(
                 view, 
-                "Menú de usuario del estudiante: " + (currentStudent != null ? currentStudent.getNames() : "N/A"),
-                "Menú de Usuario", 
+                "Menu de usuario del estudiante: " + (currentStudent != null ? currentStudent.getNames() : "N/A"),
+                "Menu de Usuario", 
                 JOptionPane.INFORMATION_MESSAGE
             );
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error en menú de usuario", e);
+            logger.log(Level.SEVERE, "Error en menu de usuario", e);
         }
     }
+
     private void handleMyProjects() {
         try {
             JOptionPane.showMessageDialog(
@@ -151,14 +162,17 @@ public class GUIStudentController extends ObservableBase implements iObserver {
             logger.log(Level.SEVERE, "Error en mis proyectos", e);
         }
     }
-    // Método para abrir la vista manualmente si es necesario
+    
     public void showView(User student) {
         if (student != null && student.getRole() == Role.STUDENT) {
             validateNotification(null, student);
         }
     }
+
     @Override
     public void observersLoader() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        // Este método no parece ser necesario para este controlador
+        // ya que solo actúa como observador.
+        logger.warning("observersLoader() no implementado en GUIStudentController.");
     }
 }

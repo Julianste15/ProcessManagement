@@ -2,9 +2,9 @@ package co.unicauca.domain.enums;
 
 public enum Career {
     SYSTEMS_ENGINEERING("Ingeniería de Sistemas"),
-    ELECTRONICS_TELECOMMUNICATIONS("Ingeniería Electrónica y Telecomunicaciones"),
-    INDUSTRIAL_AUTOMATION("Automatización Industrial"),
-    TELEMATICS_TECHNOLOGY("Tecnología en Telemática");
+    ELECTRONICS_TELECOMMUNICATIONS("Ingeniería Electronica y Telecomunicaciones"),
+    INDUSTRIAL_AUTOMATION("Automatizacion Industrial"),
+    TELEMATICS_TECHNOLOGY("Tecnología en Telematica");
     
     private final String displayName;
     

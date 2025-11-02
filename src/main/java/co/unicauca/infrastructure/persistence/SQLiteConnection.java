@@ -20,7 +20,7 @@ public class SQLiteConnection{
                 connection.close();
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error al cerrar la conexión", e);
+            throw new RuntimeException("Error al cerrar la conexion", e);
         }
     }
     public Connection getConnection() {
