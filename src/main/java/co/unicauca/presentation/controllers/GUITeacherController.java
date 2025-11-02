@@ -155,6 +155,12 @@ public class GUITeacherController extends ObservableBase implements iObserver {
             logger.log(Level.SEVERE, "Error en menu de usuario", e);
         }
     }
+    
+    public void showView(User teacher) {
+        if (teacher != null && teacher.getRole() == Role.TEACHER) {
+            validateNotification(null, teacher);
+        }
+    }
 
     @Override
     public void observersLoader() {

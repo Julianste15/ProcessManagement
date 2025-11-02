@@ -3,6 +3,8 @@ package co.unicauca.presentation.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import co.unicauca.domain.entities.User;
+import static co.unicauca.domain.enums.Role.STUDENT;
+import static co.unicauca.domain.enums.Role.TEACHER;
 import co.unicauca.domain.services.SessionService;
 import co.unicauca.presentation.interfaces.iGUILoginController;
 import co.unicauca.presentation.observer.iObserver;
@@ -154,7 +156,7 @@ public class GUILoginController extends ObservableBase implements iGUILoginContr
                     logger.info("Buscando StudentController...");
                     if (studentController != null) {
                         logger.info("✅ Notificando a StudentController");
-                        this.notifyOnly(GUIStudentController.class, user);
+                        studentController.showView(user);
                     } else {
                         logger.warning("❌ StudentController es NULL - mostrando vista por defecto");
                         showDefaultView("Estudiante");
@@ -165,7 +167,7 @@ public class GUILoginController extends ObservableBase implements iGUILoginContr
                     logger.info("Buscando TeacherController...");
                     if (teacherController != null) {
                         logger.info("✅ Notificando a TeacherController");
-                        this.notifyOnly(GUITeacherController.class, user);
+                        teacherController.showView(user);
                     } else {
                         logger.warning("❌ TeacherController es NULL - mostrando vista por defecto");
                         showDefaultView("Profesor");
