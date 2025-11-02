@@ -1,17 +1,25 @@
 package co.unicauca.infrastructure.security;
-import co.unicauca.infrastructure.dependency_injection.Service;
-import org.mindrot.jbcrypt.BCrypt;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 @Service
 public class Encryptor implements iEncryptor {
-    public Encryptor(){}
-    @Override
-    public String encrypt(String prmChain) 
-    {
-        return BCrypt.hashpw(prmChain, BCrypt.gensalt());
+
+    private final PasswordEncoder encoder;
+
+    public Encryptor(){
+        this.encoder = new BCryptPasswordEncoder();
     }
+
     @Override
-    public boolean checkHash(String prmChain, String prmHash) 
-    {
-        return BCrypt.checkpw(prmChain, prmHash);
+    public String encrypt(String prmChain) {
+        return encoder.encode(prmChain);
+    }
+
+    @Override
+    public boolean checkHash(String prmChain, String prmHash) {
+        return encoder.matches(prmChain, prmHash);
     }
 }

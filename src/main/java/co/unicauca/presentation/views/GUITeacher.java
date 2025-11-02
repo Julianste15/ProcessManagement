@@ -19,7 +19,7 @@ public class GUITeacher extends javax.swing.JFrame {
     }
     
     private void setupWindowProperties() {
-        setTitle("Sistema de Gestión - Docente");
+        setTitle("Sistema de Gestion - Docente");
         setLocationRelativeTo(null); // Centrar en pantalla
         setResizable(true);
     }
@@ -31,7 +31,7 @@ public class GUITeacher extends javax.swing.JFrame {
         JPanel sidebarPanel = createSidebarPanel();
         pnlContent = createContentPanel();
 
-        // Configuración del layout principal
+        // Configuracion del layout principal
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setBackground(new Color(240, 240, 240));
         
@@ -88,7 +88,7 @@ public class GUITeacher extends javax.swing.JFrame {
                 lblLogo.setBackground(Color.WHITE);
                 lblLogo.setText("LOGO");
                 lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
-                logger.warning("No se encontró la imagen del logo en: images/Logo-unicauca.png");
+                logger.warning("No se encontro la imagen del logo en: images/Logo-unicauca.png");
             }
         } catch (Exception e) {
             // En caso de error, mantener el texto
@@ -105,7 +105,7 @@ public class GUITeacher extends javax.swing.JFrame {
         JLabel lblUniversity2 = new JLabel("del Cauca");
         lblUniversity2.setFont(new Font("Sylfaen", Font.PLAIN, 24));
         lblUniversity2.setForeground(Color.WHITE);
-        JLabel lblTitle = new JLabel("Gestión del Proceso de Trabajo de Grado");
+        JLabel lblTitle = new JLabel("Gestion del Proceso de Trabajo de Grado");
         lblTitle.setFont(new Font("Baskerville Old Face", Font.BOLD, 24));
         lblTitle.setForeground(Color.WHITE);
         GroupLayout panelLayout = new GroupLayout(panel);
@@ -147,7 +147,7 @@ public class GUITeacher extends javax.swing.JFrame {
         panel.setBackground(new Color(217, 237, 247));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // Información del usuario
+        // Informacion del usuario
         lblWelcome = new JLabel("Bienvenido Docente");
         lblWelcome.setFont(new Font("Arial", Font.BOLD, 16));
         lblWelcome.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -158,8 +158,8 @@ public class GUITeacher extends javax.swing.JFrame {
         lblCareer = new JLabel("Departamento: ");
         lblCareer.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        // Botones de menú
-        btnUserMenu = new JButton("Menú de Usuario");
+        // Botones de menu
+        btnUserMenu = new JButton("Menu de Usuario");
         btnUserMenu.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnUserMenu.setMaximumSize(new Dimension(150, 35));
         
@@ -168,7 +168,7 @@ public class GUITeacher extends javax.swing.JFrame {
         cmbRole.setMaximumSize(new Dimension(150, 35));
         cmbRole.setEnabled(false); // Solo lectura
         
-        btnLogout = new JButton("Cerrar Sesión");
+        btnLogout = new JButton("Cerrar Sesion");
         btnLogout.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLogout.setMaximumSize(new Dimension(150, 35));
         
@@ -202,7 +202,7 @@ public class GUITeacher extends javax.swing.JFrame {
         return panel;
     }
     
-    // Métodos públicos para que el controller pueda interactuar con la vista
+    // Metodos publicos para que el controller pueda interactuar con la vista
     public JButton getBtnUserMenu() {
         return btnUserMenu;
     }
@@ -227,7 +227,7 @@ public class GUITeacher extends javax.swing.JFrame {
     
     // Main method mejorado
     public static void main(String[] args) {
-            // Opción 1: Look and Feel específico
+            // Opcion 1: Look and Feel específico
         try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (Exception ex) {
