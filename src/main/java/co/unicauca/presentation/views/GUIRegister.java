@@ -70,7 +70,7 @@ public class GUIRegister extends javax.swing.JFrame{
         headerPanel.setPreferredSize(new Dimension(900, 150)); // Aumentado de 120 a 150
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
         
-        // Botón de volver (izquierda)
+        // Boton de volver (izquierda)
         btnBackLogin = new JButton("Volver al Login");
         btnBackLogin.setBackground(new Color(217, 237, 247));
         btnBackLogin.setForeground(new Color(15, 78, 151));
@@ -173,7 +173,7 @@ public class GUIRegister extends javax.swing.JFrame{
         panel.setPreferredSize(new Dimension(500, 600)); // Reducido de 650 para menos espacio
         panel.setBackground(white);
         
-        // Usar BoxLayout para disposición vertical más simple
+        // Usar BoxLayout para disposicion vertical mas simple
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         
         // Título del formulario
@@ -188,11 +188,19 @@ public class GUIRegister extends javax.swing.JFrame{
         panel.add(createFieldPanel("Nombres*", txtName = new JTextField(20)));
         panel.add(Box.createRigidArea(new Dimension(0, 8)));
         panel.add(createFieldPanel("Apellidos*", txtSurname = new JTextField(20)));
+<<<<<<< HEAD
         panel.add(Box.createRigidArea(new Dimension(0, 8)));
         panel.add(createFieldPanel("Teléfono", txtPhone = new JTextField(20)));
         panel.add(Box.createRigidArea(new Dimension(0, 8)));
         panel.add(createFieldPanel("Correo electrónico*", txtEmail = new JTextField(20)));
         panel.add(Box.createRigidArea(new Dimension(0, 8)));
+=======
+        panel.add(Box.createRigidArea(new Dimension(0, 8))); // Reducido de 10
+        panel.add(createFieldPanel("Telefono*", txtPhone = new JTextField(20)));
+        panel.add(Box.createRigidArea(new Dimension(0, 8))); // Reducido de 10
+        panel.add(createFieldPanel("Correo electronico*", txtEmail = new JTextField(20)));
+        panel.add(Box.createRigidArea(new Dimension(0, 8))); // Reducido de 10
+>>>>>>> bf7d846 (Migración completa a Spring Boot)
         panel.add(createFieldPanel("Contraseña*", txtPassword = new JPasswordField(20)));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         
@@ -200,7 +208,7 @@ public class GUIRegister extends javax.swing.JFrame{
         panel.add(createCareerRolePanel());
         panel.add(Box.createRigidArea(new Dimension(0, 15)));
         
-        // Botón de registro 
+        // Boton de registro 
         btnRegister = new JButton("Registrarse");
         btnRegister.setBackground(lightBlue);
         btnRegister.setForeground(darkBlue);
@@ -238,9 +246,9 @@ public class GUIRegister extends javax.swing.JFrame{
         if (labelText.equals("Contraseña*")) {
             String tooltipText = "<html>La contraseña debe contener:<br>"
                     + "• Mínimo 6 caracteres<br>"
-                    + "• Al menos un número<br>"
-                    + "• Al menos un carácter especial<br>"
-                    + "• Al menos una mayúscula</html>";
+                    + "• Al menos un numero<br>"
+                    + "• Al menos un caracter especial<br>"
+                    + "• Al menos una mayuscula</html>";
             field.setToolTipText(tooltipText);
             label.setToolTipText(tooltipText);
         }
@@ -337,6 +345,7 @@ public class GUIRegister extends javax.swing.JFrame{
             return false;
         }
         
+<<<<<<< HEAD
         // Validar que el teléfono sea numérico solo si no esta vacio
         String phoneText = txtPhone.getText().trim();
         if(!phoneText.isEmpty()){
@@ -346,6 +355,14 @@ public class GUIRegister extends javax.swing.JFrame{
                 showMessage("El teléfono debe contener solo números", JOptionPane.WARNING_MESSAGE);
                 return false;
             }
+=======
+        // Validar que el telefono sea numerico
+        try {
+            Long.parseLong(txtPhone.getText().trim());
+        } catch (NumberFormatException e) {
+            showMessage("El telefono debe contener solo numeros", JOptionPane.WARNING_MESSAGE);
+            return false;
+>>>>>>> bf7d846 (Migración completa a Spring Boot)
         }
         return true;
     }

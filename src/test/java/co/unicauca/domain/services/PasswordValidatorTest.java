@@ -9,8 +9,8 @@ class PasswordValidatorTest {
     void validAndInvalidPasswords() {
         PasswordValidator v = new PasswordValidator();
         assertTrue(v.isValid("Abcdef1!"));
-        assertFalse(v.isValid("short1!"));      // falta mayúscula
-        assertFalse(v.isValid("Noupper1!".toLowerCase())); // falta mayúscula
+        assertFalse(v.isValid("short1!"));      // falta mayuscula
+        assertFalse(v.isValid("Noupper1!".toLowerCase())); // falta mayuscula
         assertFalse(v.isValid("NoDigit!!"));    // falta dígito
         assertFalse(v.isValid("NoSpecial12"));  // falta especial
     }

@@ -17,7 +17,7 @@ public class GUIStudent extends javax.swing.JFrame {
         setupWindowProperties();
     }
     private void setupWindowProperties() {
-        setTitle("Sistema de Gestión - Estudiante");
+        setTitle("Sistema de Gestion - Estudiante");
         setLocationRelativeTo(null); // Centrar en pantalla
         setResizable(true);
     }
@@ -27,7 +27,7 @@ public class GUIStudent extends javax.swing.JFrame {
         JPanel headerPanel = createHeaderPanel();
         JPanel sidebarPanel = createSidebarPanel();
         pnlContent = createContentPanel();
-        // Configuración del layout principal
+        // Configuracion del layout principal
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setBackground(new Color(240, 240, 240)); 
         GroupLayout layout = new GroupLayout(getContentPane());
@@ -78,14 +78,14 @@ public class GUIStudent extends javax.swing.JFrame {
             lblLogo.setBackground(Color.WHITE);
             lblLogo.setText("LOGO");
             lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
-            logger.warning("No se encontró la imagen del logo en: images/Logo-unicauca.png");
+            logger.warning("No se encontro la imagen del logo en: images/Logo-unicauca.png");
             }  
         }catch(Exception e){
             lblLogo.setOpaque(true);
             lblLogo.setBackground(Color.WHITE);
             lblLogo.setText("LOGO");
             lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
-            logger.warning("No se encontró la imagen del logo en: images/Logo-unicauca.png");
+            logger.warning("No se encontro la imagen del logo en: images/Logo-unicauca.png");
         }
         // Textos de la universidad
         JLabel lblUniversity1 = new JLabel("Universidad");
@@ -94,7 +94,7 @@ public class GUIStudent extends javax.swing.JFrame {
         JLabel lblUniversity2 = new JLabel("del Cauca");
         lblUniversity2.setFont(new Font("Sylfaen", Font.PLAIN, 24));
         lblUniversity2.setForeground(Color.WHITE);
-        JLabel lblTitle = new JLabel("Gestión del Proceso de Trabajo de Grado");
+        JLabel lblTitle = new JLabel("Gestion del Proceso de Trabajo de Grado");
         lblTitle.setFont(new Font("Baskerville Old Face", Font.BOLD, 24));
         lblTitle.setForeground(Color.WHITE);
         GroupLayout panelLayout = new GroupLayout(panel);
@@ -135,7 +135,7 @@ public class GUIStudent extends javax.swing.JFrame {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(new Color(217, 237, 247));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        // Información del estudiante
+        // Informacion del estudiante
         lblWelcome = new JLabel("Bienvenido Estudiante");
         lblWelcome.setFont(new Font("Arial", Font.BOLD, 16));
         lblWelcome.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -143,10 +143,10 @@ public class GUIStudent extends javax.swing.JFrame {
         lblEmail.setAlignmentX(Component.CENTER_ALIGNMENT); 
         lblCareer = new JLabel("Carrera: ");
         lblCareer.setAlignmentX(Component.CENTER_ALIGNMENT); 
-        lblStudentId = new JLabel("Código: ");
+        lblStudentId = new JLabel("Codigo: ");
         lblStudentId.setAlignmentX(Component.CENTER_ALIGNMENT);
-        // Botones de menú
-        btnUserMenu = new JButton("Menú de Usuario");
+        // Botones de menu
+        btnUserMenu = new JButton("Menu de Usuario");
         btnUserMenu.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnUserMenu.setMaximumSize(new Dimension(150, 35));
         btnMyProjects = new JButton("Mis Proyectos");
@@ -156,7 +156,7 @@ public class GUIStudent extends javax.swing.JFrame {
         cmbRole.setAlignmentX(Component.CENTER_ALIGNMENT);
         cmbRole.setMaximumSize(new Dimension(150, 35));
         cmbRole.setEnabled(false); // Solo lectura
-        btnLogout = new JButton("Cerrar Sesión");
+        btnLogout = new JButton("Cerrar Sesion");
         btnLogout.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLogout.setMaximumSize(new Dimension(150, 35));
         // Espaciado entre componentes
@@ -194,7 +194,7 @@ public class GUIStudent extends javax.swing.JFrame {
         JButton btnViewProjects = new JButton("Ver Proyectos Disponibles");
         JButton btnMyApplications = new JButton("Mis Postulaciones");
         JButton btnUploadDocuments = new JButton("Subir Documentos");
-        JButton btnAcademicProgress = new JButton("Progreso Académico");  
+        JButton btnAcademicProgress = new JButton("Progreso Academico");  
         studentContent.add(btnViewProjects);
         studentContent.add(btnMyApplications);
         studentContent.add(btnUploadDocuments);
@@ -217,7 +217,7 @@ public class GUIStudent extends javax.swing.JFrame {
         lblWelcome.setText("Bienvenido: " + name);
         lblEmail.setText("Email: " + email);
         lblCareer.setText("Carrera: " + career);
-        lblStudentId.setText("Código: " + (studentId != null ? studentId : "No asignado"));
+        lblStudentId.setText("Codigo: " + (studentId != null ? studentId : "No asignado"));
     }
     public void setLogoutAction(Runnable action) {
         getBtnLogout().addActionListener(e -> action.run());

@@ -2,7 +2,7 @@ package co.unicauca.infrastructure.validation;
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.exceptions.UserException;
 import co.unicauca.domain.exceptions.UserExceptionEnum;
-import co.unicauca.infrastructure.dependency_injection.Service;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserValidation implements iValidator {   
@@ -13,26 +13,26 @@ public class UserValidation implements iValidator {
     }
     @Override
     public void validate(User prmModel) throws UserException {
-        System.out.println("=== INICIO VALIDACIÓN ===");
-        System.out.println("Creando nueva excepción...");
+        System.out.println("=== INICIO VALIDACIoN ===");
+        System.out.println("Creando nueva excepcion...");
         atrException = new UserException();
 
         System.out.println("Mensajes iniciales: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
 
         validateNames(prmModel);
-        System.out.println("Después de validar nombres: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+        System.out.println("Despues de validar nombres: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
 
         validateSurnames(prmModel);
-        System.out.println("Después de validar apellidos: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+        System.out.println("Despues de validar apellidos: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
 
         validateEmail(prmModel);
-        System.out.println("Después de validar email: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+        System.out.println("Despues de validar email: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
 
         validatePassword(prmModel);
-        System.out.println("Después de validar contraseña: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+        System.out.println("Despues de validar contraseña: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
 
         validateTelephone(prmModel);
-        System.out.println("Después de validar teléfono: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
+        System.out.println("Despues de validar telefono: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
 
         System.out.println("Mensajes finales: " + (atrException.getMessage() == null ? "null" : atrException.getMessage()));
 
@@ -108,6 +108,7 @@ public class UserValidation implements iValidator {
             hasError = true;
         }
     }
+<<<<<<< HEAD
     public void validateTelephone(User prmUser)
     {
         // Si el teléfono es null, es válido (campo opcional)
@@ -118,6 +119,13 @@ public class UserValidation implements iValidator {
         if(prmUser.getTelephone() <= 0)
         {
             atrException.addExceptionMessage(UserExceptionEnum.TELEPHONE, "Debe ser positivo");
+=======
+    public void validateTelephone(User prmUser) {
+        if (prmUser.getTelephone() != null) {
+            if(prmUser.getTelephone() <= 0) {
+                atrException.addExceptionMessage( UserExceptionEnum.TELEPHONE,"Debe ser un número positivo");
+            }
+>>>>>>> bf7d846 (Migración completa a Spring Boot)
         }
     }
 }

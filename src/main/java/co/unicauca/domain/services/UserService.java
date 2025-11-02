@@ -1,19 +1,21 @@
 package co.unicauca.domain.services;
+
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.repositories.UserRepository;
 import co.unicauca.domain.exceptions.UserException;
-import co.unicauca.domain.exceptions.UserExceptionEnum;
-import co.unicauca.infrastructure.dependency_injection.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import co.unicauca.infrastructure.security.iEncryptor;
 import co.unicauca.infrastructure.validation.iValidator;
-import co.unicauca.infrastructure.dependency_injection.FactoryAutowired;
-@Controller//userService debe ser controller para que funcione
+import co.unicauca.domain.exceptions.UserExceptionEnum;
+
+@Service
 public class UserService {
-    @FactoryAutowired
+    @Autowired
     private UserRepository userRepository;
-    @FactoryAutowired
+    @Autowired
     private iValidator userValidator;
-    @FactoryAutowired
+    @Autowired
     private iEncryptor encryptor;
     public User registerUser(User user) throws UserException {
         if (user == null) {
@@ -24,7 +26,7 @@ public class UserService {
         } catch (UserException ex) {
             throw ex;
         } catch (Exception ex) {
-            UserException.throwException(UserExceptionEnum.NAMES, "Error de validación: " + ex.getMessage());
+            UserException.throwException(UserExceptionEnum.NAMES, "Error de validacion: " + ex.getMessage());
         }
         if (userRepository.findByEmail(user.getEmail()) != null) {// Verificar que no exista
             UserException.throwException(UserExceptionEnum.EMAIL, "El usuario ya existe");
@@ -44,7 +46,7 @@ public class UserService {
         try {
             User user = userRepository.findByEmail(email);
             
-            System.out.println("📦 Resultado búsqueda: " + (user != null ? "ENCONTRADO" : "NO ENCONTRADO"));
+            System.out.println("📦 Resultado busqueda: " + (user != null ? "ENCONTRADO" : "NO ENCONTRADO"));
             if (user != null) {
                 System.out.println("   Nombre: " + user.getNames());
                 System.out.println("   Email: " + user.getEmail());

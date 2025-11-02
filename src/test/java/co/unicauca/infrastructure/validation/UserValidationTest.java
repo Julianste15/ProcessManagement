@@ -13,13 +13,13 @@ class UserValidationTest {
     void invalidUserThrowsException() {
         UserValidation v = new UserValidation();
         User u = new User();
-        // Usuario vacio debería generar errores de validación
+        // Usuario vacio debería generar errores de validacion
         assertThrows(UserException.class, () -> v.validate(u));
     }
     @Test
     void minimalValidUserPasses() {
         UserValidation v = new UserValidation();
-        User u = new User(1L, "Ana", "Pérez", "ana@unicauca.edu.co",
+        User u = new User(1L, "Ana", "Perez", "ana@unicauca.edu.co",
                 "Abcdef1!", 3100000000L, Career.SYSTEMS_ENGINEERING, Role.STUDENT);
         assertDoesNotThrow(() -> v.validate(u));
     }
