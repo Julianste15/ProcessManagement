@@ -3,7 +3,6 @@ import co.unicauca.domain.entities.User;
 import co.unicauca.domain.exceptions.UserException;
 import co.unicauca.domain.exceptions.UserExceptionEnum;
 import org.springframework.stereotype.Service;
-
 @Service
 public class UserValidation implements iValidator {   
     private UserException atrException;

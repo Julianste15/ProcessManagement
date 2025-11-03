@@ -1,19 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package co.unicauca.infrastructure.events;
-
 import co.unicauca.domain.entities.FormatoA;
 import co.unicauca.domain.ports.IFormatoAEventPublisher;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-/**
- *
- * @author AN515-54-55MX
- */
 @Service
 public class FormatoAEventPublisherImpl implements IFormatoAEventPublisher {
     // Constantes de configuración de RabbitMQ

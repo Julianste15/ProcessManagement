@@ -1,26 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package co.unicauca.infrastructure.persistence;
-
 import org.springframework.stereotype.Repository;
 import co.unicauca.domain.entities.FormatoA;
 import co.unicauca.domain.entities.EstadoProyecto;
 import co.unicauca.domain.entities.Modalidad;
 import co.unicauca.domain.repositories.IFormatoARepository;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.Optional;
-
-/**
- *
- * @author AN515-54-55MX
- */
 @Repository
 public class FormatoARepositoryImpl implements IFormatoARepository {
     private final SQLiteConnection db;

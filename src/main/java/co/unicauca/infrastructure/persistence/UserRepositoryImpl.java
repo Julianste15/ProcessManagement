@@ -1,5 +1,4 @@
 package co.unicauca.infrastructure.persistence;
-
 import org.springframework.stereotype.Repository;
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.enums.Career;

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package co.unicauca.infrastructure.events;
 
 import org.springframework.amqp.core.Binding;
@@ -13,10 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 
-/**
- *
- * @author AN515-54-55MX
- */
 @Configuration
 public class RabbitMQConfig {
     // 1. Definimos los mismos nombres que usamos en el Publicador

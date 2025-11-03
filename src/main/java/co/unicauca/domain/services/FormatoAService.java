@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package co.unicauca.domain.services;
 
 import co.unicauca.domain.entities.EstadoProyecto;
@@ -13,10 +9,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Optional;
 
-/**
- *
- * @author AN515-54-55MX
- */
 @Service
 public class FormatoAService {
     private final IFormatoARepository repository;

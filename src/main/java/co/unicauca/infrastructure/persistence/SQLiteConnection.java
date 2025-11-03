@@ -1,5 +1,4 @@
 package co.unicauca.infrastructure.persistence;
-
 import java.sql.*;
 public class SQLiteConnection{
     private static final String URL = "jdbc:sqlite:university.db";
