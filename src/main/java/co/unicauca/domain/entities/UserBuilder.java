@@ -18,7 +18,7 @@ public class UserBuilder {
         return this;
     }
     public UserBuilder withEmail(String email) {
-        if (!isValidEmail(email)) throw new IllegalArgumentException("Email inválido");
+        if (!isValidEmail(email)) throw new IllegalArgumentException("Email invalido");
         this.email = email;
         return this;
     }

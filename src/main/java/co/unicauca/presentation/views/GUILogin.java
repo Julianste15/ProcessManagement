@@ -20,7 +20,7 @@ public class GUILogin extends javax.swing.JFrame {
     }
     
     private void setupWindowProperties() {
-        setTitle("Inicio de Sesión - Universidad del Cauca");
+        setTitle("Inicio de Sesion - Universidad del Cauca");
         setLocationRelativeTo(null); // Centrar en pantalla
         setResizable(false);
         setIconImage(createAppIcon()); // Opcional: agregar icono
@@ -62,10 +62,10 @@ public class GUILogin extends javax.swing.JFrame {
         panel.setBackground(new Color(245, 245, 245));
         panel.setPreferredSize(new Dimension(400, 450));
         
-        // Usar BoxLayout para disposición vertical
+        // Usar BoxLayout para disposicion vertical
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         
-        // Logo/Icono de la aplicación
+        // Logo/Icono de la aplicacion
         JLabel lblIcon = createAppIconLabel();
         lblIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(lblIcon);
@@ -78,7 +78,7 @@ public class GUILogin extends javax.swing.JFrame {
         lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(lblTitle);
         
-        JLabel lblSubtitle = new JLabel("Sistema de Gestión de Trabajos de Grado");
+        JLabel lblSubtitle = new JLabel("Sistema de Gestion de Trabajos de Grado");
         lblSubtitle.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblSubtitle.setForeground(Color.DARK_GRAY);
         lblSubtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -134,7 +134,7 @@ public class GUILogin extends javax.swing.JFrame {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
         panel.setBackground(new Color(245, 245, 245));
         
-        JLabel lblEmail = new JLabel("Correo electrónico*");
+        JLabel lblEmail = new JLabel("Correo electronico*");
         lblEmail.setPreferredSize(new Dimension(120, 20));
         
         JLabel lblRequired1 = new JLabel("*");
@@ -181,7 +181,7 @@ public class GUILogin extends javax.swing.JFrame {
         Color darkBlue = new Color(15, 78, 151);
         Color lightBlue = new Color(217, 237, 247);
         Color white = Color.WHITE;
-        // Botón Registrarse - Estilo secundario
+        // Boton Registrarse - Estilo secundario
         btnRegister = new JButton("Registrarse");
         btnRegister.setBackground(lightBlue); 
         btnRegister.setForeground(darkBlue);
@@ -190,8 +190,8 @@ public class GUILogin extends javax.swing.JFrame {
         btnRegister.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         btnRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // Botón Iniciar Sesión - Estilo primario
-        btnLogin = new JButton("Iniciar Sesión");
+        // Boton Iniciar Sesion - Estilo primario
+        btnLogin = new JButton("Iniciar Sesion");
         btnLogin.setBackground(lightBlue);
         btnLogin.setForeground(darkBlue);
         btnLogin.setPreferredSize(new Dimension(120, 30));
@@ -205,7 +205,7 @@ public class GUILogin extends javax.swing.JFrame {
         return panel;
     }
     
-    // Métodos públicos para acceso del controller
+    // Metodos publicos para acceso del controller
     public JTextField getFieldEmail() { return txtEmail; }
     public JPasswordField getFieldPassword() { return txtPassword; }
     public JButton getButtonRegister() { return btnRegister; }
@@ -242,16 +242,16 @@ public class GUILogin extends javax.swing.JFrame {
     }
     
     public void showMessage(String message, int messageType) {
-        String title = "Inicio de Sesión";
+        String title = "Inicio de Sesion";
         switch (messageType) {
             case JOptionPane.ERROR_MESSAGE:
-                title = "Error de Autenticación";
+                title = "Error de Autenticacion";
                 break;
             case JOptionPane.WARNING_MESSAGE:
                 title = "Advertencia";
                 break;
             case JOptionPane.INFORMATION_MESSAGE:
-                title = "Éxito";
+                title = "exito";
                 break;
         }
         JOptionPane.showMessageDialog(this, message, title, messageType);
@@ -260,7 +260,7 @@ public class GUILogin extends javax.swing.JFrame {
     public void setLoginAction(Runnable action) {
         btnLogin.addActionListener(e -> action.run());
         
-        // También permitir login con Enter en el campo de contraseña
+        // Tambien permitir login con Enter en el campo de contraseña
         txtPassword.addActionListener(e -> action.run());
     }
     

@@ -22,7 +22,7 @@ public abstract class ModelException extends Exception {
         for(String exceptionMessage : atrExceptionMessages) {
             varMessage.append(exceptionMessage).append("\n");
         }
-        return varMessage.toString().trim(); // Eliminar el último \n
+        return varMessage.toString().trim(); // Eliminar el ultimo \n
     }
     public void addExceptionMessage(iFieldEnum prmField, String prmMessage) {
         if(atrExceptionMessages == null) {
@@ -30,7 +30,7 @@ public abstract class ModelException extends Exception {
         }
         atrExceptionMessages.add("El campo " + prmField.getFieldName() + ": " + prmMessage);
     }
-    // Método para limpiar mensajes previos
+    // Metodo para limpiar mensajes previos
     public void clearMessages() {
         if (atrExceptionMessages != null) {
             atrExceptionMessages.clear();

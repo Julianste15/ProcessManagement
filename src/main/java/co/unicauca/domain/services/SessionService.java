@@ -1,21 +1,22 @@
 package co.unicauca.domain.services;
+
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.exceptions.UserException;
 import co.unicauca.domain.exceptions.UserExceptionEnum;
-import co.unicauca.infrastructure.dependency_injection.Service;
-import co.unicauca.infrastructure.dependency_injection.FactoryAutowired;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import co.unicauca.infrastructure.security.iEncryptor;
 @Service
 public class SessionService {
-    @FactoryAutowired
+    @Autowired
     private UserService userService;
-    @FactoryAutowired
+    @Autowired
     private iEncryptor encryptor;
     private User currentUser;
     public SessionService() {
         System.out.println("SessionService creado como Service");
     }
-    // Constructor manual (para inyección garantizada)
+    @Autowired
     public SessionService(UserService userService, iEncryptor encryptor) {
         this.userService = userService;
         this.encryptor = encryptor;
@@ -25,15 +26,15 @@ public class SessionService {
         System.out.println("=== INICIO LOGIN ===");
         System.out.println("Email: " + email);
         
-        // Validar que las dependencias estén inyectadas
+        // Validar que las dependencias esten inyectadas
         if (userService == null) {
             throw new UserException(UserExceptionEnum.EMAIL, 
-                "Error de configuración: UserService no está disponible");
+                "Error de configuracion: UserService no esta disponible");
         }
         
         if (encryptor == null) {
             throw new UserException(UserExceptionEnum.EMAIL, 
-                "Error de configuración: Encryptor no está disponible");
+                "Error de configuracion: Encryptor no esta disponible");
         }
         
         if (email == null || password == null) {

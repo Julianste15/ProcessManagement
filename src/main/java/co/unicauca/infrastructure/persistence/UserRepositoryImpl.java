@@ -1,14 +1,14 @@
 package co.unicauca.infrastructure.persistence;
 
+import org.springframework.stereotype.Repository;
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.enums.Career;
 import co.unicauca.domain.enums.Role;
 import co.unicauca.domain.repositories.UserRepository;
-import co.unicauca.infrastructure.dependency_injection.RepositoryFactory;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-@RepositoryFactory
+@Repository
 public class UserRepositoryImpl implements UserRepository {
     private final SQLiteConnection db;
     public UserRepositoryImpl() {

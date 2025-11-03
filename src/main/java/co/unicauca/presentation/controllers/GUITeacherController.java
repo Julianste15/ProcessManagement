@@ -1,9 +1,10 @@
 package co.unicauca.presentation.controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.enums.Role;
 import co.unicauca.domain.services.SessionService;
-import co.unicauca.infrastructure.dependency_injection.Controller;
-import co.unicauca.infrastructure.dependency_injection.ControllerAutowired;
 import co.unicauca.presentation.observer.ObservableBase;
 import co.unicauca.presentation.views.GUITeacher;
 import co.unicauca.presentation.observer.iObserver;
@@ -11,18 +12,23 @@ import java.awt.EventQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-@Controller
+
+@Component
 public class GUITeacherController extends ObservableBase implements iObserver {
-    private static final Logger logger = Logger.getLogger(GUIStudentController.class.getName());
+    private static final Logger logger = Logger.getLogger(GUITeacherController.class.getName());
     private GUITeacher view;
     private User currentTeacher;
-    @ControllerAutowired
-    private SessionService sessionService;
-    @ControllerAutowired
-    private GUILoginController loginController;
-    public GUITeacherController() {
-        // La vista se crea cuando se necesita
+
+    private final SessionService sessionService;
+    private final GUILoginController loginController;
+
+    @Autowired
+    public GUITeacherController(SessionService sessionService, GUILoginController loginController) {
+        this.sessionService = sessionService;
+        this.loginController = loginController;
+        logger.info("TeacherController constructor llamado e inyectado por Spring");
     }
+
     private void initializeView() {
         if (view == null) {
             try {
@@ -35,6 +41,7 @@ public class GUITeacherController extends ObservableBase implements iObserver {
             }
         }
     }
+
     private void setupEventHandlers() {
         try {
             view.setLogoutAction(this::handleLogout);
@@ -44,9 +51,10 @@ public class GUITeacherController extends ObservableBase implements iObserver {
             logger.log(Level.SEVERE, "Error configurando event handlers", e);
         }
     }
+
     @Override
     public void validateNotification(ObservableBase subject, Object model) {
-        logger.info("TeacherController recibió notificación");
+        logger.info("TeacherController recibio notificacion");
         
         if (model instanceof User) {
             User user = (User) model;
@@ -77,6 +85,7 @@ public class GUITeacherController extends ObservableBase implements iObserver {
             logger.warning("Model recibido no es User: " + (model != null ? model.getClass() : "null"));
         }
     }
+
     private void loadTeacherData(User teacher) {
         try {
             view.setUserInfo(
@@ -89,68 +98,66 @@ public class GUITeacherController extends ObservableBase implements iObserver {
             logger.log(Level.SEVERE, "Error cargando datos de profesor", e);
         }
     }
+
     private void handleLogout() {
         try {
             int option = JOptionPane.showConfirmDialog(
                 view, 
-                "¿Está seguro que desea cerrar sesión?", 
-                "Confirmar cierre de sesión", 
+                "¿Esta seguro que desea cerrar sesion?", 
+                "Confirmar cierre de sesion", 
                 JOptionPane.YES_NO_OPTION
             );
             
             if (option == JOptionPane.YES_OPTION) {
-                logger.info("Cerrando sesión de profesor: " + currentTeacher.getNames());
+                logger.info("Cerrando sesion de profesor: " + currentTeacher.getNames());
                 
-                // 1. Cerrar sesión en el servicio
                 if (sessionService != null) {
                     sessionService.logout();
                 } else {
                     logger.warning("SessionService es null durante logout");
                 }
                 
-                // 2. Cerrar vista actual
                 if (view != null) {
                     view.setVisible(false);
                     view.dispose();
                     view = null;
                 }
                 
-                // 3. Limpiar datos
                 currentTeacher = null;
                 
-                // 4. Volver al login - OPCIÓN 1: Notificar al login controller
                 if (loginController != null) {
                     logger.info("Notificando a LoginController para volver al login");
                     loginController.showLogin();
                 } 
                 
-                logger.info("Sesión de profesor cerrada exitosamente");
+                logger.info("Sesion de profesor cerrada exitosamente");
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error durante logout de profesor", e);
             JOptionPane.showMessageDialog(
                 view, 
-                "Error al cerrar sesión: " + e.getMessage(),
+                "Error al cerrar sesion: " + e.getMessage(),
                 "Error", 
                 JOptionPane.ERROR_MESSAGE
             );
         }
     }
+
     private void handleUserMenu() {
         try {
             JOptionPane.showMessageDialog(
                 view, 
-                "Menú de usuario del docente: " + (currentTeacher != null ? currentTeacher.getNames() : "N/A"),
-                "Menú de Usuario", 
+                "Menu de usuario del docente: " + (currentTeacher != null ? currentTeacher.getNames() : "N/A"),
+                "Menu de Usuario", 
                 JOptionPane.INFORMATION_MESSAGE
             );
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error en menú de usuario", e);
+            logger.log(Level.SEVERE, "Error en menu de usuario", e);
         }
     }
 
     @Override
     public void observersLoader() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        logger.warning("observersLoader() no implementado en GUITeacherController.");
     }
 }

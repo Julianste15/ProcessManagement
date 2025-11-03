@@ -23,14 +23,14 @@ public class UserException extends ModelException {
             return;
         }
         
-        // Crear una NUEVA excepción con solo los mensajes actuales
+        // Crear una NUEVA excepcion con solo los mensajes actuales
         UserException newException = new UserException();
         // Copiar los mensajes actuales
         if (this.atrExceptionMessages != null) {
             newException.setExceptionMessages(new LinkedList<>(this.atrExceptionMessages));
         }
         
-        throw newException; // Lanzar la nueva excepción limpia
+        throw newException; // Lanzar la nueva excepcion limpia
     }
     public static void throwException(UserExceptionEnum prmField, String prmMessage) throws UserException
     {
