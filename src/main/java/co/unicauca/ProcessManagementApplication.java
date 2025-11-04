@@ -7,8 +7,15 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.awt.EventQueue;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
+@ComponentScan(basePackages = {
+    "co.unicauca.config",
+    "co.unicauca.domain.services",
+    "co.unicauca.presentation.controllers",
+    "co.unicauca.domain.repositories"
+})
 public class ProcessManagementApplication {
 
     public static void main(String[] args) {
