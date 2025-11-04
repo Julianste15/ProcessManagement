@@ -6,43 +6,79 @@ spring:
     name: gateway-service
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
+      globalcors:
+        cors-configurations:
+          '[/**]': # Aplica a todas las rutas
+            allowed-origins: "http://localhost:5173" # Tu frontend
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowed-headers: "*"
+            allow-credentials: true
+            
+      # --- RUTAS CORREGIDAS ---
       routes:
-        - id: auth-service
-          uri: lb://auth-service
+        # ---
+        # 1. RUTAS PÚBLICAS (Login y Registro)
+        #    Estas rutas NO tienen el "AuthenticationFilter"
+        # ---
+        - id: auth-service-public
+          uri: lb://AUTH-SERVICE  # Corregido a MAYÚSCULAS
           predicates:
+            - Path=/api/auth/login
+          filters:
+            - LoggingFilter
+            
+        - id: user-service-public
+          uri: lb://USER-SERVICE  # Corregido a MAYÚSCULAS
+          predicates:
+            - Path=/api/users/register
+          filters:
+            - LoggingFilter
+
+        # ---
+        # 2. RUTAS PROTEGIDAS (Resto de la API)
+        #    Estas rutas SÍ tienen "AuthenticationFilter"
+        # ---
+        - id: auth-service-protected
+          uri: lb://AUTH-SERVICE  # Corregido a MAYÚSCULAS
+          predicates:
+            # Protege cualquier otra ruta de /api/auth/ (ej: /validate, /logout)
             - Path=/api/auth/**
           filters:
             - AuthenticationFilter
             - LoggingFilter
             
         - id: user-service-protected
-          uri: lb://user-service
+          uri: lb://USER-SERVICE  # Corregido a MAYÚSCULAS
           predicates:
+            # Protege cualquier otra ruta de /api/users/ (ej: /profile, /all)
             - Path=/api/users/**
           filters:
-            - AuthenticationFilter  # ¡PROTEGIDO!
+            - AuthenticationFilter
             - LoggingFilter
             
         - id: evaluation-service
-          uri: lb://evaluation-service
+          uri: lb://EVALUATION-SERVICE # Corregido a MAYÚSCULAS (asumo)
           predicates:
             - Path=/api/evaluations/**,/api/evaluation-assignments/**
           filters:
             - AuthenticationFilter
             - LoggingFilter
+            
         - id: format-a-service
-          uri: lb://format-a-service
+          uri: lb://FORMAT-A-SERVICE # Corregido a MAYÚSCULAS (asumo)
           predicates:
             - Path=/api/format-a/**
           filters:
             - AuthenticationFilter
             - LoggingFilter
+            
         - id: anteproject-service
-          uri: lb://anteproject-service
+          uri: lb://ANTEPROJECT-SERVICE # Corregido a MAYÚSCULAS (asumo)
           predicates:
             - Path=/api/anteprojects/**
           filters:
@@ -60,3 +96,4 @@ jwt:
 logging:
   level:
     co.unicauca.gateway: DEBUG
+
