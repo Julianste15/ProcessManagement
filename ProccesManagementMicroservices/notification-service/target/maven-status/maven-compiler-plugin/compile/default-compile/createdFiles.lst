@@ -1,0 +1,13 @@
+co\unicauca\notification\repository\NotificationTemplateRepository.class
+co\unicauca\notification\consumers\FormatAEventConsumer.class
+co\unicauca\notification\dto\EmailMessage.class
+co\unicauca\notification\consumers\NotificationEventConsumer.class
+co\unicauca\notification\config\RabbitMQConfig.class
+co\unicauca\notification\dto\NotificationRequest.class
+co\unicauca\notification\service\NotificationService.class
+co\unicauca\notification\model\NotificationTemplate.class
+co\unicauca\notification\config\EmailConfig.class
+co\unicauca\notification\controller\NotificationController.class
+co\unicauca\notification\service\TemplateService.class
+co\unicauca\notification\NotificationApplication.class
+co\unicauca\notification\service\EmailServiceSimulado.class

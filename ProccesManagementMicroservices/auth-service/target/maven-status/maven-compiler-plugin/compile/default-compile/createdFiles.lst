@@ -1,0 +1,9 @@
+co\unicauca\auth\config\JwtConfig.class
+co\unicauca\auth\dto\LoginRequest.class
+co\unicauca\auth\service\PasswordValidator.class
+co\unicauca\auth\AuthApplication.class
+co\unicauca\auth\controller\AuthController.class
+co\unicauca\auth\dto\AuthResponse.class
+co\unicauca\auth\service\SessionService.class
+co\unicauca\auth\security\JwtService.class
+co\unicauca\auth\service\AuthService.class

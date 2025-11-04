@@ -1,0 +1,62 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - AuthenticationFilter
+            - LoggingFilter
+            
+        - id: user-service-protected
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - AuthenticationFilter  # ¡PROTEGIDO!
+            - LoggingFilter
+            
+        - id: evaluation-service
+          uri: lb://evaluation-service
+          predicates:
+            - Path=/api/evaluations/**,/api/evaluation-assignments/**
+          filters:
+            - AuthenticationFilter
+            - LoggingFilter
+        - id: format-a-service
+          uri: lb://format-a-service
+          predicates:
+            - Path=/api/format-a/**
+          filters:
+            - AuthenticationFilter
+            - LoggingFilter
+        - id: anteproject-service
+          uri: lb://anteproject-service
+          predicates:
+            - Path=/api/anteprojects/**
+          filters:
+            - AuthenticationFilter
+            - LoggingFilter
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+jwt:
+  secret: mi-clave-secreta-muy-segura-para-el-proyecto-de-grado-2025-fiet-unicauca
+
+logging:
+  level:
+    co.unicauca.gateway: DEBUG
