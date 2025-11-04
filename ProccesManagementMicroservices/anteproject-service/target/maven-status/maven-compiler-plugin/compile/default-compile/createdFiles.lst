@@ -1,0 +1,14 @@
+co\unicauca\anteproject\model\AnteprojectStatus.class
+co\unicauca\anteproject\service\AnteprojectService.class
+co\unicauca\anteproject\model\Anteproject.class
+co\unicauca\anteproject\client\EvaluationServiceClient.class
+co\unicauca\anteproject\dto\AnteprojectDTO.class
+co\unicauca\anteproject\client\FormatAServiceClient.class
+co\unicauca\anteproject\controller\AnteprojectController.class
+co\unicauca\anteproject\dto\CreateAnteprojectRequest.class
+co\unicauca\anteproject\dto\ProgressUpdateDTO.class
+co\unicauca\anteproject\AnteprojectApplication.class
+co\unicauca\anteproject\dto\EvaluationAssignmentRequest.class
+co\unicauca\anteproject\repository\AnteprojectRepository.class
+co\unicauca\anteproject\model\ProjectProgress.class
+co\unicauca\anteproject\repository\ProjectProgressRepository.class

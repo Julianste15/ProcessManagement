@@ -1,0 +1,8 @@
+co\unicauca\evaluation\model\EvaluationAssignment.class
+co\unicauca\evaluation\model\AssignmentStatus.class
+co\unicauca\evaluation\repository\EvaluationRepository.class
+co\unicauca\evaluation\controller\EvaluationAssignmentController.class
+co\unicauca\evaluation\model\Evaluation.class
+co\unicauca\evaluation\service\EvaluationAssignmentService.class
+co\unicauca\evaluation\repository\EvaluationAssignmentRepository.class
+co\unicauca\evaluation\dto\EvaluationAssignmentDTO.class
