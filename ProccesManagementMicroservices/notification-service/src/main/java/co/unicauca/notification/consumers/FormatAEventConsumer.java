@@ -22,7 +22,7 @@ public class FormatAEventConsumer {
     public void handleFormatAEvent(Map<String, Object> eventData) {
         try {
             String eventType = (String) eventData.get("eventType");
-            logger.info("📨 Evento recibido: " + eventType);
+            logger.info("?Evento recibido: " + eventType);
             
             switch (eventType) {
                 case "FORMATO_A_ENVIADO":
@@ -39,7 +39,7 @@ public class FormatAEventConsumer {
             }
             
         } catch (Exception e) {
-            logger.severe("❌ Error procesando evento: " + e.getMessage());
+            logger.severe("Error procesando evento: " + e.getMessage());
         }
     }
     

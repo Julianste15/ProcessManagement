@@ -1,0 +1,26 @@
+/* Estilos para la aplicación JavaFX */
+
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.button {
+    -fx-cursor: hand;
+    -fx-background-radius: 5;
+}
+
+.button:hover {
+    -fx-opacity: 0.9;
+}
+
+.text-field, .password-field, .combo-box {
+    -fx-background-radius: 5;
+    -fx-border-color: #CCCCCC;
+    -fx-border-radius: 5;
+}
+
+.text-field:focused, .password-field:focused {
+    -fx-border-color: #0F4E97;
+    -fx-border-width: 2;
+}
+
