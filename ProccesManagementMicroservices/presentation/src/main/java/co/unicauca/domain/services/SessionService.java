@@ -57,7 +57,26 @@ public class SessionService {
             user.setEmail(responseEmail);
             user.setNames(names);
             user.setSurnames(surnames);
-            user.setRole(Role.fromValue(roleStr));
+            if (roleStr != null) {
+                user.setRole(Role.fromValue(roleStr));
+            }
+            
+            Object requiresFormatAObj = response.get("requiresFormatA");
+            if (requiresFormatAObj instanceof Boolean) {
+                user.setRequiresFormatoA((Boolean) requiresFormatAObj);
+            } else if (requiresFormatAObj != null) {
+                user.setRequiresFormatoA(Boolean.parseBoolean(requiresFormatAObj.toString()));
+            }
+            
+            Object formatoAIdObj = response.get("formatoAId");
+            if (formatoAIdObj instanceof Number) {
+                user.setFormatoAId(((Number) formatoAIdObj).longValue());
+            }
+            
+            Object formatoAEstadoObj = response.get("formatoAEstado");
+            if (formatoAEstadoObj != null) {
+                user.setFormatoAEstado(formatoAEstadoObj.toString());
+            }
             
             this.currentUser = user;
             

@@ -12,6 +12,9 @@ public class User {
     private Long telephone;
     private Career career;
     private Role role;
+    private boolean requiresFormatoA;
+    private Long formatoAId;
+    private String formatoAEstado;
     
     public User() {}
     
@@ -25,6 +28,9 @@ public class User {
         this.telephone = telephone;
         this.career = career;
         this.role = role;
+        this.requiresFormatoA = false;
+        this.formatoAId = null;
+        this.formatoAEstado = null;
     }
     
     // Getters y setters
@@ -51,6 +57,15 @@ public class User {
     
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+    
+    public boolean isRequiresFormatoA() { return requiresFormatoA; }
+    public void setRequiresFormatoA(boolean requiresFormatoA) { this.requiresFormatoA = requiresFormatoA; }
+    
+    public Long getFormatoAId() { return formatoAId; }
+    public void setFormatoAId(Long formatoAId) { this.formatoAId = formatoAId; }
+    
+    public String getFormatoAEstado() { return formatoAEstado; }
+    public void setFormatoAEstado(String formatoAEstado) { this.formatoAEstado = formatoAEstado; }
     
     public String getFullName() {
         return (names != null ? names : "") + " " + (surnames != null ? surnames : "");

@@ -33,7 +33,9 @@ public class UserService {
             registerRequest.put("surnames", user.getSurnames());
             registerRequest.put("email", user.getEmail());
             registerRequest.put("password", user.getPassword());
-            registerRequest.put("telephone", user.getTelephone() != null ? user.getTelephone() : 0L);
+            if (user.getTelephone() != null) {
+                registerRequest.put("telephone", user.getTelephone());
+            }
             registerRequest.put("career", user.getCareer() != null ? user.getCareer().name() : "SYSTEMS_ENGINEERING");
             registerRequest.put("role", user.getRole() != null ? user.getRole().name() : "STUDENT");
             
@@ -84,6 +86,29 @@ public class UserService {
             Object tel = map.get("telephone");
             if (tel != null && tel instanceof Number) {
                 user.setTelephone(((Number) tel).longValue());
+            }
+        }
+        
+        if (map.containsKey("requiresFormatA")) {
+            Object requires = map.get("requiresFormatA");
+            if (requires instanceof Boolean) {
+                user.setRequiresFormatoA((Boolean) requires);
+            } else if (requires != null) {
+                user.setRequiresFormatoA(Boolean.parseBoolean(requires.toString()));
+            }
+        }
+        
+        if (map.containsKey("formatoAId")) {
+            Object formatoId = map.get("formatoAId");
+            if (formatoId instanceof Number) {
+                user.setFormatoAId(((Number) formatoId).longValue());
+            }
+        }
+        
+        if (map.containsKey("formatoAEstado")) {
+            Object estado = map.get("formatoAEstado");
+            if (estado != null) {
+                user.setFormatoAEstado(estado.toString());
             }
         }
         

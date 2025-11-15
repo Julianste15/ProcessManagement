@@ -1,7 +1,9 @@
 package co.unicauca.presentation.views;
 
 import co.unicauca.domain.entities.User;
+import co.unicauca.domain.enums.Role;
 import co.unicauca.presentation.controllers.DashboardController;
+import co.unicauca.domain.services.SessionService;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -19,8 +21,8 @@ public class DashboardView {
     private Button logoutButton;
     private DashboardController controller;
     
-    public DashboardView(Stage stage, User user) {
-        this.controller = new DashboardController(this, stage);
+    public DashboardView(Stage stage, User user, SessionService sessionService) {
+        this.controller = new DashboardController(this, stage, sessionService);
         createUI(user);
     }
     
@@ -65,6 +67,22 @@ public class DashboardView {
         contentText.setWrapText(true);
         
         contentBox.getChildren().addAll(contentTitle, contentText);
+        
+        if (user.getRole() == Role.TEACHER) {
+            Label formatoALabel = new Label();
+            formatoALabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0F4E97; -fx-font-weight: bold;");
+            
+            String estado = user.getFormatoAEstado();
+            if (estado == null || estado.isEmpty()) {
+                estado = user.isRequiresFormatoA() ? "Pendiente de diligenciar" : "Sin información";
+            } else {
+                estado = estado.replace('_', ' ').toLowerCase();
+                estado = estado.substring(0, 1).toUpperCase() + estado.substring(1);
+            }
+            
+            formatoALabel.setText("Estado del Formato A: " + estado);
+            contentBox.getChildren().add(formatoALabel);
+        }
         
         // Logout button
         logoutButton = new Button("Cerrar Sesión");

@@ -1,10 +1,12 @@
 package co.unicauca.presentation.controllers;
 
 import co.unicauca.domain.entities.User;
+import co.unicauca.domain.enums.Role;
 import co.unicauca.domain.services.SessionService;
 import co.unicauca.presentation.views.LoginView;
 import co.unicauca.presentation.views.RegisterView;
 import co.unicauca.presentation.views.DashboardView;
+import co.unicauca.presentation.views.FormatAFormView;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.util.logging.Logger;
@@ -52,7 +54,12 @@ public class LoginController {
             
             if (user != null) {
                 logger.info("Login exitoso para: " + email);
-                showDashboard(user);
+                if (Role.TEACHER.equals(user.getRole()) && user.isRequiresFormatoA()) {
+                    logger.info("Usuario es docente y requiere diligenciar Formato A");
+                    showFormatAForm(user);
+                } else {
+                    showDashboard(user);
+                }
             } else {
                 view.showError("Email o contraseña incorrectos");
             }
@@ -71,11 +78,19 @@ public class LoginController {
     }
     
     private void showDashboard(User user) {
-        DashboardView dashboardView = new DashboardView(stage, user);
+        DashboardView dashboardView = new DashboardView(stage, user, sessionService);
         Scene scene = new Scene(dashboardView.getRoot(), 900, 700);
         scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Dashboard - " + user.getFullName());
+    }
+    
+    private void showFormatAForm(User user) {
+        FormatAFormView formatAFormView = new FormatAFormView(stage, user, sessionService, updatedUser -> showDashboard(updatedUser != null ? updatedUser : user));
+        Scene scene = new Scene(formatAFormView.getRoot(), 900, 750);
+        scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
+        stage.setScene(scene);
+        stage.setTitle("Formato A - " + user.getEmail());
     }
 }
 

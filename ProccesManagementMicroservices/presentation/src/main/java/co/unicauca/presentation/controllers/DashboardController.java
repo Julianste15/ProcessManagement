@@ -13,12 +13,12 @@ import java.util.logging.Logger;
 public class DashboardController {
     private static final Logger logger = Logger.getLogger(DashboardController.class.getName());
     
-    private Stage stage;
-    private SessionService sessionService;
+    private final Stage stage;
+    private final SessionService sessionService;
     
-    public DashboardController(DashboardView view, Stage stage) {
+    public DashboardController(DashboardView view, Stage stage, SessionService sessionService) {
         this.stage = stage;
-        this.sessionService = new SessionService();
+        this.sessionService = sessionService != null ? sessionService : new SessionService();
     }
     
     public void handleLogout() {
