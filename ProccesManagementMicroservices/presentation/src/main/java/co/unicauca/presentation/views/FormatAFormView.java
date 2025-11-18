@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import java.io.File;
 import java.util.function.Consumer;
 
 public class FormatAFormView {
@@ -22,6 +23,8 @@ public class FormatAFormView {
     private TextArea objetivosEspecificosArea;
     private TextField archivoPdfField;
     private Label errorLabel;
+    private File selectedPdfFile;
+    private boolean updatingPdfField;
     private final FormatAController controller;
 
     public FormatAFormView(Stage stage, User user, SessionService sessionService, Consumer<User> onSuccess) {
@@ -105,11 +108,24 @@ public class FormatAFormView {
         objetivosEspecificosArea.setPrefRowCount(5);
 
         // Archivo PDF
-        Label archivoPdfLabel = new Label("Enlace al archivo PDF (opcional)");
+        Label archivoPdfLabel = new Label("Archivo PDF (puedes adjuntar o ingresar una URL)");
         archivoPdfLabel.setStyle("-fx-font-weight: bold;");
         archivoPdfField = new TextField();
-        archivoPdfField.setPromptText("Ingrese una URL o referencia al archivo PDF");
+        archivoPdfField.setPromptText("Selecciona el PDF o ingresa una URL");
         archivoPdfField.setPrefHeight(35);
+        archivoPdfField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (!updatingPdfField) {
+                selectedPdfFile = null;
+            }
+        });
+
+        Button selectPdfButton = new Button("Adjuntar PDF");
+        selectPdfButton.setOnAction(e -> controller.handleSelectPdf());
+        Button clearPdfButton = new Button("Quitar archivo");
+        clearPdfButton.setOnAction(e -> clearSelectedPdfFile());
+
+        HBox archivoPdfBox = new HBox(10, archivoPdfField, selectPdfButton, clearPdfButton);
+        archivoPdfBox.setAlignment(Pos.CENTER_LEFT);
 
         errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
@@ -138,7 +154,7 @@ public class FormatAFormView {
             codirectorLabel, codirectorField,
             objetivoGeneralLabel, objetivoGeneralArea,
             objetivosEspecificosLabel, objetivosEspecificosArea,
-            archivoPdfLabel, archivoPdfField,
+            archivoPdfLabel, archivoPdfBox,
             errorLabel,
             buttonBox
         );
@@ -179,6 +195,21 @@ public class FormatAFormView {
 
     public String getArchivoPdf() {
         return archivoPdfField.getText().trim();
+    }
+
+    public File getSelectedPdfFile() {
+        return selectedPdfFile;
+    }
+
+    public void setSelectedPdfFile(File file) {
+        this.selectedPdfFile = file;
+        updatingPdfField = true;
+        archivoPdfField.setText(file != null ? file.getAbsolutePath() : "");
+        updatingPdfField = false;
+    }
+
+    public void clearSelectedPdfFile() {
+        setSelectedPdfFile(null);
     }
 
     public void showError(String message) {

@@ -5,22 +5,27 @@ spring:
   application:
     name: format-a-service
   datasource:
-    url: jdbc:h2:mem:formatoadb
-    driverClassName: org.h2.Driver
-    username: sa
-    password: password
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: jdbc:postgresql://localhost:5432/formatoadb
+    driverClassName: org.postgresql.Driver
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+  # H2 para desarrollo (comentado, descomentar si necesitas H2)
+  # h2:
+  #   console:
+  #     enabled: true
+  #     path: /h2-console
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   rabbitmq:
     host: localhost
     port: 5672
@@ -54,3 +59,8 @@ logging:
   level:
     co.unicauca.formata: DEBUG
     org.springframework.cloud.openfeign: DEBUG
+
+format-a:
+  storage:
+    path: ./storage/formata
+    max-size-bytes: 5242880
