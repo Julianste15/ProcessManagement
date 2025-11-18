@@ -26,8 +26,10 @@ public class FormatARequest {
      * Contenido del PDF codificado en Base64
      */
     private String archivoPdfContenido;
+    private String cartaAceptacionEmpresaContenido;
+
     public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }    
+    public void setTitulo(String titulo) { this.titulo = titulo; }
     public Modalidad getModalidad() { return modalidad; }
     public void setModalidad(Modalidad modalidad) { this.modalidad = modalidad; }    
     public String getDirectorEmail() { return directorEmail; }
@@ -44,4 +46,7 @@ public class FormatARequest {
     public void setArchivoPdfNombre(String archivoPdfNombre) { this.archivoPdfNombre = archivoPdfNombre; }
     public String getArchivoPdfContenido() { return archivoPdfContenido; }
     public void setArchivoPdfContenido(String archivoPdfContenido) { this.archivoPdfContenido = archivoPdfContenido; }
+
+    public String getCartaAceptacionEmpresaContenido() { return cartaAceptacionEmpresaContenido; }
+    public void setCartaAceptacionEmpresaContenido(String cartaAceptacionEmpresaContenido) { this.cartaAceptacionEmpresaContenido = cartaAceptacionEmpresaContenido; }
 }

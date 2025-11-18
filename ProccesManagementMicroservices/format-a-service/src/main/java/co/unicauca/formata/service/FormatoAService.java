@@ -26,9 +26,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import co.unicauca.formata.exceptions.FormatoAException;
 
 @Service
-public class FormatoAService {    
+public class FormatoAService {
     private static final Logger logger = Logger.getLogger(FormatoAService.class.getName());    
     @Autowired
     private FormatARepository formatoARepository;    
@@ -52,10 +53,10 @@ public class FormatoAService {
     /**
      * Envía un nuevo Formato A
      */
-    public FormatAResponse submitFormatoA(FormatARequest request) {
-        logger.info("Procesando envío de Formato A: " + request.getTitulo());        
+    public FormatAResponse submitFormatoA(FormatARequest request) throws FormatoAException {
+        logger.info("Procesando envío de Formato A: " + request.getTitulo());
         // Validar que el director existe
-        validateUserExists(request.getDirectorEmail());        
+        validateUserExists(request.getDirectorEmail());
         // Validar codirector si existe
         if (request.getCodirectorEmail() != null && !request.getCodirectorEmail().isEmpty()) {
             validateUserExists(request.getCodirectorEmail());

@@ -27,16 +27,25 @@ public class FormatoA {
     @Column(name = "objetivo")
     private List<String> objetivosEspecificos = new ArrayList<>();   
     @Column(name = "archivo_pdf", length = 500)
-    private String archivoPDF;    
+    private String archivoPDF;
+
+    @Column(name = "carta_aceptacion_empresa", length = 500)
+    private String cartaAceptacionEmpresa;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstadoProyecto estado;    
     @Column(nullable = false)
-    private int intentos = 1;    
-    public FormatoA() {}    
-    public FormatoA(String titulo, Modalidad modalidad, LocalDate fechaCreacion, 
-                   String directorEmail, String codirectorEmail, String objetivoGeneral, 
-                   List<String> objetivosEspecificos, String archivoPDF) {
+    private int intentos = 1;
+
+    @Column(name = "carta_aceptacion_empresa", length = 500)
+    private String cartaAceptacionEmpresa;
+
+    public FormatoA() {}
+
+    public FormatoA(String titulo, Modalidad modalidad, LocalDate fechaCreacion,
+                   String directorEmail, String codirectorEmail, String objetivoGeneral,
+                   List<String> objetivosEspecificos, String archivoPDF, String cartaAceptacionEmpresa) {
         this.titulo = titulo;
         this.modalidad = modalidad;
         this.fechaCreacion = fechaCreacion;
@@ -45,6 +54,7 @@ public class FormatoA {
         this.objetivoGeneral = objetivoGeneral;
         this.objetivosEspecificos = objetivosEspecificos;
         this.archivoPDF = archivoPDF;
+        this.cartaAceptacionEmpresa = cartaAceptacionEmpresa;
         this.estado = EstadoProyecto.FORMATO_A_EN_EVALUACION;
         this.intentos = 1;
     }
@@ -65,9 +75,13 @@ public class FormatoA {
     public List<String> getObjetivosEspecificos() { return objetivosEspecificos; }
     public void setObjetivosEspecificos(List<String> objetivosEspecificos) { this.objetivosEspecificos = objetivosEspecificos; }    
     public String getArchivoPDF() { return archivoPDF; }
-    public void setArchivoPDF(String archivoPDF) { this.archivoPDF = archivoPDF; }    
+    public void setArchivoPDF(String archivoPDF) { this.archivoPDF = archivoPDF; }
+
+    public String getCartaAceptacionEmpresa() { return cartaAceptacionEmpresa; }
+    public void setCartaAceptacionEmpresa(String cartaAceptacionEmpresa) { this.cartaAceptacionEmpresa = cartaAceptacionEmpresa; }
+
     public EstadoProyecto getEstado() { return estado; }
-    public void setEstado(EstadoProyecto estado) { this.estado = estado; }    
+    public void setEstado(EstadoProyecto estado) { this.estado = estado; }
     public int getIntentos() { return intentos; }
     public void setIntentos(int intentos) { this.intentos = intentos; }    
     public void incrementarIntentos() {
