@@ -22,6 +22,10 @@ spring:
   #   console:
   #     enabled: true
   #     path: /h2-console
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   rabbitmq:
     host: localhost
     port: 5672
@@ -55,3 +59,8 @@ logging:
   level:
     co.unicauca.formata: DEBUG
     org.springframework.cloud.openfeign: DEBUG
+
+format-a:
+  storage:
+    path: ./storage/formata
+    max-size-bytes: 5242880

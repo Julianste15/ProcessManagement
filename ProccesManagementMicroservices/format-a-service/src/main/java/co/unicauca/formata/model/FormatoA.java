@@ -26,7 +26,7 @@ public class FormatoA {
     @CollectionTable(name = "formato_a_objetivos", joinColumns = @JoinColumn(name = "formato_a_id"))
     @Column(name = "objetivo")
     private List<String> objetivosEspecificos = new ArrayList<>();   
-    @Column(name = "archivo_pdf")
+    @Column(name = "archivo_pdf", length = 500)
     private String archivoPDF;    
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

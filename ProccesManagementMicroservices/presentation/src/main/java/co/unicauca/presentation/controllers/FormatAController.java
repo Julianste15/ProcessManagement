@@ -7,8 +7,13 @@ import co.unicauca.domain.services.SessionService;
 import co.unicauca.presentation.views.FormatAFormView;
 import co.unicauca.presentation.views.LoginView;
 import javafx.scene.Scene;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +23,7 @@ import java.util.stream.Collectors;
 
 public class FormatAController {
     private static final Logger logger = Logger.getLogger(FormatAController.class.getName());
+    private static final long MAX_PDF_BYTES = 5 * 1024 * 1024; // 5 MB
 
     private final FormatAFormView view;
     private final Stage stage;
@@ -76,10 +82,7 @@ public class FormatAController {
             request.put("objetivoGeneral", objetivoGeneral);
             request.put("objetivosEspecificos", objetivosEspecificos);
 
-            String archivoPdf = view.getArchivoPdf();
-            if (!archivoPdf.isEmpty()) {
-                request.put("archivoPDF", archivoPdf);
-            }
+            handlePdfPayload(request);
 
             logger.info("Enviando Formato A para el docente: " + user.getEmail());
             Map<String, Object> response = formatAService.submitFormatoA(request);
@@ -98,6 +101,9 @@ public class FormatAController {
         } catch (RuntimeException ex) {
             logger.severe("Error del microservicio FormatA: " + ex.getMessage());
             view.showError(ex.getMessage());
+        } catch (IOException ex) {
+            logger.severe("No se pudo leer el archivo PDF seleccionado: " + ex.getMessage());
+            view.showError("No se pudo leer el archivo PDF seleccionado. Verifique el archivo e intente nuevamente.");
         } catch (Exception ex) {
             logger.severe("Error inesperado al enviar el Formato A: " + ex.getMessage());
             view.showError("Ocurrió un error al enviar el Formato A. Intente nuevamente.");
@@ -151,6 +157,44 @@ public class FormatAController {
             current.setRequiresFormatoA(false);
             current.setFormatoAEstado(estado);
             current.setFormatoAId(formatoId);
+        }
+    }
+
+    public void handleSelectPdf() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Seleccionar Formato A (PDF)");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Archivos PDF (*.pdf)", "*.pdf")
+        );
+
+        File selected = fileChooser.showOpenDialog(stage);
+        if (selected != null) {
+            if (!selected.getName().toLowerCase().endsWith(".pdf")) {
+                view.showError("Debe seleccionar un archivo con extensión .pdf");
+                return;
+            }
+            if (selected.length() > MAX_PDF_BYTES) {
+                view.showError("El archivo PDF no puede superar los 5 MB.");
+                return;
+            }
+            view.clearError();
+            view.setSelectedPdfFile(selected);
+        }
+    }
+
+    private void handlePdfPayload(Map<String, Object> request) throws IOException {
+        File selectedPdf = view.getSelectedPdfFile();
+        if (selectedPdf != null) {
+            byte[] bytes = Files.readAllBytes(selectedPdf.toPath());
+            String base64 = Base64.getEncoder().encodeToString(bytes);
+            request.put("archivoPdfNombre", selectedPdf.getName());
+            request.put("archivoPdfContenido", base64);
+            return;
+        }
+
+        String archivoPdf = view.getArchivoPdf();
+        if (!archivoPdf.isEmpty()) {
+            request.put("archivoPDF", archivoPdf);
         }
     }
 }

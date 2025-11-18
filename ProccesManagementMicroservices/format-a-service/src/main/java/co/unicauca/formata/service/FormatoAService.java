@@ -14,12 +14,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Service
 public class FormatoAService {    
@@ -35,7 +41,13 @@ public class FormatoAService {
     private EvaluationServiceClient evaluationServiceClient;
     
     @Value("${user.service.url:http://user-service/api/users}")
-    private String userServiceUrl;    
+    private String userServiceUrl;
+
+    @Value("${format-a.storage.path:./storage/formata}")
+    private String storagePath;
+
+    @Value("${format-a.storage.max-size-bytes:5242880}")
+    private long maxPdfSizeBytes;
     
     /**
      * Envía un nuevo Formato A
@@ -48,7 +60,8 @@ public class FormatoAService {
         if (request.getCodirectorEmail() != null && !request.getCodirectorEmail().isEmpty()) {
             validateUserExists(request.getCodirectorEmail());
         }        
-        // Crear y guardar Formato A
+        String archivoPdf = resolvePdfPath(request, null);
+
         FormatoA formatoA = new FormatoA(
             request.getTitulo(),
             request.getModalidad(),
@@ -57,7 +70,7 @@ public class FormatoAService {
             request.getCodirectorEmail(),
             request.getObjetivoGeneral(),
             request.getObjetivosEspecificos(),
-            request.getArchivoPDF()
+            archivoPdf
         );        
         FormatoA savedFormatoA = formatoARepository.save(formatoA);        
         // Publicar evento
@@ -160,7 +173,7 @@ public class FormatoAService {
         formatoA.setCodirectorEmail(request.getCodirectorEmail());
         formatoA.setObjetivoGeneral(request.getObjetivoGeneral());
         formatoA.setObjetivosEspecificos(request.getObjetivosEspecificos());
-        formatoA.setArchivoPDF(request.getArchivoPDF());
+        formatoA.setArchivoPDF(resolvePdfPath(request, formatoA.getArchivoPDF()));
         formatoA.setFechaCreacion(LocalDate.now());
         formatoA.setEstado(EstadoProyecto.FORMATO_A_EN_EVALUACION);
         formatoA.incrementarIntentos();        
@@ -235,5 +248,59 @@ public class FormatoAService {
         response.setEstado(formatoA.getEstado());
         response.setIntentos(formatoA.getIntentos());
         return response;
+    }
+
+    private String resolvePdfPath(FormatARequest request, String currentPath) {
+        if (request == null) {
+            return currentPath;
+        }
+
+        if (hasEmbeddedPdf(request)) {
+            return storePdfFile(request.getArchivoPdfNombre(), request.getArchivoPdfContenido());
+        }
+
+        if (request.getArchivoPDF() != null && !request.getArchivoPDF().isBlank()) {
+            return request.getArchivoPDF();
+        }
+
+        return currentPath;
+    }
+
+    private boolean hasEmbeddedPdf(FormatARequest request) {
+        return request.getArchivoPdfContenido() != null && !request.getArchivoPdfContenido().isBlank();
+    }
+
+    private String storePdfFile(String originalName, String base64Content) {
+        try {
+            byte[] pdfBytes = Base64.getDecoder().decode(base64Content);
+            if (pdfBytes.length == 0) {
+                throw new RuntimeException("El archivo PDF está vacío.");
+            }
+            if (pdfBytes.length > maxPdfSizeBytes) {
+                throw new RuntimeException("El archivo PDF supera el tamaño máximo permitido (" + (maxPdfSizeBytes / (1024 * 1024)) + " MB).");
+            }
+
+            Path directory = Paths.get(storagePath).toAbsolutePath();
+            Files.createDirectories(directory);
+
+            String sanitizedName = sanitizeFileName(Optional.ofNullable(originalName).orElse("formato_a.pdf"));
+            if (!sanitizedName.toLowerCase().endsWith(".pdf")) {
+                sanitizedName = sanitizedName + ".pdf";
+            }
+
+            String uniqueName = System.currentTimeMillis() + "_" + sanitizedName;
+            Path destination = directory.resolve(uniqueName);
+            Files.write(destination, pdfBytes);
+
+            return destination.toString();
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("El contenido del archivo PDF es inválido.");
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo almacenar el PDF adjunto.");
+        }
+    }
+
+    private String sanitizeFileName(String name) {
+        return name.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
     }
 }

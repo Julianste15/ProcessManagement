@@ -14,7 +14,18 @@ public class FormatARequest {
     @NotBlank(message = "El objetivo general es obligatorio")
     private String objetivoGeneral;    
     private List<String> objetivosEspecificos;    
-    private String archivoPDF;    
+    /**
+     * Ruta o URL ya existente del PDF (compatibilidad hacia atrás)
+     */
+    private String archivoPDF;
+    /**
+     * Nombre del archivo PDF adjuntado desde el cliente
+     */
+    private String archivoPdfNombre;
+    /**
+     * Contenido del PDF codificado en Base64
+     */
+    private String archivoPdfContenido;
     public String getTitulo() { return titulo; }
     public void setTitulo(String titulo) { this.titulo = titulo; }    
     public Modalidad getModalidad() { return modalidad; }
@@ -29,4 +40,8 @@ public class FormatARequest {
     public void setObjetivosEspecificos(List<String> objetivosEspecificos) { this.objetivosEspecificos = objetivosEspecificos; }    
     public String getArchivoPDF() { return archivoPDF; }
     public void setArchivoPDF(String archivoPDF) { this.archivoPDF = archivoPDF; }
+    public String getArchivoPdfNombre() { return archivoPdfNombre; }
+    public void setArchivoPdfNombre(String archivoPdfNombre) { this.archivoPdfNombre = archivoPdfNombre; }
+    public String getArchivoPdfContenido() { return archivoPdfContenido; }
+    public void setArchivoPdfContenido(String archivoPdfContenido) { this.archivoPdfContenido = archivoPdfContenido; }
 }
