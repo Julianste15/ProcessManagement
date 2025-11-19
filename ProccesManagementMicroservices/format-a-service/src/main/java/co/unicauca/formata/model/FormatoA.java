@@ -38,9 +38,6 @@ public class FormatoA {
     @Column(nullable = false)
     private int intentos = 1;
 
-    @Column(name = "carta_aceptacion_empresa", length = 500)
-    private String cartaAceptacionEmpresa;
-
     public FormatoA() {}
 
     public FormatoA(String titulo, Modalidad modalidad, LocalDate fechaCreacion,
