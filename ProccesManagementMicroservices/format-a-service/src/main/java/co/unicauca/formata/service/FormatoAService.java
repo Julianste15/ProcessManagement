@@ -62,6 +62,8 @@ public class FormatoAService {
             validateUserExists(request.getCodirectorEmail());
         }        
         String archivoPdf = resolvePdfPath(request, null);
+        String cartaAceptacion = request.getCartaAceptacionEmpresaContenido() != null && !request.getCartaAceptacionEmpresaContenido().isEmpty() 
+            ? request.getCartaAceptacionEmpresaContenido() : null;
 
         FormatoA formatoA = new FormatoA(
             request.getTitulo(),
@@ -71,7 +73,8 @@ public class FormatoAService {
             request.getCodirectorEmail(),
             request.getObjetivoGeneral(),
             request.getObjetivosEspecificos(),
-            archivoPdf
+            archivoPdf,
+            cartaAceptacion
         );        
         FormatoA savedFormatoA = formatoARepository.save(formatoA);        
         // Publicar evento
