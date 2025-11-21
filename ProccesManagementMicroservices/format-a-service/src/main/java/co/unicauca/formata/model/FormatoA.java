@@ -27,34 +27,7 @@ public class FormatoA {
     @ElementCollection
     @CollectionTable(name = "formato_a_objetivos", joinColumns = @JoinColumn(name = "formato_a_id"))
     @Column(name = "objetivo")
-    private List<String> objetivosEspecificos = new ArrayList<>();
-    @Column(name = "archivo_pdf", length = 500)
-    private String archivoPDF;
-    @Column(name = "carta_aceptacion_empresa", length = 500)
-    private String cartaAceptacionEmpresa;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private EstadoProyecto estado;
-    @Column(nullable = false)
-    private int intentos = 1;
-
-    public FormatoA() {
-    }
-
-    public FormatoA(String titulo, Modalidad modalidad, LocalDate fechaCreacion,
-            String directorEmail, String codirectorEmail, String objetivoGeneral,
-            List<String> objetivosEspecificos, String archivoPDF, String cartaAceptacionEmpresa) {
-        this.titulo = titulo;
-        this.modalidad = modalidad;
-        this.fechaCreacion = fechaCreacion;
-        this.directorEmail = directorEmail;
-        this.codirectorEmail = codirectorEmail;
-        this.objetivoGeneral = objetivoGeneral;
-        this.objetivosEspecificos = objetivosEspecificos;
-        this.archivoPDF = archivoPDF;
-        this.cartaAceptacionEmpresa = cartaAceptacionEmpresa;
-        this.estado = EstadoProyecto.FORMATO_A_EN_EVALUACION;
-        this.intentos = 1;
+    private List<String> objetivosEspecificos = new ArrayList<>();@Column(name="archivo_pdf",length=500)this.fechaCreacion=fechaCreacion;this.directorEmail=directorEmail;this.codirectorEmail=codirectorEmail;this.objetivoGeneral=objetivoGeneral;this.objetivosEspecificos=objetivosEspecificos;this.archivoPDF=archivoPDF;this.cartaAceptacionEmpresa=cartaAceptacionEmpresa;this.estado=EstadoProyecto.FORMATO_A_EN_EVALUACION;this.intentos=1;
     }
 
     public Long getId() {

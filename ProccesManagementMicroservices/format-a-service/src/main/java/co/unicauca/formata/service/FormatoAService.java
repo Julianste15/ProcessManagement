@@ -59,6 +59,7 @@ public class FormatoAService {
         }
 
         String archivoPdf = resolvePdfPath(request, null);
+<<<<<<< HEAD
         String cartaAceptacion = null;
 
         if (request.getModalidad() == Modalidad.PRACTICA_PROFESIONAL) {
@@ -82,6 +83,23 @@ public class FormatoAService {
                 cartaAceptacion);
 
         FormatoA savedFormatoA = formatoARepository.save(formatoA);
+=======
+        String cartaAceptacion = request.getCartaAceptacionEmpresaContenido() != null && !request.getCartaAceptacionEmpresaContenido().isEmpty() 
+            ? request.getCartaAceptacionEmpresaContenido() : null;
+
+        FormatoA formatoA = new FormatoA(
+            request.getTitulo(),
+            request.getModalidad(),
+            LocalDate.now(),
+            request.getDirectorEmail(),
+            request.getCodirectorEmail(),
+            request.getObjetivoGeneral(),
+            request.getObjetivosEspecificos(),
+            archivoPdf,
+            cartaAceptacion
+        );        
+        FormatoA savedFormatoA = formatoARepository.save(formatoA);        
+>>>>>>> a1ab41eff2323bd81fa8349142c35277263c7df5
         // Publicar evento
         eventPublisher.publishFormatoAEnviado(savedFormatoA);
         logger.info("Formato A guardado con ID: " + savedFormatoA.getId());
