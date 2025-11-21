@@ -1,5 +1,4 @@
-C:\Users\AN515-54-55MX\OneDrive\Documentos\NetBeansProjects\ProcessManagement\ProccesManagementMicroservices\gateway-service\src\main\java\co\unicauca\gateway\config\SecurityConfig.java
-C:\Users\AN515-54-55MX\OneDrive\Documentos\NetBeansProjects\ProcessManagement\ProccesManagementMicroservices\gateway-service\src\main\java\co\unicauca\gateway\filters\LoggingFilter.java
-C:\Users\AN515-54-55MX\OneDrive\Documentos\NetBeansProjects\ProcessManagement\ProccesManagementMicroservices\gateway-service\src\main\java\co\unicauca\gateway\config\GatewayConfig.java
-C:\Users\AN515-54-55MX\OneDrive\Documentos\NetBeansProjects\ProcessManagement\ProccesManagementMicroservices\gateway-service\src\main\java\co\unicauca\gateway\filters\AuthenticationFilter.java
-C:\Users\AN515-54-55MX\OneDrive\Documentos\NetBeansProjects\ProcessManagement\ProccesManagementMicroservices\gateway-service\src\main\java\co\unicauca\gateway\GatewayApplication.java
+D:\universidad\Software II\ProccesManagement-microservice\ProcessManagement\ProccesManagementMicroservices\gateway-service\src\main\java\co\unicauca\gateway\config\SecurityConfig.java
+D:\universidad\Software II\ProccesManagement-microservice\ProcessManagement\ProccesManagementMicroservices\gateway-service\src\main\java\co\unicauca\gateway\filters\LoggingFilter.java
+D:\universidad\Software II\ProccesManagement-microservice\ProcessManagement\ProccesManagementMicroservices\gateway-service\src\main\java\co\unicauca\gateway\GatewayApplication.java
+D:\universidad\Software II\ProccesManagement-microservice\ProcessManagement\ProccesManagementMicroservices\gateway-service\src\main\java\co\unicauca\gateway\filters\AuthenticationFilter.java

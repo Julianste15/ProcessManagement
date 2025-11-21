@@ -1,3 +1,4 @@
+co\unicauca\auth\service\AuthService$1.class
 co\unicauca\auth\config\JwtConfig.class
 co\unicauca\auth\dto\LoginRequest.class
 co\unicauca\auth\service\PasswordValidator.class

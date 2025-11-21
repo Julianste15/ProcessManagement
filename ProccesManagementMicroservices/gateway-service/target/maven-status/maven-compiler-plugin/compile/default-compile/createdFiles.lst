@@ -3,5 +3,4 @@ co\unicauca\gateway\filters\AuthenticationFilter.class
 co\unicauca\gateway\filters\AuthenticationFilter$Config.class
 co\unicauca\gateway\filters\LoggingFilter$Config.class
 co\unicauca\gateway\config\SecurityConfig.class
-co\unicauca\gateway\config\GatewayConfig.class
 co\unicauca\gateway\GatewayApplication.class

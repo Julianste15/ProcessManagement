@@ -1,9 +1,9 @@
-C:\Users\Julian\Documents\NetBeansProjects\ProcessManagement-rama-Oscar-nueva\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\dto\ProjectSummaryDTO.java
-C:\Users\Julian\Documents\NetBeansProjects\ProcessManagement-rama-Oscar-nueva\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\model\CoordinationDashboard.java
-C:\Users\Julian\Documents\NetBeansProjects\ProcessManagement-rama-Oscar-nueva\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\client\FormatAClient.java
-C:\Users\Julian\Documents\NetBeansProjects\ProcessManagement-rama-Oscar-nueva\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\dto\DashboardStatsDTO.java
-C:\Users\Julian\Documents\NetBeansProjects\ProcessManagement-rama-Oscar-nueva\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\service\CoordinationService.java
-C:\Users\Julian\Documents\NetBeansProjects\ProcessManagement-rama-Oscar-nueva\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\repository\CoordinationRepository.java
-C:\Users\Julian\Documents\NetBeansProjects\ProcessManagement-rama-Oscar-nueva\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\client\AnteprojectClient.java
-C:\Users\Julian\Documents\NetBeansProjects\ProcessManagement-rama-Oscar-nueva\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\controller\CoordinationController.java
-C:\Users\Julian\Documents\NetBeansProjects\ProcessManagement-rama-Oscar-nueva\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\CoordinationApplication.java
+D:\universidad\Software II\ProccesManagement-microservice\ProcessManagement\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\client\AnteprojectClient.java
+D:\universidad\Software II\ProccesManagement-microservice\ProcessManagement\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\repository\CoordinationRepository.java
+D:\universidad\Software II\ProccesManagement-microservice\ProcessManagement\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\service\CoordinationService.java
+D:\universidad\Software II\ProccesManagement-microservice\ProcessManagement\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\CoordinationApplication.java
+D:\universidad\Software II\ProccesManagement-microservice\ProcessManagement\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\controller\CoordinationController.java
+D:\universidad\Software II\ProccesManagement-microservice\ProcessManagement\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\model\CoordinationDashboard.java
+D:\universidad\Software II\ProccesManagement-microservice\ProcessManagement\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\dto\DashboardStatsDTO.java
+D:\universidad\Software II\ProccesManagement-microservice\ProcessManagement\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\dto\ProjectSummaryDTO.java
+D:\universidad\Software II\ProccesManagement-microservice\ProcessManagement\ProccesManagementMicroservices\coordination-service\src\main\java\co\unicauca\coordination\client\FormatAClient.java
