@@ -3,20 +3,22 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 public enum Role {
     STUDENT("estudiante"),
-    TEACHER("profesor"), 
-    ADMINISTRATOR("administrador");    
-    private final String displayName;    
+    TEACHER("profesor"),
+    ADMINISTRATOR("administrador"),
+    COORDINATOR("coordinador");
+    private final String displayName;
     Role(String displayName) {
         this.displayName = displayName;
-    }    
+    }
     @JsonValue
     public String getDisplayName() {
         return displayName;
-    }    
+    }
     @JsonCreator
     public static Role fromValue(String value) {
-        if (value == null) return null;        
-        value = value.toUpperCase();        
+        if (value == null)
+            return null;
+        value = value.toUpperCase();
         if ("ADMIN".equals(value) || "ADMINISTRATOR".equals(value)) {
             return ADMINISTRATOR;
         }
@@ -25,20 +27,26 @@ public enum Role {
         }
         if ("STUDENT".equals(value) || "ESTUDIANTE".equals(value)) {
             return STUDENT;
-        }        
+        }
+        if ("COORDINATOR".equals(value) || "COORDINADOR".equals(value)) {
+            return COORDINATOR;
+        }
         try {
             return Role.valueOf(value);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Rol desconocido: " + value);
         }
-    }    
+    }
     public boolean isStudent() {
         return this == STUDENT;
-    }    
+    }
     public boolean isTeacher() {
         return this == TEACHER;
-    }    
+    }
     public boolean isAdministrator() {
         return this == ADMINISTRATOR;
+    }
+    public boolean isCoordinator() {
+        return this == COORDINATOR;
     }
 }

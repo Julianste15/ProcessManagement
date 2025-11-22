@@ -31,8 +31,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /**
      * Busca usuarios por rol y carrera
      */
-    List<User> findByRoleAndCareer(co.unicauca.user.model.enums.Role role, 
-                                  co.unicauca.user.model.enums.Career career);    
+    List<User> findByRoleAndCareer(co.unicauca.user.model.enums.Role role, co.unicauca.user.model.enums.Career career);    
     /**
      * Busca usuarios por nombres (búsqueda parcial)
      */

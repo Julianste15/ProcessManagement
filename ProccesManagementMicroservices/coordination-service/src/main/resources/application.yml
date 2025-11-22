@@ -14,11 +14,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-  # H2 para desarrollo (comentado, descomentar si necesitas H2)
-  # h2:
-  #   console:
-  #     enabled: true
-  #     path: /h2-console
 
 eureka:
   client:

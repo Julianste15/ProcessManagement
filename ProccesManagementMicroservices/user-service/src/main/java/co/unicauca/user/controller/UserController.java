@@ -1,36 +1,31 @@
 package co.unicauca.user.controller;
-
 import co.unicauca.user.dto.LoginRequest;
 import co.unicauca.user.dto.RegisterRequest;
 import co.unicauca.user.dto.UserDTO;
 import co.unicauca.user.service.UserService;
 import co.unicauca.user.model.User;
-import co.unicauca.user.repository.UserRepository; // ¡IMPORTANTE!
+import co.unicauca.user.repository.UserRepository;
 import co.unicauca.user.util.AuthHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.logging.Logger;
-
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "*")
 public class UserController {    
     private static final Logger logger = Logger.getLogger(UserController.class.getName());    
     @Autowired
-    private UserService userService;
-    
+    private UserService userService;    
     @Autowired
-    private UserRepository userRepository; // ¡INYECTAR EL REPOSITORY!    
+    private UserRepository userRepository;   
     /**
      * Registra un nuevo usuario
      */
@@ -63,7 +58,6 @@ public class UserController {
             logger.info("Validando credenciales para: " + request.getEmail());            
             User user = userService.getUserByEmail(request.getEmail());            
             if (user != null && userService.validatePassword(request.getPassword(), user.getPassword())) {
-                // Devolver Map como lo espera AuthService
                 Map<String, Object> response = new HashMap<>();
                 response.put("email", user.getEmail());
                 response.put("role", user.getRole().toString());
@@ -94,24 +88,19 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-    }
-    
+    }    
     /**
      * ENDPOINT PROTEGIDO - Obtiene el perfil del usuario actual
      */
     @GetMapping("/profile")
     public ResponseEntity<?> getCurrentUserProfile(HttpServletRequest request) {
         try {
-            // Estos headers los añade el Gateway después de validar el token
             String userEmail = request.getHeader("X-User-Email");
-            String userRole = request.getHeader("X-User-Role");
-            
-            logger.info("Accediendo perfil protegido para: " + userEmail + " con rol: " + userRole);
-            
+            String userRole = request.getHeader("X-User-Role");            
+            logger.info("Accediendo perfil protegido para: " + userEmail + " con rol: " + userRole);            
             if (userEmail == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
-            }
-            
+            }            
             User user = userService.getUserByEmail(userEmail);
             if (user != null) {
                 UserDTO userDTO = convertToDTO(user);
@@ -122,8 +111,7 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
-    }
-    
+    }    
     /**
      * ENDPOINT PROTEGIDO - Solo para administradores
      * Obtiene todos los usuarios (solo admin)
@@ -131,14 +119,11 @@ public class UserController {
     @GetMapping("/all")
     public ResponseEntity<?> getAllUsers(HttpServletRequest request) {
         try {
-            // Validación más limpia
             AuthHelper.validateAdminRole(request);
-
             List<User> users = userRepository.findAll();
             List<UserDTO> userDTOs = users.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
-
             return ResponseEntity.ok(userDTOs);
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());

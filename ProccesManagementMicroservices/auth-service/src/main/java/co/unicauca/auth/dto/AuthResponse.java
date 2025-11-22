@@ -7,8 +7,7 @@ public class AuthResponse {
     private String names;    
     private boolean requiresFormatA;
     private Long formatoAId;
-    private String formatoAEstado;
-    
+    private String formatoAEstado;    
     public AuthResponse() {
         this.type = "Bearer";
         this.requiresFormatA = false;

@@ -30,7 +30,6 @@ public abstract class ModelException extends Exception {
         }
         atrExceptionMessages.add("El campo " + prmField.getFieldName() + ": " + prmMessage);
     }
-    // Metodo para limpiar mensajes previos
     public void clearMessages() {
         if (atrExceptionMessages != null) {
             atrExceptionMessages.clear();

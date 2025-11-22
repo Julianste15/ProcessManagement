@@ -20,9 +20,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     public AuthenticationFilter() {
         super(Config.class);
     }    
-    public static class Config {
-        // Configuración vacía, se usa para la estructura
-    }    
+    public static class Config {}    
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }    
@@ -69,12 +67,10 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             ServerHttpRequest request = exchange.getRequest();
             String path = request.getPath().toString();            
             logger.info("Procesando ruta: " + path);            
-            // Endpoints públicos que no requieren autenticación
             if (isPublicEndpoint(path)) {
                 logger.info("Endpoint público, omitiendo autenticación: " + path);
                 return chain.filter(exchange);
             }            
-            // Endpoints que requieren autenticación
             if (isAuthMissing(request)) {
                 logger.warning("Falta header Authorization en ruta protegida: " + path);
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -92,14 +88,12 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
             }            
-            // Agregar información del usuario al request
             populateRequestWithHeaders(exchange, token);            
             logger.info("Autenticación exitosa para: " + getAllClaimsFromToken(token).getSubject());
             return chain.filter(exchange);
         };
     }
     private boolean isPublicEndpoint(String path) {
-        // Rutas públicas
         return path.equals("/api/auth/login") || 
                path.startsWith("/api/auth/validate") ||
                path.equals("/api/users/register") ||

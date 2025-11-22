@@ -7,17 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.logging.Logger;
-
 @RestController
 @RequestMapping("/api/coordination")
 @CrossOrigin(origins = "*")
-public class CoordinationController {
-    
-    private static final Logger logger = Logger.getLogger(CoordinationController.class.getName());
-    
+public class CoordinationController {    
+    private static final Logger logger = Logger.getLogger(CoordinationController.class.getName());    
     @Autowired
-    private CoordinationService coordinationService;
-    
+    private CoordinationService coordinationService;    
     @GetMapping("/dashboard/{coordinatorId}")
     public ResponseEntity<DashboardStatsDTO> getDashboardStats(@PathVariable Long coordinatorId) {
         logger.info("Solicitando dashboard para coordinador: " + coordinatorId);
@@ -28,8 +24,7 @@ public class CoordinationController {
             logger.severe("Error en dashboard: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
-    }
-    
+    }    
     @GetMapping("/projects/{coordinatorId}")
     public ResponseEntity<List<ProjectSummaryDTO>> getAllProjects(@PathVariable Long coordinatorId) {
         logger.info("Solicitando todos los proyectos para coordinador: " + coordinatorId);
@@ -40,8 +35,7 @@ public class CoordinationController {
             logger.severe("Error obteniendo proyectos: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
-    }
-    
+    }    
     @GetMapping("/pending-format-a/{coordinatorId}")
     public ResponseEntity<List<ProjectSummaryDTO>> getPendingFormatA(@PathVariable Long coordinatorId) {
         logger.info("Solicitando Formatos A pendientes para coordinador: " + coordinatorId);
@@ -52,8 +46,7 @@ public class CoordinationController {
             logger.severe("Error obteniendo Formatos A pendientes: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
-    }
-    
+    }    
     @GetMapping("/reports/{coordinatorId}")
     public ResponseEntity<String> generateReport(@PathVariable Long coordinatorId) {
         logger.info("Generando reporte para coordinador: " + coordinatorId);

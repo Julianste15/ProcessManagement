@@ -8,7 +8,7 @@ public class UserException extends ModelException {
     }
     public UserException(UserExceptionEnum prmField, String prmMessage)
     {
-        super(); // Inicializar primero
+        super();
         setExceptionMessages(new LinkedList<>());
         super.addExceptionMessage(prmField, prmMessage);
     }
@@ -22,15 +22,11 @@ public class UserException extends ModelException {
         if(message == null || message.trim().isEmpty()) {
             return;
         }
-        
-        // Crear una NUEVA excepcion con solo los mensajes actuales
         UserException newException = new UserException();
-        // Copiar los mensajes actuales
         if (this.atrExceptionMessages != null) {
             newException.setExceptionMessages(new LinkedList<>(this.atrExceptionMessages));
         }
-        
-        throw newException; // Lanzar la nueva excepcion limpia
+        throw newException;
     }
     public static void throwException(UserExceptionEnum prmField, String prmMessage) throws UserException
     {

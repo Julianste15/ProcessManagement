@@ -28,12 +28,9 @@ public enum Career {
     @JsonCreator
     public static Career fromValue(String value) {
         if (value == null) return null;
-        
-        // Intentar con el nombre del enum primero
         try {
             return Career.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException e) {
-            // Buscar por display name
             for (Career career : values()) {
                 if (career.displayName.equalsIgnoreCase(value)) {
                     return career;
@@ -43,11 +40,9 @@ public enum Career {
         }
     }
     public static Career fromDatabaseValue(String dbValue) {
-        // Para cuando se guarda el enum.name() en BD (SYSTEMS_ENGINEERING)
         try {
             return Career.valueOf(dbValue.toUpperCase());
         } catch (IllegalArgumentException e) {
-            // Fallback: intentar por display name
             return fromDisplayName(dbValue);
         }
     }

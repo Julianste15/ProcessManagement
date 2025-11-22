@@ -6,12 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {    
-    // Exchange
     public static final String EXCHANGE_NAME = "formato_events_exchange";    
-    // Queues
     public static final String NOTIFICATIONS_QUEUE = "notifications_queue";
     public static final String EVALUATIONS_QUEUE = "evaluations_queue";    
-    // Routing Keys
     public static final String FORMATO_ENVIADO_KEY = "formato.a.enviado";
     public static final String FORMATO_EVALUADO_KEY = "formato.a.evaluado";
     public static final String FORMATO_REINTENTADO_KEY = "formato.a.reintentado";    

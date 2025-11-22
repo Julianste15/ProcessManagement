@@ -1,32 +1,24 @@
 package co.unicauca.coordination.model;
-
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
-
 @Entity
 @Table(name = "coordination_dashboard")
 public class CoordinationDashboard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
+    private Long id;    
     @Column(name = "coordinator_id")
-    private Long coordinatorId;
-    
+    private Long coordinatorId;    
     @ElementCollection
     @CollectionTable(name = "dashboard_projects")
-    private List<Long> projectIds;
-    
+    private List<Long> projectIds;    
     @Column(name = "total_projects")
-    private Integer totalProjects;
-    
+    private Integer totalProjects;    
     @Column(name = "pending_evaluations")
-    private Integer pendingEvaluations;
-    
+    private Integer pendingEvaluations;    
     @Column(name = "approved_projects")
-    private Integer approvedProjects;
-    
+    private Integer approvedProjects;    
     @Column(name = "rejected_projects")
     private Integer rejectedProjects;    
     private LocalDateTime lastUpdate;

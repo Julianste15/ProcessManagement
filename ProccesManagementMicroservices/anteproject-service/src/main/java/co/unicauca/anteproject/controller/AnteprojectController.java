@@ -18,12 +18,8 @@ public class AnteprojectController {
     private static final Logger logger = Logger.getLogger(AnteprojectController.class.getName());    
     @Autowired
     private AnteprojectService anteprojectService;    
-    /**
-     * Crear un nuevo anteproyecto
-     */
     @PostMapping
-    public ResponseEntity<?> createAnteproject(@Valid @RequestBody CreateAnteprojectRequest request,
-                                             HttpServletRequest httpRequest) {
+    public ResponseEntity<?> createAnteproject(@Valid @RequestBody CreateAnteprojectRequest request,HttpServletRequest httpRequest) {
         try {
             String currentUser = httpRequest.getHeader("X-User-Email");
             String userRole = httpRequest.getHeader("X-User-Role");            
@@ -41,9 +37,6 @@ public class AnteprojectController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }    
-    /**
-     * Subir documento de anteproyecto
-     */
     @PostMapping("/{id}/submit-document")
     public ResponseEntity<?> submitDocument(@PathVariable Long id,@RequestParam String documentUrl,HttpServletRequest httpRequest) {
         try {
@@ -56,9 +49,6 @@ public class AnteprojectController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }    
-    /**
-     * Agregar actualización de progreso
-     */
     @PostMapping("/{id}/progress")
     public ResponseEntity<?> addProgressUpdate(@PathVariable Long id,@RequestParam String description,
                                              @RequestParam(required = false) Integer progressPercentage,
@@ -74,9 +64,6 @@ public class AnteprojectController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }    
-    /**
-     * Obtener anteproyecto por ID
-     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getAnteprojectById(@PathVariable Long id,HttpServletRequest httpRequest) {
         try {
@@ -92,9 +79,6 @@ public class AnteprojectController {
             return ResponseEntity.notFound().build();
         }
     }    
-    /**
-     * Obtener anteproyectos del estudiante actual
-     */
     @GetMapping("/my-anteprojects")
     public ResponseEntity<?> getMyAnteprojects(HttpServletRequest httpRequest) {
         try {
@@ -110,9 +94,6 @@ public class AnteprojectController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }    
-    /**
-     * Obtener anteproyectos del director actual
-     */
     @GetMapping("/director-projects")
     public ResponseEntity<?> getDirectorAnteprojects(HttpServletRequest httpRequest) {
         try {
@@ -128,9 +109,6 @@ public class AnteprojectController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }    
-    /**
-     * Actualizar estado del anteproyecto (solo coordinadores/admin)
-     */
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable Long id,@RequestParam AnteprojectStatus status,
                 HttpServletRequest httpRequest) {
@@ -147,7 +125,6 @@ public class AnteprojectController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }    
-    // Métodos helper
     private boolean hasViewPermission(AnteprojectDTO anteproject, String currentUser, String userRole) {
         return anteproject.getStudentEmail().equals(currentUser) ||
                anteproject.getDirectorEmail().equals(currentUser) ||

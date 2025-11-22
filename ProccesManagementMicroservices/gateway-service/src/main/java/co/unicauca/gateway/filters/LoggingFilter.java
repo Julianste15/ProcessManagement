@@ -10,9 +10,7 @@ public class LoggingFilter extends AbstractGatewayFilterFactory<LoggingFilter.Co
     public LoggingFilter() {
         super(Config.class);
     }    
-    public static class Config {
-        // Configuración vacía
-    }    
+    public static class Config {}    
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {

@@ -8,8 +8,8 @@ spring:
     gateway:
       globalcors:
         cors-configurations:
-          '[/**]': # Aplica a todas las rutas
-            allowed-origins: "http://localhost:5173" # Tu frontend
+          '[/**]': 
+            allowed-origins: "http://localhost:5173"
             allowed-methods:
               - GET
               - POST
@@ -19,50 +19,40 @@ spring:
             allowed-headers: "*"
             allow-credentials: true
             
-      # --- RUTAS CORREGIDAS ---
       routes:
-        # ---
-        # 1. RUTAS PÚBLICAS (Login y Registro)
-        #    Estas rutas NO tienen el "AuthenticationFilter"
-        # ---
+
         - id: auth-service-public
-          uri: lb://AUTH-SERVICE  # Corregido a MAYÚSCULAS
+          uri: lb://AUTH-SERVICE
           predicates:
             - Path=/api/auth/login
           filters:
             - LoggingFilter
             
         - id: user-service-public
-          uri: lb://USER-SERVICE  # Corregido a MAYÚSCULAS
+          uri: lb://USER-SERVICE 
           predicates:
             - Path=/api/users/register
           filters:
             - LoggingFilter
 
-        # ---
-        # 2. RUTAS PROTEGIDAS (Resto de la API)
-        #    Estas rutas SÍ tienen "AuthenticationFilter"
-        # ---
         - id: auth-service-protected
-          uri: lb://AUTH-SERVICE  # Corregido a MAYÚSCULAS
+          uri: lb://AUTH-SERVICE  
           predicates:
-            # Protege cualquier otra ruta de /api/auth/ (ej: /validate, /logout)
             - Path=/api/auth/**
           filters:
             - AuthenticationFilter
             - LoggingFilter
             
         - id: user-service-protected
-          uri: lb://USER-SERVICE  # Corregido a MAYÚSCULAS
+          uri: lb://USER-SERVICE  
           predicates:
-            # Protege cualquier otra ruta de /api/users/ (ej: /profile, /all)
             - Path=/api/users/**
           filters:
             - AuthenticationFilter
             - LoggingFilter
             
         - id: evaluation-service
-          uri: lb://EVALUATION-SERVICE # Corregido a MAYÚSCULAS (asumo)
+          uri: lb://EVALUATION-SERVICE 
           predicates:
             - Path=/api/evaluations/**,/api/evaluation-assignments/**
           filters:
@@ -70,7 +60,7 @@ spring:
             - LoggingFilter
             
         - id: format-a-service
-          uri: lb://FORMAT-A-SERVICE # Corregido a MAYÚSCULAS (asumo)
+          uri: lb://FORMAT-A-SERVICE 
           predicates:
             - Path=/api/format-a/**
           filters:
@@ -78,7 +68,7 @@ spring:
             - LoggingFilter
             
         - id: anteproject-service
-          uri: lb://ANTEPROJECT-SERVICE # Corregido a MAYÚSCULAS (asumo)
+          uri: lb://ANTEPROJECT-SERVICE 
           predicates:
             - Path=/api/anteprojects/**
           filters:

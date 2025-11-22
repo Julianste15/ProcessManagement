@@ -1,5 +1,4 @@
 package co.unicauca.auth.controller;
-
 import co.unicauca.auth.dto.LoginRequest;
 import co.unicauca.auth.dto.AuthResponse;
 import co.unicauca.auth.service.AuthService;
@@ -8,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.logging.Logger;
-
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
@@ -37,7 +35,6 @@ public class AuthController {
     @GetMapping("/validate")
     public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String token) {
         try {
-            // Remover "Bearer " del token si existe
             if (token != null && token.startsWith("Bearer ")) {
                 token = token.substring(7);
             }            

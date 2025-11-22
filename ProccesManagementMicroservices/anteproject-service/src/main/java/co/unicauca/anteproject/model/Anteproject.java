@@ -68,7 +68,5 @@ public class Anteproject {
     public List<ProjectProgress> getProgressUpdates() { return progressUpdates; }
     public void setProgressUpdates(List<ProjectProgress> progressUpdates) { this.progressUpdates = progressUpdates; }    
     @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
+    public void preUpdate() {this.updatedAt = LocalDateTime.now();}
 }

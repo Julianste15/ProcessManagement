@@ -1,9 +1,0 @@
-co\unicauca\coordination\CoordinationApplication.class
-co\unicauca\coordination\model\CoordinationDashboard.class
-co\unicauca\coordination\repository\CoordinationRepository.class
-co\unicauca\coordination\client\FormatAClient.class
-co\unicauca\coordination\dto\DashboardStatsDTO.class
-co\unicauca\coordination\dto\ProjectSummaryDTO.class
-co\unicauca\coordination\client\AnteprojectClient.class
-co\unicauca\coordination\service\CoordinationService.class
-co\unicauca\coordination\controller\CoordinationController.class
