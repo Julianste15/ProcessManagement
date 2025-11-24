@@ -45,11 +45,21 @@ public class RabbitMQConfig {
                 .with(FORMATO_ENVIADO_KEY);
     }    
     /**
-     * Binding para notificaciones de formatos evaluados
+     * Binding para notificaciones de formatos evaluados a evaluations_queue
      */
     @Bean
     public Binding evaluationsBinding(Queue evaluationsQueue, TopicExchange exchange) {
         return BindingBuilder.bind(evaluationsQueue)
+                .to(exchange)
+                .with(FORMATO_EVALUADO_KEY);
+    }    
+    /**
+     * Binding para notificaciones de formatos evaluados a notifications_queue
+     * Este binding adicional permite que el FormatAEventConsumer reciba eventos de evaluación
+     */
+    @Bean
+    public Binding evaluationsToNotificationsBinding(Queue notificationsQueue, TopicExchange exchange) {
+        return BindingBuilder.bind(notificationsQueue)
                 .to(exchange)
                 .with(FORMATO_EVALUADO_KEY);
     }    

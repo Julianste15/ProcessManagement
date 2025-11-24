@@ -1,7 +1,9 @@
 package co.unicauca.presentation.controllers;
+import co.unicauca.domain.entities.User;
 import co.unicauca.domain.services.SessionService;
 import co.unicauca.presentation.views.DashboardView;
 import co.unicauca.presentation.views.LoginView;
+import co.unicauca.presentation.views.TeacherFormatsView;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.util.logging.Logger;
@@ -11,10 +13,13 @@ import java.util.logging.Logger;
 public class DashboardController {
     private static final Logger logger = Logger.getLogger(DashboardController.class.getName());    
     private final Stage stage;
-    private final SessionService sessionService;    
+    private final SessionService sessionService;
+    private final User user;
+    
     public DashboardController(DashboardView view, Stage stage, SessionService sessionService) {
         this.stage = stage;
         this.sessionService = sessionService != null ? sessionService : new SessionService();
+        this.user = sessionService != null ? sessionService.getCurrentUser() : null;
     }    
     public void handleLogout() {
         try {
@@ -28,6 +33,19 @@ public class DashboardController {
             logger.info("Sesión cerrada exitosamente");
         } catch (Exception e) {
             logger.severe("Error durante el logout: " + e.getMessage());
+        }
+    }
+    
+    public void handleViewFormats() {
+        try {
+            logger.info("Navegando a vista de formatos del docente");
+            TeacherFormatsView formatsView = new TeacherFormatsView(stage, user, sessionService);
+            Scene scene = new Scene(formatsView.getRoot(), 1000, 700);
+            stage.setScene(scene);
+            stage.setTitle("Mis Formatos A - Sistema de Gestión de Trabajos de Grado");
+        } catch (Exception e) {
+            logger.severe("Error navegando a formatos: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

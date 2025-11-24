@@ -29,16 +29,13 @@ public class AuthService {
         try {
             logger.info("Autenticando usuario: " + request.getEmail());
             
-            // Llamar al user-service usando Map para evitar dependencias
             String userServiceUrl = "http://user-service/api/users/validate-credentials";
             
-            // Crear request simple
             Map<String, String> userRequest = Map.of(
                 "email", request.getEmail(),
                 "password", request.getPassword()
             );
             
-            // Llamar al endpoint
             ResponseEntity<Map> response = restTemplate.postForEntity(
                 userServiceUrl,
                 userRequest,
@@ -48,7 +45,6 @@ public class AuthService {
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 Map<String, Object> userData = response.getBody();
                 
-                // Extraer datos del Map
                 String email = (String) userData.get("email");
                 String role = (String) userData.get("role");
                 String names = (String) userData.get("names");
@@ -103,7 +99,6 @@ public class AuthService {
                     }
                 }
                 
-                // Generar token JWT
                 String token = jwtService.generateToken(email, role);
                 
                 return new AuthResponse(
@@ -138,6 +133,5 @@ public class AuthService {
      */
     public void logout(String token) {
         logger.info("Cerrando sesión para token");
-        // En implementación real, podrías invalidar el token
     }
 }

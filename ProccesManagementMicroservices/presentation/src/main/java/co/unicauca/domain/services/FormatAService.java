@@ -65,4 +65,16 @@ public class FormatAService {
                 "observaciones", observations != null ? observations : "");
         client.put("/api/format-a/" + projectId + "/evaluate", request, Map.class);
     }
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> resubmitFormatoA(Long formatoAId, Map<String, Object> request) throws Exception {
+        if (client == null) {
+            throw new IllegalStateException("No se ha inicializado el cliente para microservicios");
+        }
+        logger.info("Reenviando Formato A ID: " + formatoAId);
+        Object response = client.put("/api/format-a/" + formatoAId + "/resubmit", request, Map.class);
+        if (response instanceof Map) {
+            return (Map<String, Object>) response;
+        }
+        return Map.of();
+    }
 }

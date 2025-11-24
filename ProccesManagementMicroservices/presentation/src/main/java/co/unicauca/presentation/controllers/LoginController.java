@@ -47,10 +47,8 @@ public class LoginController {
                 if (Role.COORDINATOR.equals(user.getRole())) {
                     logger.info("Usuario es coordinador, redirigiendo a dashboard de coordinador");
                     showCoordinatorDashboard(user);
-                } else if (Role.TEACHER.equals(user.getRole()) && user.isRequiresFormatoA()) {
-                    logger.info("Usuario es docente y requiere diligenciar Formato A");
-                    showFormatAForm(user);
                 } else {
+                    logger.info("Redirigiendo a dashboard");
                     showDashboard(user);
                 }
             } else {

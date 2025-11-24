@@ -23,20 +23,16 @@ public class UserService {
             UserException.throwException(UserExceptionEnum.NAMES, "User cannot be null");
         }        
         try {
-            // Validar usuario
             userValidator.validate(user);
         } catch (UserException ex) {
             throw ex;
         } catch (Exception ex) {
             UserException.throwException(UserExceptionEnum.NAMES, "Error de validacion: " + ex.getMessage());
         }        
-        // Verificar que no exista
         if (userRepository.findByEmail(user.getEmail()) != null) {
             UserException.throwException(UserExceptionEnum.EMAIL, "El usuario ya existe");
         }        
-        // Encriptar password
         user.setPassword(passwordEncryptor.encrypt(user.getPassword()));        
-        // Guardar usuario
         User savedUser = userRepository.save(user);        
         if (savedUser == null) {
             UserException.throwException(UserExceptionEnum.NAMES, "Error al guardar usuario");

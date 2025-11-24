@@ -62,7 +62,14 @@ public class DashboardView {
                 estado = estado.substring(0, 1).toUpperCase() + estado.substring(1);
             }            
             formatoALabel.setText("Estado del Formato A: " + estado);
-            contentBox.getChildren().add(formatoALabel);
+            
+            Button viewFormatsButton = new Button("Ver Mis Formatos A");
+            viewFormatsButton.setPrefWidth(200);
+            viewFormatsButton.setPrefHeight(40);
+            viewFormatsButton.setStyle("-fx-background-color: #17A2B8; -fx-text-fill: white; -fx-font-weight: bold;");
+            viewFormatsButton.setOnAction(e -> controller.handleViewFormats());
+            
+            contentBox.getChildren().addAll(formatoALabel, viewFormatsButton);
         }        
         logoutButton = new Button("Cerrar Sesión");
         logoutButton.setPrefWidth(150);

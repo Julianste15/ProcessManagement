@@ -159,7 +159,7 @@ public class FormatoAService {
         formatoA.setEstado(EstadoProyecto.FORMATO_A_EN_EVALUACION);
         formatoA.incrementarIntentos();
         FormatoA updatedFormatoA = formatoARepository.save(formatoA);
-        eventPublisher.publishFormatoAEnviado(updatedFormatoA);
+        eventPublisher.publishFormatoAReintentado(updatedFormatoA);
         logger.info("Formato A reintentado: " + id + " - Intento: " + updatedFormatoA.getIntentos());
         return convertToResponse(updatedFormatoA);
     }

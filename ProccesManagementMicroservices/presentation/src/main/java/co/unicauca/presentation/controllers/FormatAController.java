@@ -37,71 +37,84 @@ public class FormatAController {
         this.onSuccess = onSuccess;
         this.formatAService = new FormatAService(sessionService != null ? sessionService.getClient() : null);
     }
-    public void handleSubmit() {
-        view.clearError();
-        try {
-            String titulo = view.getTitulo();
-            if (titulo.isEmpty()) {
-                view.showError("El título del proyecto es obligatorio.");
-                return;
-            }
-            Modalidad modalidad = view.getModalidad();
-            if (modalidad == null) {
-                view.showError("Debe seleccionar una modalidad válida.");
-                return;
-            }
-            String objetivoGeneral = view.getObjetivoGeneral();
-            if (objetivoGeneral.isEmpty()) {
-                view.showError("El objetivo general es obligatorio.");
-                return;
-            }
-            List<String> objetivosEspecificos = parseObjetivosEspecificos(view.getObjetivosEspecificos());
-            if (objetivosEspecificos.isEmpty()) {
-                view.showError("Debe ingresar al menos un objetivo específico.");
-                return;
-            }
-            Map<String, Object> request = new HashMap<>();
-            request.put("titulo", titulo);
-            request.put("modalidad", modalidad.name());
-            request.put("directorEmail", user.getEmail());
-            String codirector = view.getCodirectorEmail();
-            if (!codirector.isEmpty()) {
-                request.put("codirectorEmail", codirector);
-            }
-            String studentEmail = view.getStudentEmail();
-            if (studentEmail.isEmpty()) {
-                view.showError("El correo del estudiante es obligatorio.");
-                return;
-            }
-            if (!studentEmail.endsWith("@unicauca.edu.co")) {
-                view.showError("El correo del estudiante debe ser del dominio @unicauca.edu.co");
-                return;
-            }
-            request.put("studentEmail", studentEmail);
-            request.put("objetivoGeneral", objetivoGeneral);
-            request.put("objetivosEspecificos", objetivosEspecificos);
-            handlePdfPayload(request);
-            logger.info("Enviando Formato A para el docente: " + user.getEmail());
-            Map<String, Object> response = formatAService.submitFormatoA(request);
-            actualizarEstadoUsuario(response);
-            view.showInfo("Formato A enviado exitosamente. El estado actual es: " + user.getFormatoAEstado());
-            if (onSuccess != null) {
-                onSuccess.accept(sessionService != null ? sessionService.getCurrentUser() : user);
-            }
-        } catch (IllegalStateException ex) {
-            logger.severe("Error de configuración en FormatAService: " + ex.getMessage());
-            view.showError("No se pudo enviar el Formato A. Verifique la configuración del cliente.");
-        } catch (RuntimeException ex) {
-            logger.severe("Error del microservicio FormatA: " + ex.getMessage());
-            view.showError(ex.getMessage());
-        } catch (IOException ex) {
-            logger.severe("No se pudo leer el archivo PDF seleccionado: " + ex.getMessage());
-            view.showError("No se pudo leer el archivo PDF seleccionado. Verifique el archivo e intente nuevamente.");
-        } catch (Exception ex) {
-            logger.severe("Error inesperado al enviar el Formato A: " + ex.getMessage());
-            view.showError("Ocurrió un error al enviar el Formato A. Intente nuevamente.");
+public void handleSubmit() {
+    view.clearError();
+    try {
+        String titulo = view.getTitulo();
+        if (titulo.isEmpty()) {
+            view.showError("El título del proyecto es obligatorio.");
+            return;
         }
+        Modalidad modalidad = view.getModalidad();
+        if (modalidad == null) {
+            view.showError("Debe seleccionar una modalidad válida.");
+            return;
+        }
+        String objetivoGeneral = view.getObjetivoGeneral();
+        if (objetivoGeneral.isEmpty()) {
+            view.showError("El objetivo general es obligatorio.");
+            return;
+        }
+        List<String> objetivosEspecificos = parseObjetivosEspecificos(view.getObjetivosEspecificos());
+        if (objetivosEspecificos.isEmpty()) {
+            view.showError("Debe ingresar al menos un objetivo específico.");
+            return;
+        }
+        Map<String, Object> request = new HashMap<>();
+        request.put("titulo", titulo);
+        request.put("modalidad", modalidad.name());
+        request.put("directorEmail", user.getEmail());
+        String codirector = view.getCodirectorEmail();
+        if (!codirector.isEmpty()) {
+            request.put("codirectorEmail", codirector);
+        }
+        String studentEmail = view.getStudentEmail();
+        if (studentEmail.isEmpty()) {
+            view.showError("El correo del estudiante es obligatorio.");
+            return;
+        }
+        if (!studentEmail.endsWith("@unicauca.edu.co")) {
+            view.showError("El correo del estudiante debe ser del dominio @unicauca.edu.co");
+            return;
+        }
+        request.put("studentEmail", studentEmail);
+        request.put("objetivoGeneral", objetivoGeneral);
+        request.put("objetivosEspecificos", objetivosEspecificos);
+        handlePdfPayload(request);
+        
+        Map<String, Object> response;
+        
+        // Verificar si está en modo reenvío o creación
+        if (view.isResubmitMode()) {
+            Long formatoAId = view.getFormatoAIdToResubmit();
+            logger.info("Reenviando Formato A ID: " + formatoAId + " para el docente: " + user.getEmail());
+            response = formatAService.resubmitFormatoA(formatoAId, request);
+            view.showInfo("Formato A reenviado exitosamente. El formato ha sido actualizado y está en revisión nuevamente.");
+        } else {
+            logger.info("Enviando nuevo Formato A para el docente: " + user.getEmail());
+            response = formatAService.submitFormatoA(request);
+            view.showInfo("Formato A enviado exitosamente. El estado actual es: " + user.getFormatoAEstado());
+        }
+        
+        actualizarEstadoUsuario(response);
+        
+        if (onSuccess != null) {
+            onSuccess.accept(sessionService != null ? sessionService.getCurrentUser() : user);
+        }
+    } catch (IllegalStateException ex) {
+        logger.severe("Error de configuración en FormatAService: " + ex.getMessage());
+        view.showError("No se pudo enviar el Formato A. Verifique la configuración del cliente.");
+    } catch (RuntimeException ex) {
+        logger.severe("Error del microservicio FormatA: " + ex.getMessage());
+        view.showError(ex.getMessage());
+    } catch (IOException ex) {
+        logger.severe("No se pudo leer el archivo PDF seleccionado: " + ex.getMessage());
+        view.showError("No se pudo leer el archivo PDF seleccionado. Verifique el archivo e intente nuevamente.");
+    } catch (Exception ex) {
+        logger.severe("Error inesperado al enviar el Formato A: " + ex.getMessage());
+        view.showError("Ocurrió un error al enviar el Formato A. Intente nuevamente.");
     }
+}
     public void handleLogout() {
         try {
             if (sessionService != null) {
