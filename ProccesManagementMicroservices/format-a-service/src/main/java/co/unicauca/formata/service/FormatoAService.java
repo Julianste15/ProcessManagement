@@ -68,6 +68,7 @@ public class FormatoAService {
                 LocalDate.now(),
                 request.getDirectorEmail(),
                 request.getCodirectorEmail(),
+                request.getStudentEmail(),
                 request.getObjetivoGeneral(),
                 request.getObjetivosEspecificos(),
                 archivoPdf,
@@ -152,6 +153,7 @@ public class FormatoAService {
         formatoA.setModalidad(request.getModalidad());
         formatoA.setDirectorEmail(request.getDirectorEmail());
         formatoA.setCodirectorEmail(request.getCodirectorEmail());
+        formatoA.setStudentEmail(request.getStudentEmail());
         formatoA.setObjetivoGeneral(request.getObjetivoGeneral());
         formatoA.setObjetivosEspecificos(request.getObjetivosEspecificos());
         formatoA.setArchivoPDF(resolvePdfPath(request, formatoA.getArchivoPDF()));
@@ -175,7 +177,7 @@ public class FormatoAService {
      * Obtiene Formatos A por usuario (director o codirector)
      */
     public List<FormatAResponse> getFormatosAByUser(String userEmail) {
-        List<FormatoA> formatos = formatoARepository.findByDirectorEmailOrCodirectorEmail(userEmail, userEmail);
+        List<FormatoA> formatos = formatoARepository.findByDirectorEmailOrCodirectorEmailOrStudentEmail(userEmail, userEmail, userEmail);
         return formatos.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());

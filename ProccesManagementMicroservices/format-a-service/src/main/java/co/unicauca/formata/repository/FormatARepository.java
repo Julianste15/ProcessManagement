@@ -11,7 +11,13 @@ public interface FormatARepository extends JpaRepository<FormatoA, Long> {
     /**
      * Busca Formatos A por director o codirector
      */
-    List<FormatoA> findByDirectorEmailOrCodirectorEmail(String directorEmail, String codirectorEmail);    
+    List<FormatoA> findByDirectorEmailOrCodirectorEmail(String directorEmail, String codirectorEmail);
+
+    /**
+     * Busca Formatos A por director, codirector o estudiante
+     */
+    List<FormatoA> findByDirectorEmailOrCodirectorEmailOrStudentEmail(String directorEmail, String codirectorEmail, String studentEmail);
+
     /**
      * Busca Formatos A por estado
      */

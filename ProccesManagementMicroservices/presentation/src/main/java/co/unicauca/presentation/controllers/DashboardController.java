@@ -1,12 +1,15 @@
 package co.unicauca.presentation.controllers;
+
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.services.SessionService;
 import co.unicauca.presentation.views.DashboardView;
 import co.unicauca.presentation.views.LoginView;
 import co.unicauca.presentation.views.TeacherFormatsView;
+import co.unicauca.presentation.views.FormatAFormView;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.util.logging.Logger;
+
 /**
  * Controlador para la vista de Dashboard
  */
@@ -21,6 +24,7 @@ public class DashboardController {
         this.sessionService = sessionService != null ? sessionService : new SessionService();
         this.user = sessionService != null ? sessionService.getCurrentUser() : null;
     }    
+
     public void handleLogout() {
         try {
             logger.info("Cerrando sesión...");
@@ -45,6 +49,24 @@ public class DashboardController {
             stage.setTitle("Mis Formatos A - Sistema de Gestión de Trabajos de Grado");
         } catch (Exception e) {
             logger.severe("Error navegando a formatos: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void handleFillFormatA() {
+        try {
+            logger.info("Navegando a formulario de Formato A");
+            FormatAFormView formatAFormView = new FormatAFormView(stage, user, sessionService,
+                    updatedUser -> {
+                        DashboardView dashboardView = new DashboardView(stage, updatedUser != null ? updatedUser : user, sessionService);
+                        Scene scene = new Scene(dashboardView.getRoot(), 900, 700);
+                        stage.setScene(scene);
+                    });
+            Scene scene = new Scene(formatAFormView.getRoot(), 900, 750);
+            stage.setScene(scene);
+            stage.setTitle("Diligenciar Formato A - " + user.getFullName());
+        } catch (Exception e) {
+            logger.severe("Error navegando a formulario Formato A: " + e.getMessage());
             e.printStackTrace();
         }
     }

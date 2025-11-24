@@ -1,4 +1,5 @@
 package co.unicauca.presentation.views;
+
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.enums.Role;
 import co.unicauca.presentation.controllers.DashboardController;
@@ -8,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
 /**
  * Vista de Dashboard con JavaFX
  */
@@ -17,43 +19,56 @@ public class DashboardView {
     private Label userInfoLabel;
     private Button logoutButton;
     private DashboardController controller;    
+    
     public DashboardView(Stage stage, User user, SessionService sessionService) {
         this.controller = new DashboardController(this, stage, sessionService);
         createUI(user);
     }    
+    
     private void createUI(User user) {
         root = new VBox(30);
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(40));
         root.setStyle("-fx-background-color: #F5F5F5;");        
+        
         VBox headerBox = new VBox(10);
         headerBox.setAlignment(Pos.CENTER);
         headerBox.setPadding(new Insets(20));
         headerBox.setStyle("-fx-background-color: #0F4E97; -fx-background-radius: 10;");        
+        
         welcomeLabel = new Label("¡Bienvenido, " + user.getFullName().trim() + "!");
         welcomeLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;");        
+        
         userInfoLabel = new Label();
         userInfoLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #E0E0E0;");        
+        
         String roleText = user.getRole() != null ? user.getRole().getDisplayName() : "Usuario";
         String emailText = user.getEmail() != null ? user.getEmail() : "";
         userInfoLabel.setText("Rol: " + roleText + " | Email: " + emailText);        
+        
         headerBox.getChildren().addAll(welcomeLabel, userInfoLabel);        
+        
         VBox contentBox = new VBox(20);
         contentBox.setAlignment(Pos.CENTER);
         contentBox.setPadding(new Insets(30));
         contentBox.setMaxWidth(600);
         contentBox.setStyle("-fx-background-color: white; -fx-background-radius: 10;");        
+        
         Label contentTitle = new Label("Dashboard");
         contentTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0F4E97;");        
+        
         Label contentText = new Label("Bienvenido al Sistema de Gestión de Trabajos de Grado.\n" +
                                      "Aquí podrás gestionar tus proyectos y evaluaciones.");
         contentText.setStyle("-fx-font-size: 14px; -fx-text-fill: #666;");
         contentText.setAlignment(Pos.CENTER);
         contentText.setWrapText(true);        
+        
         contentBox.getChildren().addAll(contentTitle, contentText);        
+        
         if (user.getRole() == Role.TEACHER) {
             Label formatoALabel = new Label();
             formatoALabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0F4E97; -fx-font-weight: bold;");            
+            
             String estado = user.getFormatoAEstado();
             if (estado == null || estado.isEmpty()) {
                 estado = user.isRequiresFormatoA() ? "Pendiente de diligenciar" : "Sin información";
@@ -63,21 +78,31 @@ public class DashboardView {
             }            
             formatoALabel.setText("Estado del Formato A: " + estado);
             
+            Button fillFormatAButton = new Button("Diligenciar Formato A");
+            fillFormatAButton.setPrefWidth(200);
+            fillFormatAButton.setPrefHeight(40);
+            fillFormatAButton.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; -fx-font-weight: bold;");
+            fillFormatAButton.setOnAction(e -> controller.handleFillFormatA());
+
             Button viewFormatsButton = new Button("Ver Mis Formatos A");
             viewFormatsButton.setPrefWidth(200);
             viewFormatsButton.setPrefHeight(40);
             viewFormatsButton.setStyle("-fx-background-color: #17A2B8; -fx-text-fill: white; -fx-font-weight: bold;");
             viewFormatsButton.setOnAction(e -> controller.handleViewFormats());
             
-            contentBox.getChildren().addAll(formatoALabel, viewFormatsButton);
+            contentBox.getChildren().addAll(formatoALabel, fillFormatAButton, viewFormatsButton);
         }        
+        
         logoutButton = new Button("Cerrar Sesión");
         logoutButton.setPrefWidth(150);
         logoutButton.setPrefHeight(40);
         logoutButton.setStyle("-fx-background-color: #DC3545; -fx-text-fill: white; -fx-font-weight: bold;");        
+        
         root.getChildren().addAll(headerBox, contentBox, logoutButton);        
+        
         logoutButton.setOnAction(e -> controller.handleLogout());
     }    
+    
     public VBox getRoot() {
         return root;
     }
