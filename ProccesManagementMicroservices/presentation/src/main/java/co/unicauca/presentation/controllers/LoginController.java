@@ -6,7 +6,6 @@ import co.unicauca.domain.services.SessionService;
 import co.unicauca.presentation.views.LoginView;
 import co.unicauca.presentation.views.RegisterView;
 import co.unicauca.presentation.views.DashboardView;
-import co.unicauca.presentation.views.FormatAFormView;
 import co.unicauca.presentation.views.CoordinatorDashboardView;
 import co.unicauca.presentation.views.StudentDashboardView;
 import javafx.scene.Scene;
@@ -41,11 +40,6 @@ public class LoginController {
 
         if (!email.toLowerCase().endsWith("@unicauca.edu.co")) {
             view.showError("Debe usar su email institucional (@unicauca.edu.co)");
-            return;
-        }
-
-        if (password.length() < 6) {
-            view.showError("La contraseña debe tener al menos 6 caracteres");
             return;
         }
 
@@ -88,15 +82,6 @@ public class LoginController {
         scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Dashboard - " + user.getFullName());
-    }
-
-    private void showFormatAForm(User user) {
-        FormatAFormView formatAFormView = new FormatAFormView(stage, user, sessionService,
-                updatedUser -> showDashboard(updatedUser != null ? updatedUser : user));
-        Scene scene = new Scene(formatAFormView.getRoot(), 900, 750);
-        scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
-        stage.setScene(scene);
-        stage.setTitle("Formato A - " + user.getEmail());
     }
 
     private void showCoordinatorDashboard(User user) {

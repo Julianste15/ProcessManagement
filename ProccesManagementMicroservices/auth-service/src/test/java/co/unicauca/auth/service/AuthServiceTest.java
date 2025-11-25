@@ -1,5 +1,4 @@
 package co.unicauca.auth.service;
-
 import co.unicauca.auth.dto.AuthResponse;
 import co.unicauca.auth.dto.LoginRequest;
 import co.unicauca.auth.security.JwtService;
@@ -12,10 +11,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.List;
 import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -78,9 +75,7 @@ class AuthServiceTest {
     @Test
     void validateToken_shouldDelegateToJwtService() {
         when(jwtService.validateToken("abc.def.ghi")).thenReturn(true);
-
         boolean result = authService.validateToken("abc.def.ghi");
-
         assertTrue(result);
         verify(jwtService).validateToken("abc.def.ghi");
     }

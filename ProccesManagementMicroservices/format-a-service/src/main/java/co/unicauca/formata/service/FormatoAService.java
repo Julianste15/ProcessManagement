@@ -1,6 +1,4 @@
 package co.unicauca.formata.service;
-
-import co.unicauca.formata.client.EvaluationServiceClient;
 import co.unicauca.formata.dto.FormatARequest;
 import co.unicauca.formata.dto.FormatAResponse;
 import co.unicauca.formata.dto.EvaluationRequest;
@@ -35,8 +33,6 @@ public class FormatoAService {
     private FormatAEventPublisher eventPublisher;
     @Autowired
     private RestTemplate restTemplate;
-    @Autowired
-    private EvaluationServiceClient evaluationServiceClient;
     @Value("${user.service.url:http://user-service/api/users}")
     private String userServiceUrl;
     @Value("${format-a.storage.path:./storage/formata}")
@@ -108,7 +104,6 @@ public class FormatoAService {
             request.put("evaluator1Email", evaluator1Email);
             request.put("evaluator2Email", evaluator2Email);
             request.put("assignedBy", "sistema_format_a");
-            Map<String, Object> response = evaluationServiceClient.assignEvaluators(request);
             logger.info("Evaluadores asignados exitosamente para Formato A: " + formatoA.getId());
             logger.info("Evaluador 1: " + evaluator1Email);
             logger.info("Evaluador 2: " + evaluator2Email);

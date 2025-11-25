@@ -11,99 +11,137 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 /**
- * Vista de Dashboard con JavaFX
+ * Vista de Dashboard con JavaFX - Diseño Moderno
  */
-public class DashboardView {    
-    private VBox root;
+public class DashboardView {
+    
+    private BorderPane root;
     private Label welcomeLabel;
     private Label userInfoLabel;
     private Button logoutButton;
-    private DashboardController controller;    
+    private DashboardController controller;
+    private User user;
     
     public DashboardView(Stage stage, User user, SessionService sessionService) {
         this.controller = new DashboardController(this, stage, sessionService);
-        createUI(user);
-    }    
+        this.user = user;
+        createUI();
+    }
     
-    private void createUI(User user) {
-        root = new VBox(30);
-        root.setAlignment(Pos.CENTER);
-        root.setPadding(new Insets(40));
-        root.setStyle("-fx-background-color: #F5F5F5;");        
+    private void createUI() {
+        root = new BorderPane();
+        root.getStyleClass().add("main-container");
         
-        VBox headerBox = new VBox(10);
-        headerBox.setAlignment(Pos.CENTER);
-        headerBox.setPadding(new Insets(20));
-        headerBox.setStyle("-fx-background-color: #0F4E97; -fx-background-radius: 10;");        
+        // --- SIDEBAR ---
+        VBox sidebar = new VBox(0);
+        sidebar.getStyleClass().add("sidebar");
+        sidebar.setPrefWidth(250);
         
-        welcomeLabel = new Label("¡Bienvenido, " + user.getFullName().trim() + "!");
-        welcomeLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;");        
+        // Logo Area
+        VBox logoBox = new VBox();
+        logoBox.getStyleClass().add("logo-container");
+        Label logoText = new Label("Process\nManagement");
+        logoText.getStyleClass().add("logo-text");
+        logoBox.getChildren().add(logoText);
         
-        userInfoLabel = new Label();
-        userInfoLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #E0E0E0;");        
+        // Navigation Menu
+        VBox navMenu = new VBox(0);
         
-        String roleText = user.getRole() != null ? user.getRole().getDisplayName() : "Usuario";
-        String emailText = user.getEmail() != null ? user.getEmail() : "";
-        userInfoLabel.setText("Rol: " + roleText + " | Email: " + emailText);        
-        
-        headerBox.getChildren().addAll(welcomeLabel, userInfoLabel);        
-        
-        VBox contentBox = new VBox(20);
-        contentBox.setAlignment(Pos.CENTER);
-        contentBox.setPadding(new Insets(30));
-        contentBox.setMaxWidth(600);
-        contentBox.setStyle("-fx-background-color: white; -fx-background-radius: 10;");        
-        
-        Label contentTitle = new Label("Dashboard");
-        contentTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0F4E97;");        
-        
-        Label contentText = new Label("Bienvenido al Sistema de Gestión de Trabajos de Grado.\n" +
-                                     "Aquí podrás gestionar tus proyectos y evaluaciones.");
-        contentText.setStyle("-fx-font-size: 14px; -fx-text-fill: #666;");
-        contentText.setAlignment(Pos.CENTER);
-        contentText.setWrapText(true);        
-        
-        contentBox.getChildren().addAll(contentTitle, contentText);        
+        Button homeBtn = createNavButton("Inicio", true);
+        navMenu.getChildren().add(homeBtn);
         
         if (user.getRole() == Role.TEACHER) {
-            Label formatoALabel = new Label();
-            formatoALabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #0F4E97; -fx-font-weight: bold;");            
+            Button fillFormatABtn = createNavButton("Diligenciar Formato A", false);
+            fillFormatABtn.setOnAction(e -> controller.handleFillFormatA());
             
-            String estado = user.getFormatoAEstado();
-            if (estado == null || estado.isEmpty()) {
-                estado = user.isRequiresFormatoA() ? "Pendiente de diligenciar" : "Sin información";
-            } else {
-                estado = estado.replace('_', ' ').toLowerCase();
-                estado = estado.substring(0, 1).toUpperCase() + estado.substring(1);
-            }            
-            formatoALabel.setText("Estado del Formato A: " + estado);
+            Button viewFormatsBtn = createNavButton("Mis Formatos A", false);
+            viewFormatsBtn.setOnAction(e -> controller.handleViewFormats());
             
-            Button fillFormatAButton = new Button("Diligenciar Formato A");
-            fillFormatAButton.setPrefWidth(200);
-            fillFormatAButton.setPrefHeight(40);
-            fillFormatAButton.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; -fx-font-weight: bold;");
-            fillFormatAButton.setOnAction(e -> controller.handleFillFormatA());
-
-            Button viewFormatsButton = new Button("Ver Mis Formatos A");
-            viewFormatsButton.setPrefWidth(200);
-            viewFormatsButton.setPrefHeight(40);
-            viewFormatsButton.setStyle("-fx-background-color: #17A2B8; -fx-text-fill: white; -fx-font-weight: bold;");
-            viewFormatsButton.setOnAction(e -> controller.handleViewFormats());
-            
-            contentBox.getChildren().addAll(formatoALabel, fillFormatAButton, viewFormatsButton);
-        }        
+            navMenu.getChildren().addAll(fillFormatABtn, viewFormatsBtn);
+        }
         
-        logoutButton = new Button("Cerrar Sesión");
-        logoutButton.setPrefWidth(150);
-        logoutButton.setPrefHeight(40);
-        logoutButton.setStyle("-fx-background-color: #DC3545; -fx-text-fill: white; -fx-font-weight: bold;");        
+        // Spacer to push logout to bottom
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
         
-        root.getChildren().addAll(headerBox, contentBox, logoutButton);        
-        
+        // Logout Button in Sidebar
+        logoutButton = createNavButton("Cerrar Sesión", false);
+        logoutButton.getStyleClass().add("nav-button-logout"); // Optional: add specific style
         logoutButton.setOnAction(e -> controller.handleLogout());
-    }    
+        
+        sidebar.getChildren().addAll(logoBox, navMenu, spacer, logoutButton);
+        root.setLeft(sidebar);
+        
+        // --- MAIN CONTENT AREA ---
+        VBox mainContent = new VBox(20);
+        mainContent.setPadding(new Insets(30));
+        
+        // Header
+        HBox header = new HBox();
+        header.getStyleClass().add("header");
+        header.setAlignment(Pos.CENTER_LEFT);
+        
+        VBox headerText = new VBox(2);
+        welcomeLabel = new Label("Hola, " + user.getNames());
+        welcomeLabel.getStyleClass().add("h2");
+        
+        String roleText = user.getRole() != null ? user.getRole().getDisplayName() : "Usuario";
+        userInfoLabel = new Label(roleText + " | " + user.getEmail());
+        userInfoLabel.getStyleClass().add("subtitle");
+        
+        headerText.getChildren().addAll(welcomeLabel, userInfoLabel);
+        header.getChildren().add(headerText);
+        
+        root.setTop(header);
+        
+        // Dashboard Cards
+        FlowPane cardsContainer = new FlowPane();
+        cardsContainer.setHgap(20);
+        cardsContainer.setVgap(20);
+        
+        // Status Card
+        VBox statusCard = createInfoCard("Estado del Sistema", "Activo y sincronizado");
+        cardsContainer.getChildren().add(statusCard);
+        
+        if (user.getRole() == Role.TEACHER) {
+             String estado = user.getFormatoAEstado();
+             if (estado == null || estado.isEmpty()) {
+                 estado = user.isRequiresFormatoA() ? "Pendiente" : "N/A";
+             }
+             VBox formatCard = createInfoCard("Estado Formato A", estado);
+             cardsContainer.getChildren().add(formatCard);
+        }
+        
+        mainContent.getChildren().addAll(new Label("Resumen General"), cardsContainer);
+        root.setCenter(mainContent);
+    }
     
-    public VBox getRoot() {
+    private Button createNavButton(String text, boolean isActive) {
+        Button btn = new Button(text);
+        btn.setMaxWidth(Double.MAX_VALUE);
+        btn.getStyleClass().add("nav-button");
+        if (isActive) {
+            btn.getStyleClass().add("nav-button-active");
+        }
+        return btn;
+    }
+    
+    private VBox createInfoCard(String title, String value) {
+        VBox card = new VBox(10);
+        card.getStyleClass().add("card");
+        card.setPrefWidth(250);
+        
+        Label titleLbl = new Label(title);
+        titleLbl.getStyleClass().add("subtitle");
+        
+        Label valueLbl = new Label(value);
+        valueLbl.getStyleClass().add("h3");
+        
+        card.getChildren().addAll(titleLbl, valueLbl);
+        return card;
+    }
+    
+    public BorderPane getRoot() {
         return root;
     }
 }

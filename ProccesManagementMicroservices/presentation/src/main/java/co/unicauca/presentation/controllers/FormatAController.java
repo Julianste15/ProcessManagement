@@ -139,6 +139,12 @@ public class FormatAController {
         }
     }
 
+    public void handleBack() {
+        if (onSuccess != null) {
+            onSuccess.accept(sessionService != null ? sessionService.getCurrentUser() : user);
+        }
+    }
+
     public void handleLogout() {
         try {
             if (sessionService != null) {

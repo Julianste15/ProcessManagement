@@ -1,21 +1,27 @@
 package co.unicauca.notification.service;
+
 import co.unicauca.notification.dto.EmailMessage;
+import co.unicauca.notification.events.EvaluatorAssignmentEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.util.logging.Logger;
+
 @Service
 public class NotificationService {
+
     private static final Logger logger = Logger.getLogger(NotificationService.class.getName());
+
     @Autowired
     private EmailServiceSimulado emailService;
+
     @Autowired
     private TemplateService templateService;
+
     @Value("${notification.email.enabled:true}")
     private boolean notificationsEnabled;
-    /**
-     * Notifica cuando se envía un Formato A
-     */
+
+    /** Notifica cuando se envía un Formato A */
     public void notifyFormatoAEnviado(Long formatoAId, String titulo, String directorEmail,
             String modalidad, Integer intento) {
         if (!notificationsEnabled) {
@@ -34,9 +40,8 @@ public class NotificationService {
             logger.severe("Error notificando Formato A enviado: " + e.getMessage());
         }
     }
-    /**
-     * Notifica cuando se evalúa un Formato A
-     */
+
+    /** Notifica cuando se evalúa un Formato A */
     public void notifyFormatoAEvaluado(Long formatoAId, String titulo, String directorEmail,
             String codirectorEmail, String studentEmail, String estado, String observaciones) {
         if (!notificationsEnabled) {
@@ -63,12 +68,10 @@ public class NotificationService {
             logger.info("Notificaciones enviadas para Formato A: " + formatoAId);
         } catch (Exception e) {
             logger.severe("Error notificando Formato A evaluado: " + e.getMessage());
-            e.printStackTrace();
         }
     }
-    /**
-     * Notifica cuando se reintenta un Formato A
-     */
+
+    /** Notifica cuando se reintenta un Formato A */
     public void notifyFormatoAReintentado(Long formatoAId, String titulo, String directorEmail,
             Integer intento) {
         if (!notificationsEnabled) {
@@ -87,9 +90,8 @@ public class NotificationService {
             logger.severe("Error notificando Formato A reintentado: " + e.getMessage());
         }
     }
-    /**
-     * Notificación genérica
-     */
+
+    /** Envío de notificación genérica */
     public void sendGenericNotification(String toEmail, String subject, String message) {
         if (!notificationsEnabled) {
             logger.info("Notificaciones deshabilitadas - omitiendo notificación genérica");
@@ -103,9 +105,44 @@ public class NotificationService {
             logger.severe("Error enviando notificación genérica: " + e.getMessage());
         }
     }
-    /**
-     * Verifica estado del servicio
-     */
+
+    /** Notifica asignación de evaluadores */
+    public void notifyEvaluatorAssignment(EvaluatorAssignmentEvent event) {
+        if (!notificationsEnabled) {
+            logger.info("Notificaciones deshabilitadas - omitiendo asignación de evaluadores");
+            return;
+        }
+        try {
+            String subject = "Asignación como Evaluador - " + event.getAnteprojectTitle();
+            String message = String.format(
+                    "Estimado docente,\n\n" +
+                    "Ha sido asignado como evaluador del anteproyecto '%s'.\n" +
+                    "Por favor ingrese a la plataforma para realizar la evaluación.\n\n" +
+                    "Atentamente,\nCoordinación de Sistemas",
+                    event.getAnteprojectTitle()
+            );
+            logger.info("Notificando a evaluador 1: " + event.getEvaluator1Email());
+            emailService.sendEmail(new EmailMessage(event.getEvaluator1Email(), subject, message));
+            logger.info("Notificando a evaluador 2: " + event.getEvaluator2Email());
+            emailService.sendEmail(new EmailMessage(event.getEvaluator2Email(), subject, message));
+            // Opcional: notificar estudiante y director
+            String infoSubject = "Anteproyecto en Evaluación - " + event.getAnteprojectTitle();
+            String infoMessage = String.format(
+                    "El anteproyecto '%s' ha sido asignado a evaluadores y se encuentra en proceso de evaluación.",
+                    event.getAnteprojectTitle()
+            );
+            if (event.getStudentEmail() != null) {
+                emailService.sendEmail(new EmailMessage(event.getStudentEmail(), infoSubject, infoMessage));
+            }
+            if (event.getDirectorEmail() != null) {
+                emailService.sendEmail(new EmailMessage(event.getDirectorEmail(), infoSubject, infoMessage));
+            }
+        } catch (Exception e) {
+            logger.severe("Error notificando asignación de evaluadores: " + e.getMessage());
+        }
+    }
+
+    /** Verifica estado del servicio */
     public String getServiceStatus() {
         return "Notification Service: " + (notificationsEnabled ? "ACTIVO " : "INACTIVO") +
                 " | Email Service: " + (emailService.isEmailAvailable() ? "SIMULADO " : "ERROR");

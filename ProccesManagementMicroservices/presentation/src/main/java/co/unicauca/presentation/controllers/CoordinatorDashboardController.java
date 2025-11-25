@@ -7,10 +7,12 @@ import co.unicauca.infrastructure.client.MicroserviceClient;
 import co.unicauca.presentation.views.CoordinatorDashboardView;
 import co.unicauca.presentation.views.CoordinatorDashboardView.ProjectRow;
 import co.unicauca.presentation.views.LoginView;
+import co.unicauca.presentation.views.EvaluatorAssignmentDialog;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,6 +32,7 @@ public class CoordinatorDashboardController {
     private final SessionService sessionService;
     private final FormatAService formatAService;
     private final co.unicauca.domain.services.AnteprojectService anteprojectService;
+    private final co.unicauca.domain.services.UserService userService;
 
     public CoordinatorDashboardController(CoordinatorDashboardView view, Stage stage, User user,
             SessionService sessionService) {
@@ -41,6 +44,7 @@ public class CoordinatorDashboardController {
         client.setToken(sessionService.getToken());
         this.formatAService = new FormatAService(client);
         this.anteprojectService = new co.unicauca.domain.services.AnteprojectService(client);
+        this.userService = new co.unicauca.domain.services.UserService();
     }
 
     public void loadProjects() {
@@ -190,6 +194,51 @@ public class CoordinatorDashboardController {
                 }
             }).start();
         });
+    }
+
+    public void handleAssignEvaluators(ProjectRow project) {
+        view.setStatusLabel("Cargando docentes...");
+        new Thread(() -> {
+            try {
+                List<Map<String, Object>> teachers = userService.getSystemsTeachers();
+                
+                Platform.runLater(() -> {
+                    view.setStatusLabel("");
+                    EvaluatorAssignmentDialog dialog = new EvaluatorAssignmentDialog(teachers);
+                    
+                    Optional<Pair<String, String>> result = dialog.showAndWait();
+                    
+                    result.ifPresent(evaluators -> {
+                        assignEvaluators(project.getId(), evaluators.getKey(), evaluators.getValue());
+                    });
+                });
+            } catch (Exception e) {
+                logger.severe("Error cargando docentes: " + e.getMessage());
+                Platform.runLater(() -> {
+                    view.showError("Error cargando lista de docentes: " + e.getMessage());
+                    view.setStatusLabel("Error al cargar docentes");
+                });
+            }
+        }).start();
+    }
+
+    private void assignEvaluators(Long anteprojectId, String evaluator1, String evaluator2) {
+        view.setStatusLabel("Asignando evaluadores...");
+        new Thread(() -> {
+            try {
+                anteprojectService.assignEvaluators(anteprojectId, evaluator1, evaluator2);
+                Platform.runLater(() -> {
+                    view.showSuccess("Evaluadores asignados exitosamente");
+                    loadAnteprojects();
+                });
+            } catch (Exception e) {
+                logger.severe("Error asignando evaluadores: " + e.getMessage());
+                Platform.runLater(() -> {
+                    view.showError("Error asignando evaluadores: " + e.getMessage());
+                    view.setStatusLabel("Error en asignación");
+                });
+            }
+        }).start();
     }
 
     public void handleLogout() {

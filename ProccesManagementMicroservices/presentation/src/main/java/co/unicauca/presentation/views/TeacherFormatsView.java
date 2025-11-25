@@ -13,10 +13,11 @@ import java.time.LocalDate;
 
 /**
  * Vista para que los docentes vean sus formatos A y puedan reenviar los rechazados
+ * Diseño Moderno
  */
 public class TeacherFormatsView {
     
-    private VBox root;
+    private BorderPane root;
     private TableView<FormatRow> formatsTable;
     private Label statusLabel;
     private Button backButton;
@@ -29,60 +30,72 @@ public class TeacherFormatsView {
     }
     
     private void createUI(User user) {
-        root = new VBox(20);
-        root.setAlignment(Pos.TOP_CENTER);
-        root.setPadding(new Insets(30));
-        root.setStyle("-fx-background-color: #F5F5F5;");
+        root = new BorderPane();
+        root.getStyleClass().add("main-container");
         
-        // Header
-        VBox headerBox = new VBox(10);
-        headerBox.setAlignment(Pos.CENTER);
-        headerBox.setPadding(new Insets(20));
-        headerBox.setStyle("-fx-background-color: #0F4E97; -fx-background-radius: 10;");
+        // --- HEADER ---
+        HBox header = new HBox();
+        header.getStyleClass().add("header");
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setSpacing(20);
         
+        VBox headerText = new VBox(2);
         Label titleLabel = new Label("Mis Formatos A");
-        titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;");
+        titleLabel.getStyleClass().add("h2");
         
         Label subtitleLabel = new Label("Docente: " + user.getFullName());
-        subtitleLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #E0E0E0;");
+        subtitleLabel.getStyleClass().add("subtitle");
         
-        headerBox.getChildren().addAll(titleLabel, subtitleLabel);
+        headerText.getChildren().addAll(titleLabel, subtitleLabel);
         
-        // Status label
-        statusLabel = new Label();
-        statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #666;");
-        statusLabel.setVisible(false);
-        
-        // Table
-        formatsTable = createFormatsTable();
-        
-        // Buttons
-        HBox buttonBox = new HBox(15);
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.setPadding(new Insets(10));
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
         
         backButton = new Button("Volver al Dashboard");
-        backButton.setPrefWidth(200);
-        backButton.setPrefHeight(40);
-        backButton.setStyle("-fx-background-color: #6C757D; -fx-text-fill: white; -fx-font-weight: bold;");
+        backButton.getStyleClass().add("button-secondary");
         backButton.setOnAction(e -> controller.handleBack());
         
-        Button refreshButton = new Button("Actualizar");
-        refreshButton.setPrefWidth(150);
-        refreshButton.setPrefHeight(40);
-        refreshButton.setStyle("-fx-background-color: #17A2B8; -fx-text-fill: white; -fx-font-weight: bold;");
+        header.getChildren().addAll(headerText, spacer, backButton);
+        root.setTop(header);
+        
+        // --- CONTENT ---
+        VBox content = new VBox(20);
+        content.setPadding(new Insets(30));
+        content.setAlignment(Pos.TOP_CENTER);
+        
+        // Status Message
+        statusLabel = new Label();
+        statusLabel.getStyleClass().add("status-badge");
+        statusLabel.setVisible(false);
+        statusLabel.setManaged(false);
+        
+        // Table Container (Card)
+        VBox tableCard = new VBox(15);
+        tableCard.getStyleClass().add("card");
+        VBox.setVgrow(tableCard, Priority.ALWAYS);
+        
+        HBox tableActions = new HBox(10);
+        tableActions.setAlignment(Pos.CENTER_RIGHT);
+        
+        Button refreshButton = new Button("Actualizar Lista");
+        refreshButton.getStyleClass().add("button-primary");
         refreshButton.setOnAction(e -> controller.loadFormats());
         
-        buttonBox.getChildren().addAll(refreshButton, backButton);
+        tableActions.getChildren().add(refreshButton);
         
-        root.getChildren().addAll(headerBox, statusLabel, formatsTable, buttonBox);
+        formatsTable = createFormatsTable();
+        VBox.setVgrow(formatsTable, Priority.ALWAYS);
+        
+        tableCard.getChildren().addAll(tableActions, formatsTable);
+        
+        content.getChildren().addAll(statusLabel, tableCard);
+        root.setCenter(content);
     }
     
     @SuppressWarnings("unchecked")
     private TableView<FormatRow> createFormatsTable() {
         TableView<FormatRow> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        table.setPrefHeight(400);
         
         // ID Column
         TableColumn<FormatRow, Long> idCol = new TableColumn<>("ID");
@@ -107,18 +120,23 @@ public class TeacherFormatsView {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
+                getStyleClass().removeAll("status-success", "status-error", "status-warning");
                 if (empty || item == null) {
                     setText(null);
-                    setStyle("");
+                    setGraphic(null);
                 } else {
-                    setText(item);
+                    Label badge = new Label(item);
+                    badge.getStyleClass().add("status-badge");
+                    
                     if (item.contains("RECHAZADO")) {
-                        setStyle("-fx-text-fill: #DC3545; -fx-font-weight: bold;");
+                        badge.getStyleClass().add("status-error");
                     } else if (item.contains("ACEPTADO")) {
-                        setStyle("-fx-text-fill: #28A745; -fx-font-weight: bold;");
+                        badge.getStyleClass().add("status-success");
                     } else {
-                        setStyle("-fx-text-fill: #FFA500; -fx-font-weight: bold;");
+                        badge.getStyleClass().add("status-warning");
                     }
+                    setGraphic(badge);
+                    setText(null);
                 }
             }
         });
@@ -127,25 +145,6 @@ public class TeacherFormatsView {
         TableColumn<FormatRow, String> intentoCol = new TableColumn<>("Intento");
         intentoCol.setCellValueFactory(new PropertyValueFactory<>("intentoDisplay"));
         intentoCol.setPrefWidth(80);
-        intentoCol.setCellFactory(column -> new TableCell<FormatRow, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(item);
-                    if (item.contains("3/3")) {
-                        setStyle("-fx-text-fill: #DC3545; -fx-font-weight: bold;");
-                    } else if (item.contains("2/3")) {
-                        setStyle("-fx-text-fill: #FFA500; -fx-font-weight: bold;");
-                    } else {
-                        setStyle("-fx-text-fill: #666;");
-                    }
-                }
-            }
-        });
         
         // Fecha Column
         TableColumn<FormatRow, LocalDate> fechaCol = new TableColumn<>("Fecha");
@@ -159,7 +158,7 @@ public class TeacherFormatsView {
             private final Button reenviarBtn = new Button("Reenviar");
             
             {
-                reenviarBtn.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; -fx-font-size: 10px;");
+                reenviarBtn.getStyleClass().add("button-primary");
                 reenviarBtn.setOnAction(event -> {
                     FormatRow format = getTableView().getItems().get(getIndex());
                     controller.handleResubmit(format);
@@ -179,12 +178,10 @@ public class TeacherFormatsView {
                     if (isRechazado && !maxIntentos) {
                         reenviarBtn.setDisable(false);
                         reenviarBtn.setText("Reenviar");
-                        reenviarBtn.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; -fx-font-size: 10px;");
                         setGraphic(reenviarBtn);
                     } else if (isRechazado && maxIntentos) {
                         reenviarBtn.setDisable(true);
                         reenviarBtn.setText("Bloqueado");
-                        reenviarBtn.setStyle("-fx-background-color: #999; -fx-text-fill: white; -fx-font-size: 10px;");
                         setGraphic(reenviarBtn);
                     } else {
                         setGraphic(null);
@@ -198,7 +195,7 @@ public class TeacherFormatsView {
         return table;
     }
     
-    public VBox getRoot() {
+    public BorderPane getRoot() {
         return root;
     }
     
@@ -208,12 +205,15 @@ public class TeacherFormatsView {
     
     public void showStatus(String message, boolean isError) {
         statusLabel.setText(message);
-        statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: " + (isError ? "#DC3545" : "#28A745") + "; -fx-font-weight: bold;");
+        statusLabel.getStyleClass().removeAll("status-success", "status-error");
+        statusLabel.getStyleClass().add(isError ? "status-error" : "status-success");
         statusLabel.setVisible(true);
+        statusLabel.setManaged(true);
     }
     
     public void hideStatus() {
         statusLabel.setVisible(false);
+        statusLabel.setManaged(false);
     }
     
     public void showError(String message) {

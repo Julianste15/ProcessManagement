@@ -49,6 +49,12 @@ public class UserService {
             throw new UserException("Error inesperado al registrar usuario: " + e.getMessage(), e);
         }
     }   
+    @SuppressWarnings("unchecked")
+    public java.util.List<Map<String, Object>> getSystemsTeachers() throws Exception {
+        logger.info("Consultando docentes del departamento de sistemas");
+        return (java.util.List<Map<String, Object>>) client.get("/api/users/teachers/systems", java.util.List.class);
+    }
+
     private User convertMapToUser(Map<String, Object> map) {
         User user = new User();        
         if (map.containsKey("id")) {

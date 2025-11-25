@@ -60,6 +60,7 @@ public class DashboardController {
                     updatedUser -> {
                         DashboardView dashboardView = new DashboardView(stage, updatedUser != null ? updatedUser : user, sessionService);
                         Scene scene = new Scene(dashboardView.getRoot(), 900, 700);
+                        scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
                         stage.setScene(scene);
                     });
             Scene scene = new Scene(formatAFormView.getRoot(), 900, 750);
