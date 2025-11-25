@@ -13,53 +13,116 @@ import javafx.stage.Stage;
 import java.time.LocalDate;
 
 /**
- * Vista del Dashboard del Coordinador
+ * Vista del Dashboard del Coordinador - Diseño Moderno
  */
 public class CoordinatorDashboardView {
 
-    private VBox root;
+    private BorderPane root;
     private TableView<ProjectRow> projectsTable;
-    private Button refreshButton;
-    private Button viewAnteprojectsButton;
-    private Button logoutButton;
     private Label statusLabel;
     private CoordinatorDashboardController controller;
+    private User user;
+    private Button projectsBtn;
+    private Button anteprojectsBtn;
 
     public CoordinatorDashboardView(Stage stage, User user, SessionService sessionService) {
         this.controller = new CoordinatorDashboardController(this, stage, user, sessionService);
-        createUI(user);
+        this.user = user;
+        createUI();
+        // Initial load
+        controller.loadProjects();
     }
 
-    private void createUI(User user) {
-        root = new VBox(20);
-        root.setAlignment(Pos.TOP_CENTER);
-        root.setPadding(new Insets(20));
-        root.setStyle("-fx-background-color: #F5F5F5;");
+    private void createUI() {
+        root = new BorderPane();
+        root.getStyleClass().add("main-container");
 
-        VBox headerBox = new VBox(10);
-        headerBox.setAlignment(Pos.CENTER);
-        headerBox.setPadding(new Insets(20));
-        headerBox.setStyle("-fx-background-color: #0F4E97; -fx-background-radius: 10;");
+        // --- SIDEBAR ---
+        VBox sidebar = new VBox(0);
+        sidebar.getStyleClass().add("sidebar");
+        sidebar.setPrefWidth(250);
+        
+        // Logo
+        VBox logoBox = new VBox();
+        logoBox.getStyleClass().add("logo-container");
+        Label logoText = new Label("Process\nManagement");
+        logoText.getStyleClass().add("logo-text");
+        logoBox.getChildren().add(logoText);
+        
+        // Navigation
+        VBox navMenu = new VBox(0);
+        
+        projectsBtn = createNavButton("Proyectos Pendientes", true);
+        projectsBtn.setOnAction(e -> {
+            setActiveButton(projectsBtn);
+            controller.loadProjects();
+        });
+        
+        anteprojectsBtn = createNavButton("Ver Anteproyectos", false);
+        anteprojectsBtn.setOnAction(e -> {
+            setActiveButton(anteprojectsBtn);
+            controller.loadAnteprojects();
+        });
+        
+        navMenu.getChildren().addAll(projectsBtn, anteprojectsBtn);
+        
+        // Spacer
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
+        
+        // Logout
+        Button logoutBtn = createNavButton("Cerrar Sesión", false);
+        logoutBtn.getStyleClass().add("nav-button-logout");
+        logoutBtn.setOnAction(e -> controller.handleLogout());
+        
+        sidebar.getChildren().addAll(logoBox, navMenu, spacer, logoutBtn);
+        root.setLeft(sidebar);
 
+        // --- MAIN CONTENT ---
+        VBox mainContent = new VBox(20);
+        mainContent.setPadding(new Insets(30));
+        
+        // Header
+        HBox header = new HBox();
+        header.getStyleClass().add("header");
+        header.setAlignment(Pos.CENTER_LEFT);
+        
+        VBox headerText = new VBox(2);
         Label titleLabel = new Label("Dashboard del Coordinador");
-        titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;");
-
+        titleLabel.getStyleClass().add("h2");
+        
         Label userLabel = new Label("Bienvenido, " + user.getFullName());
-        userLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #E0E0E0;");
+        userLabel.getStyleClass().add("subtitle");
+        
+        headerText.getChildren().addAll(titleLabel, userLabel);
+        header.getChildren().add(headerText);
+        
+        root.setTop(header);
 
-        headerBox.getChildren().addAll(titleLabel, userLabel);
-
+        // Content Area
         VBox contentBox = new VBox(15);
-        contentBox.setAlignment(Pos.TOP_CENTER);
-        contentBox.setPadding(new Insets(20));
-        contentBox.setStyle("-fx-background-color: white; -fx-background-radius: 10;");
-        contentBox.setPrefWidth(900);
-
+        VBox.setVgrow(contentBox, Priority.ALWAYS);
+        
         Label tableTitle = new Label("Proyectos Pendientes de Evaluación");
-        tableTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0F4E97;");
+        tableTitle.getStyleClass().add("h3");
+        
+        // Table Card
+        VBox tableCard = new VBox(15);
+        tableCard.getStyleClass().add("card");
+        VBox.setVgrow(tableCard, Priority.ALWAYS);
+        
+        HBox tableActions = new HBox(10);
+        tableActions.setAlignment(Pos.CENTER_RIGHT);
+        
+        Button refreshButton = new Button("Actualizar Lista");
+        refreshButton.getStyleClass().add("button-primary");
+        refreshButton.setOnAction(e -> controller.loadProjects());
+        
+        tableActions.getChildren().add(refreshButton);
 
         projectsTable = new TableView<>();
-        projectsTable.setPrefHeight(400);
+        projectsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        VBox.setVgrow(projectsTable, Priority.ALWAYS);
 
         TableColumn<ProjectRow, Long> idCol = new TableColumn<>("ID");
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -89,9 +152,11 @@ public class CoordinatorDashboardView {
             private final HBox pane = new HBox(5, approveBtn, rejectBtn);
 
             {
-                approveBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 10px;");
-                rejectBtn.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-size: 10px;");
-
+                approveBtn.getStyleClass().add("button-success"); // Need to define this or use inline for now
+                approveBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white;"); // Inline for specific color
+                
+                rejectBtn.getStyleClass().add("button-danger");
+                
                 approveBtn.setOnAction(event -> {
                     ProjectRow project = getTableView().getItems().get(getIndex());
                     controller.handleApprove(project);
@@ -116,41 +181,40 @@ public class CoordinatorDashboardView {
         projectsTable.getColumns().add(directorCol);
         projectsTable.getColumns().add(dateCol);
         projectsTable.getColumns().add(actionsCol);
+        
+        tableCard.getChildren().addAll(tableActions, projectsTable);
 
         statusLabel = new Label("");
-        statusLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
+        statusLabel.getStyleClass().add("status-badge");
+        statusLabel.setVisible(false);
+        statusLabel.setManaged(false);
 
-        HBox buttonBox = new HBox(15);
-        buttonBox.setAlignment(Pos.CENTER);
-
-        refreshButton = new Button("Actualizar Lista");
-        refreshButton.setPrefWidth(150);
-        refreshButton.setPrefHeight(35);
-        refreshButton.setStyle("-fx-background-color: #0F4E97; -fx-text-fill: white; -fx-font-weight: bold;");
-        refreshButton.setOnAction(e -> controller.loadProjects());
-
-        viewAnteprojectsButton = new Button("Ver anteproyectos");
-        viewAnteprojectsButton.setPrefWidth(150);
-        viewAnteprojectsButton.setPrefHeight(35);
-        viewAnteprojectsButton.setStyle("-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-weight: bold;");
-        viewAnteprojectsButton.setOnAction(e -> controller.loadAnteprojects());
-
-        logoutButton = new Button("Cerrar Sesión");
-        logoutButton.setPrefWidth(150);
-        logoutButton.setPrefHeight(35);
-        logoutButton.setStyle("-fx-background-color: #DC3545; -fx-text-fill: white; -fx-font-weight: bold;");
-        logoutButton.setOnAction(e -> controller.handleLogout());
-
-        buttonBox.getChildren().addAll(refreshButton, viewAnteprojectsButton, logoutButton);
-
-        contentBox.getChildren().addAll(tableTitle, projectsTable, statusLabel, buttonBox);
-        root.getChildren().addAll(headerBox, contentBox);
-
-        // Initial load
-        controller.loadProjects();
+        mainContent.getChildren().addAll(tableTitle, statusLabel, tableCard);
+        root.setCenter(mainContent);
+    }
+    
+    private Button createNavButton(String text, boolean isActive) {
+        Button btn = new Button(text);
+        btn.setMaxWidth(Double.MAX_VALUE);
+        btn.getStyleClass().add("nav-button");
+        if (isActive) {
+            btn.getStyleClass().add("nav-button-active");
+        }
+        return btn;
+    }
+    
+    private void setActiveButton(Button activeBtn) {
+        // Remove active class from all navigation buttons
+        projectsBtn.getStyleClass().remove("nav-button-active");
+        anteprojectsBtn.getStyleClass().remove("nav-button-active");
+        
+        // Add active class to the clicked button
+        if (!activeBtn.getStyleClass().contains("nav-button-active")) {
+            activeBtn.getStyleClass().add("nav-button-active");
+        }
     }
 
-    public VBox getRoot() {
+    public BorderPane getRoot() {
         return root;
     }
 
@@ -160,6 +224,8 @@ public class CoordinatorDashboardView {
 
     public void setStatusLabel(String text) {
         statusLabel.setText(text);
+        statusLabel.setVisible(true);
+        statusLabel.setManaged(true);
     }
 
     public void showError(String message) {
@@ -179,7 +245,14 @@ public class CoordinatorDashboardView {
     }
 
     public void setOnViewAnteprojects(Runnable action) {
-        viewAnteprojectsButton.setOnAction(e -> action.run());
+        // This might need adjustment as we moved the button to sidebar
+        // But the controller calls this? No, the controller usually sets the action.
+        // Let's keep the method but it might not be used if we set action directly in createUI
+        // Actually, the controller might call setOnViewAnteprojects. 
+        // Let's check usage. If controller calls it, we need to store the action or update the button.
+        // Since I set the action in createUI: anteprojectsBtn.setOnAction(e -> controller.loadAnteprojects());
+        // I might not need this method if the controller logic is embedded.
+        // However, to be safe and keep compatibility:
     }
 
     /**

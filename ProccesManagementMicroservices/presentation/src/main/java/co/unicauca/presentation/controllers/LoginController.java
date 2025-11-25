@@ -44,11 +44,6 @@ public class LoginController {
             return;
         }
 
-        if (password.length() < 6) {
-            view.showError("La contraseña debe tener al menos 6 caracteres");
-            return;
-        }
-
         try {
             logger.info("Intentando login para: " + email);
             User user = sessionService.login(email, password);
