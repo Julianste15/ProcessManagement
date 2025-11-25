@@ -1,5 +1,4 @@
 package co.unicauca.user.controller;
-
 import co.unicauca.user.dto.RegisterRequest;
 import co.unicauca.user.model.User;
 import co.unicauca.user.model.enums.Career;
@@ -14,10 +13,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -46,8 +43,8 @@ class UserControllerTest {
         request.setSurnames("Pérez");
         request.setEmail("juan@unicauca.edu.co");
         request.setPassword("123456");
-        request.setTelephone("123");
-        request.setCareer(Career.SISTEMAS);
+        request.setTelephone(3001234567L);
+        request.setCareer(Career.SYSTEMS_ENGINEERING);
         request.setRole(Role.STUDENT);
 
         User saved = new User();
@@ -55,8 +52,8 @@ class UserControllerTest {
         saved.setNames("Juan");
         saved.setSurnames("Pérez");
         saved.setEmail("juan@unicauca.edu.co");
-        saved.setTelephone("123");
-        saved.setCareer(Career.SISTEMAS);
+        saved.setTelephone(3001234567L);
+        saved.setCareer(Career.SYSTEMS_ENGINEERING);
         saved.setRole(Role.STUDENT);
 
         when(userService.registerUser(any(User.class))).thenReturn(saved);
@@ -67,7 +64,7 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.email").value("juan@unicauca.edu.co"))
-                .andExpect(jsonPath("$.role").value("STUDENT"));
+                .andExpect(jsonPath("$.role").value("estudiante"));
     }
 
     @Test

@@ -1,7 +1,6 @@
 package co.unicauca.user.service;
 
 import co.unicauca.user.exceptions.UserException;
-import co.unicauca.user.exceptions.UserExceptionEnum;
 import co.unicauca.user.model.User;
 import co.unicauca.user.model.enums.Career;
 import co.unicauca.user.model.enums.Role;
@@ -41,8 +40,8 @@ class UserServiceTest {
         user.setSurnames("Pérez");
         user.setEmail("juan@unicauca.edu.co");
         user.setPassword("123456");
-        user.setTelephone("123");
-        user.setCareer(Career.SISTEMAS);
+        user.setTelephone(3001234567L);
+        user.setCareer(Career.SYSTEMS_ENGINEERING);
         user.setRole(Role.STUDENT);
 
         when(userRepository.findByEmail("juan@unicauca.edu.co")).thenReturn(null);
@@ -64,8 +63,8 @@ class UserServiceTest {
     void registerUser_nullUser_throwsUserException() {
         UserException ex = assertThrows(UserException.class,
                 () -> userService.registerUser(null));
-        assertTrue(ex.getExceptionMessages().stream()
-                .anyMatch(msg -> msg.getField() == UserExceptionEnum.NAMES));
+        assertNotNull(ex.getMessage());
+        assertTrue(ex.getMessage().contains("nombres") || ex.getMessage().contains("NAMES"));
     }
 
     @Test

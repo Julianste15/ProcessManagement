@@ -56,7 +56,9 @@ spring:
           predicates:
             - Path=/api/evaluations/**,/api/evaluation-assignments/**
           filters:
-            - AuthenticationFilter
+            - name: AuthenticationFilter
+              args:
+                allowedRoles: TEACHER,COORDINATOR
             - LoggingFilter
             
         - id: format-a-service
@@ -64,7 +66,9 @@ spring:
           predicates:
             - Path=/api/format-a/**
           filters:
-            - AuthenticationFilter
+            - name: AuthenticationFilter
+              args:
+                allowedRoles: STUDENT,TEACHER,COORDINATOR
             - LoggingFilter
             
         - id: anteproject-service
@@ -72,7 +76,9 @@ spring:
           predicates:
             - Path=/api/anteprojects/**
           filters:
-            - AuthenticationFilter
+            - name: AuthenticationFilter
+              args:
+                allowedRoles: STUDENT,TEACHER,COORDINATOR
             - LoggingFilter
 
 eureka:
