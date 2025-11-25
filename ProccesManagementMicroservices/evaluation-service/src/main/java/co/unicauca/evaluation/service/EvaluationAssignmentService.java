@@ -2,7 +2,6 @@ package co.unicauca.evaluation.service;
 import co.unicauca.evaluation.model.EvaluationAssignment;
 import co.unicauca.evaluation.model.AssignmentStatus;
 import co.unicauca.evaluation.repository.EvaluationAssignmentRepository;
-import co.unicauca.evaluation.repository.EvaluationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -13,9 +12,7 @@ import java.util.logging.Logger;
 public class EvaluationAssignmentService {    
     private static final Logger logger = Logger.getLogger(EvaluationAssignmentService.class.getName());    
     @Autowired
-    private EvaluationAssignmentRepository assignmentRepository;    
-    @Autowired
-    private EvaluationRepository evaluationRepository;    
+    private EvaluationAssignmentRepository assignmentRepository;       
     @Autowired
     private EvaluationService evaluationService;    
     public EvaluationAssignment assignEvaluators(Long projectId, String evaluator1Email, 

@@ -132,6 +132,39 @@ public class UserController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
+    
+    /**
+     * ENDPOINT PROTEGIDO - Solo para coordinadores
+     * Obtiene docentes del departamento de sistemas
+     */
+    @GetMapping("/teachers/systems")
+    public ResponseEntity<?> getSystemsTeachers(HttpServletRequest request) {
+        try {
+            String userRole = request.getHeader("X-User-Role");
+            
+            if (!"COORDINATOR".equals(userRole)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Acceso denegado: Se requiere rol COORDINATOR");
+            }
+            
+            List<User> teachers = userRepository.findByRoleAndCareer(
+                co.unicauca.user.model.enums.Role.TEACHER,
+                co.unicauca.user.model.enums.Career.SYSTEMS_ENGINEERING
+            );
+            
+            List<UserDTO> teacherDTOs = teachers.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+            
+            logger.info("Docentes de sistemas encontrados: " + teacherDTOs.size());
+            return ResponseEntity.ok(teacherDTOs);
+            
+        } catch (Exception e) {
+            logger.severe("Error obteniendo docentes de sistemas: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+    
     /**
      * Convierte User a UserDTO (sin password)
      */

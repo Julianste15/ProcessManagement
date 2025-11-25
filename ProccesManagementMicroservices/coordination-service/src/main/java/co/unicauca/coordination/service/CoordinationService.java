@@ -3,7 +3,6 @@ import co.unicauca.coordination.client.AnteprojectClient;
 import co.unicauca.coordination.client.FormatAClient;
 import co.unicauca.coordination.dto.DashboardStatsDTO;
 import co.unicauca.coordination.dto.ProjectSummaryDTO;
-import co.unicauca.coordination.repository.CoordinationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -11,9 +10,7 @@ import java.util.List;
 import java.util.logging.Logger;
 @Service
 public class CoordinationService {    
-    private static final Logger logger = Logger.getLogger(CoordinationService.class.getName());    
-    @Autowired
-    private CoordinationRepository coordinationRepository;    
+    private static final Logger logger = Logger.getLogger(CoordinationService.class.getName());      
     @Autowired
     private AnteprojectClient anteprojectClient;    
     @Autowired

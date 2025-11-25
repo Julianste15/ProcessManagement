@@ -14,9 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.time.LocalDate;
@@ -28,30 +26,25 @@ import java.util.logging.Logger;
 /**
  * Controlador para TeacherFormatsView
  */
-public class TeacherFormatsController {
-    
-    private static final Logger logger = Logger.getLogger(TeacherFormatsController.class.getName());
-    
+public class TeacherFormatsController {    
+    private static final Logger logger = Logger.getLogger(TeacherFormatsController.class.getName());    
     private final TeacherFormatsView view;
     private final Stage stage;
     private final SessionService sessionService;
     private final User user;
-    private final FormatAService formatAService;
-    
+    private final FormatAService formatAService;    
     public TeacherFormatsController(TeacherFormatsView view, Stage stage, SessionService sessionService, User user) {
         this.view = view;
         this.stage = stage;
         this.sessionService = sessionService;
         this.user = user;
         this.formatAService = new FormatAService(sessionService.getClient());
-    }
-    
+    }    
     /**
      * Carga los formatos del docente
      */
     public void loadFormats() {
-        view.hideStatus();
-        
+        view.hideStatus();        
         new Thread(() -> {
             try {
                 logger.info("Cargando formatos para: " + user.getEmail());
@@ -73,8 +66,7 @@ public class TeacherFormatsController {
                         view.showStatus("Formatos cargados: " + formatos.size(), false);
                         logger.info("Formatos cargados exitosamente: " + formatos.size());
                     }
-                });
-                
+                });                
             } catch (Exception e) {
                 logger.severe("Error cargando formatos: " + e.getMessage());
                 e.printStackTrace();
@@ -129,8 +121,6 @@ public class TeacherFormatsController {
             view.showError("Este formato ha alcanzado el máximo de intentos (3). No se puede reenviar.");
             return;
         }
-        
-        // Mostrar observaciones del coordinador
         Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
         confirmDialog.setTitle("Reenviar Formato A");
         confirmDialog.setHeaderText("¿Deseas reenviar este formato?");
@@ -146,22 +136,18 @@ public class TeacherFormatsController {
             obsArea.setWrapText(true);
             obsArea.setPrefRowCount(4);
             content.getChildren().add(obsArea);
-        }
-        
+        }        
         confirmDialog.getDialogPane().setContent(content);
         
         Optional<ButtonType> result = confirmDialog.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            // Abrir formulario de reenvío (reutilizando FormatAFormView)
             openResubmitForm(format);
         }
-    }
-    
-        /**
+    }    
+    /**
      * Abre el formulario para reenviar el formato
      */
     private void openResubmitForm(FormatRow format) {
-        // Mostrar diálogo con las observaciones del coordinador
         if (format.getObservaciones() != null && !format.getObservaciones().isEmpty()) {
             Alert observacionesDialog = new Alert(Alert.AlertType.INFORMATION);
             observacionesDialog.setTitle("Observaciones del Coordinador");
@@ -184,27 +170,22 @@ public class TeacherFormatsController {
                 "Puedes editarlos según las observaciones y reenviar."
             );
             infoLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
-            infoLabel.setWrapText(true);
-            
-            content.getChildren().addAll(warningLabel, obsArea, infoLabel);
-            
+            infoLabel.setWrapText(true);            
+            content.getChildren().addAll(warningLabel, obsArea, infoLabel);            
             observacionesDialog.getDialogPane().setContent(content);
             observacionesDialog.showAndWait();
         }
-        
-        // Abrir formulario pre-llenado con los datos actuales
         FormatAFormView formatAFormView = new FormatAFormView(
             stage, 
             user, 
             sessionService, 
             updatedUser -> {
-                // Volver a la vista de formatos después de enviar
                 TeacherFormatsView formatsView = new TeacherFormatsView(stage, user, sessionService);
                 Scene scene = new Scene(formatsView.getRoot(), 1000, 700);
                 stage.setScene(scene);
                 stage.setTitle("Mis Formatos A - Sistema de Gestión de Trabajos de Grado");
             },
-            format.getId(), // ← AGREGAR ESTE PARÁMETRO (ID del formato)
+            format.getId(),
             format.getTitulo(),
             format.getModalidad(),
             format.getDirectorEmail(),
@@ -219,43 +200,13 @@ public class TeacherFormatsController {
         stage.setScene(scene);
         stage.setTitle("Reenviar Formato A - Intento " + (format.getIntentos() + 1) + "/3");
     }
-    
-    /**
-     * Agrega un campo de texto copiable al contenedor
-     */
-    private void addCopyableField(VBox container, String label, String value) {
-        Label fieldLabel = new Label(label + ":");
-        fieldLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
-        
-        TextField field = new TextField(value != null ? value : "");
-        field.setEditable(false);
-        field.setStyle("-fx-background-color: #F5F5F5;");
-        
-        container.getChildren().addAll(fieldLabel, field);
-    }
-    
-    /**
-     * Agrega un área de texto copiable al contenedor
-     */
-    private void addCopyableTextArea(VBox container, String label, String value) {
-        Label fieldLabel = new Label(label + ":");
-        fieldLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
-        
-        TextArea area = new TextArea(value != null ? value : "");
-        area.setEditable(false);
-        area.setWrapText(true);
-        area.setPrefRowCount(3);
-        area.setStyle("-fx-control-inner-background: #F5F5F5;");
-        
-        container.getChildren().addAll(fieldLabel, area);
-    }
-    
     /**
      * Vuelve al dashboard
      */
     public void handleBack() {
         DashboardView dashboardView = new DashboardView(stage, user, sessionService);
         Scene scene = new Scene(dashboardView.getRoot(), 900, 700);
+        scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Dashboard - Sistema de Gestión de Trabajos de Grado");
     }

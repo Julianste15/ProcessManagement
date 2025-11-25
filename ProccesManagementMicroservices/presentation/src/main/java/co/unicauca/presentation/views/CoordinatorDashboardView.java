@@ -29,35 +29,27 @@ public class CoordinatorDashboardView {
         this.controller = new CoordinatorDashboardController(this, stage, user, sessionService);
         this.user = user;
         createUI();
-        // Initial load
         controller.loadProjects();
     }
 
+    @SuppressWarnings("deprecation")
     private void createUI() {
         root = new BorderPane();
         root.getStyleClass().add("main-container");
-
-        // --- SIDEBAR ---
         VBox sidebar = new VBox(0);
         sidebar.getStyleClass().add("sidebar");
         sidebar.setPrefWidth(250);
-        
-        // Logo
         VBox logoBox = new VBox();
         logoBox.getStyleClass().add("logo-container");
         Label logoText = new Label("Process\nManagement");
         logoText.getStyleClass().add("logo-text");
         logoBox.getChildren().add(logoText);
-        
-        // Navigation
-        VBox navMenu = new VBox(0);
-        
+        VBox navMenu = new VBox(0);        
         projectsBtn = createNavButton("Proyectos Pendientes", true);
         projectsBtn.setOnAction(e -> {
             setActiveButton(projectsBtn);
             controller.loadProjects();
-        });
-        
+        });        
         anteprojectsBtn = createNavButton("Ver Anteproyectos", false);
         anteprojectsBtn.setOnAction(e -> {
             setActiveButton(anteprojectsBtn);
@@ -149,13 +141,16 @@ public class CoordinatorDashboardView {
         actionsCol.setCellFactory(param -> new TableCell<>() {
             private final Button approveBtn = new Button("Aprobar");
             private final Button rejectBtn = new Button("Rechazar");
-            private final HBox pane = new HBox(5, approveBtn, rejectBtn);
+            private final Button assignEvaluatorsBtn = new Button("Asignar Evaluadores");
+            private final HBox pane = new HBox(5);
 
             {
-                approveBtn.getStyleClass().add("button-success"); // Need to define this or use inline for now
-                approveBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white;"); // Inline for specific color
+                approveBtn.getStyleClass().add("button-success");
+                approveBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white;");
                 
                 rejectBtn.getStyleClass().add("button-danger");
+                
+                assignEvaluatorsBtn.getStyleClass().add("button-primary");
                 
                 approveBtn.setOnAction(event -> {
                     ProjectRow project = getTableView().getItems().get(getIndex());
@@ -166,12 +161,29 @@ public class CoordinatorDashboardView {
                     ProjectRow project = getTableView().getItems().get(getIndex());
                     controller.handleReject(project);
                 });
+                
+                assignEvaluatorsBtn.setOnAction(event -> {
+                    ProjectRow project = getTableView().getItems().get(getIndex());
+                    controller.handleAssignEvaluators(project);
+                });
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : pane);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    ProjectRow row = getTableView().getItems().get(getIndex());
+                    if (row != null) {
+                        if ("Anteproyecto".equals(row.getModalidad())) {
+                            pane.getChildren().setAll(assignEvaluatorsBtn);
+                        } else {
+                            pane.getChildren().setAll(approveBtn, rejectBtn);
+                        }
+                        setGraphic(pane);
+                    }
+                }
             }
         });
 

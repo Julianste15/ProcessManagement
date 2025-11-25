@@ -231,7 +231,7 @@ public class FormatAFormView {
         
         // Event handlers
         submitButton.setOnAction(e -> controller.handleSubmit());
-        backButton.setOnAction(e -> controller.handleLogout());
+        backButton.setOnAction(e -> controller.handleBack());
     }
     
     private void prefillForm(String titulo, String modalidad, String directorEmail, String codirectorEmail,

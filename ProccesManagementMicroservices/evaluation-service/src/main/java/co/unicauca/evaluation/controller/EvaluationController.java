@@ -49,8 +49,7 @@ public class EvaluationController {
                                             @RequestParam String comments,@RequestParam(required = false) String recommendations,
                                             HttpServletRequest httpRequest) {
         try {
-            String currentUser = httpRequest.getHeader("X-User-Email");
-            String userRole = httpRequest.getHeader("X-User-Role");            
+            String currentUser = httpRequest.getHeader("X-User-Email");                      
             logger.info("Enviando evaluación - Usuario: " + currentUser);            
             if (!isAssignedEvaluator(evaluationId, currentUser)) {
                 return ResponseEntity.status(403).body("Acceso denegado: No es el evaluador asignado");

@@ -1,5 +1,4 @@
 package co.unicauca.auth.service;
-
 import co.unicauca.auth.dto.LoginRequest;
 import co.unicauca.auth.dto.AuthResponse;
 import co.unicauca.auth.security.JwtService;
@@ -14,47 +13,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
-
 @Service
 public class AuthService {    
-    private static final Logger logger = Logger.getLogger(AuthService.class.getName());
-    
+    private static final Logger logger = Logger.getLogger(AuthService.class.getName());    
     @Autowired
-    private RestTemplate restTemplate;
-    
+    private RestTemplate restTemplate;    
     @Autowired
     private JwtService jwtService;
-
+    @SuppressWarnings("unchecked")
     public AuthResponse authenticate(LoginRequest request) {
         try {
-            logger.info("Autenticando usuario: " + request.getEmail());
-            
-            String userServiceUrl = "http://user-service/api/users/validate-credentials";
-            
+            logger.info("Autenticando usuario: " + request.getEmail());            
+            String userServiceUrl = "http://user-service/api/users/validate-credentials";            
             Map<String, String> userRequest = Map.of(
                 "email", request.getEmail(),
                 "password", request.getPassword()
-            );
-            
+            );            
             ResponseEntity<Map> response = restTemplate.postForEntity(
                 userServiceUrl,
                 userRequest,
                 Map.class
-            );
-            
+            );            
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                Map<String, Object> userData = response.getBody();
-                
+                Map<String, Object> userData = response.getBody();                
                 String email = (String) userData.get("email");
                 String role = (String) userData.get("role");
                 String names = (String) userData.get("names");
                 String surnames = (String) userData.get("surnames");
-                String fullName = ((names != null ? names : "") + " " + (surnames != null ? surnames : "")).trim();
-                
+                String fullName = ((names != null ? names : "") + " " + (surnames != null ? surnames : "")).trim();                
                 boolean requiresFormatoA = false;
                 Long formatoAId = null;
                 String formatoAEstado = "NOT_SUBMITTED";
-
                 if (role != null && "TEACHER".equalsIgnoreCase(role)) {
                     try {
                         String formatAServiceUrl = "http://format-a-service/api/format-a/user/" + email;
@@ -64,9 +53,7 @@ public class AuthService {
                             null,
                             new ParameterizedTypeReference<List<Map<String, Object>>>() {}
                         );
-
                         List<Map<String, Object>> formatos = formatosResponse.getBody();
-
                         if (formatos == null || formatos.isEmpty()) {
                             requiresFormatoA = true;
                             formatoAEstado = "NOT_SUBMITTED";
@@ -74,33 +61,27 @@ public class AuthService {
                             Map<String, Object> latestFormato = formatos.stream()
                                 .filter(Objects::nonNull)
                                 .filter(map -> map.get("id") instanceof Number)
-                                .max(Comparator.comparingLong(map -> ((Number) map.get("id")).longValue()))
-                                .orElse(formatos.get(0));
+                                .max(Comparator.comparingLong(map -> ((Number) map.get("id")).longValue())).orElse(formatos.get(0));
 
                             Object estadoObj = latestFormato.get("estado");
                             if (estadoObj != null) {
                                 formatoAEstado = estadoObj.toString();
                             }
-
                             Object idObj = latestFormato.get("id");
                             if (idObj instanceof Number) {
                                 formatoAId = ((Number) idObj).longValue();
                             }
-
                             boolean tieneAceptado = formatos.stream()
                                 .map(f -> f.get("estado"))
                                 .filter(Objects::nonNull)
                                 .anyMatch(state -> "FORMATO_A_ACEPTADO".equalsIgnoreCase(state.toString()));
-
                             requiresFormatoA = !tieneAceptado;
                         }
                     } catch (Exception ex) {
                         logger.warning("No se pudo verificar el estado del Formato A para " + email + ": " + ex.getMessage());
                     }
-                }
-                
-                String token = jwtService.generateToken(email, role);
-                
+                }                
+                String token = jwtService.generateToken(email, role);                
                 return new AuthResponse(
                     token,
                     email,
@@ -113,21 +94,18 @@ public class AuthService {
                 );
             } else {
                 throw new RuntimeException("Credenciales inválidas");
-            }
-            
+            }            
         } catch (Exception e) {
             logger.severe("Error en autenticación: " + e.getMessage());
             throw new RuntimeException("Error de autenticación: " + e.getMessage());
         }
-    }
-    
+    }    
     /**
      * Valida un token JWT
      */
     public boolean validateToken(String token) {
         return jwtService.validateToken(token);
-    }
-    
+    }    
     /**
      * Cierra sesión
      */
