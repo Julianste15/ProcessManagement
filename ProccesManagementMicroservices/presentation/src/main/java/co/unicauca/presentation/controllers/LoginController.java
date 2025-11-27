@@ -8,6 +8,7 @@ import co.unicauca.presentation.views.RegisterView;
 import co.unicauca.presentation.views.DashboardView;
 import co.unicauca.presentation.views.CoordinatorDashboardView;
 import co.unicauca.presentation.views.StudentDashboardView;
+import co.unicauca.infrastructure.client.MicroserviceClient;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -56,8 +57,18 @@ public class LoginController {
                     logger.info("Usuario es estudiante, redirigiendo a dashboard de estudiante");
                     showStudentDashboard(user);
                 } else {
-                    logger.info("Redirigiendo a dashboard");
-                    showDashboard(user);
+                    // Check if user is Department Head
+                    MicroserviceClient client = new MicroserviceClient("http://localhost:8080");
+                    client.setToken(sessionService.getToken());
+                    co.unicauca.domain.services.UserService userService = new co.unicauca.domain.services.UserService(client);
+                    
+                    if (userService.isDepartmentHead(user.getEmail())) {
+                        logger.info("Usuario es jefe de departamento, redirigiendo a dashboard de jefe");
+                        showDepartmentHeadDashboard(user);
+                    } else {
+                        logger.info("Redirigiendo a dashboard");
+                        showDashboard(user);
+                    }
                 }
             } else {
                 view.showError("Email o contraseña incorrectos");
@@ -98,5 +109,14 @@ public class LoginController {
         scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Mi Proyecto de Grado - " + user.getFullName());
+    }
+
+    private void showDepartmentHeadDashboard(User user) {
+        co.unicauca.presentation.views.DepartmentHeadDashboardView departmentHeadView = 
+            new co.unicauca.presentation.views.DepartmentHeadDashboardView(stage, user, sessionService);
+        Scene scene = new Scene(departmentHeadView.getRoot(), 1000, 700);
+        scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
+        stage.setScene(scene);
+        stage.setTitle("Dashboard Jefe de Departamento - " + user.getFullName());
     }
 }

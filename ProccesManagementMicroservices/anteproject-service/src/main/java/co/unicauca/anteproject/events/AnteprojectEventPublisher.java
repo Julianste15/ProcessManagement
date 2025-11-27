@@ -18,4 +18,15 @@ public class AnteprojectEventPublisher {
             e.printStackTrace();
         }
     }
+
+    public void publishAnteprojectSubmitted(AnteprojectSubmittedEvent event) {
+        try {
+            logger.info("Publicando evento de envío de anteproyecto: " + event.getAnteprojectId());
+            rabbitTemplate.convertAndSend("anteproject.submitted.queue", event);
+            logger.info("Evento publicado exitosamente");
+        } catch (Exception e) {
+            logger.severe("Error publicando evento: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

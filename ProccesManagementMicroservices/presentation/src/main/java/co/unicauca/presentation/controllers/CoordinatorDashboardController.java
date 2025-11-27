@@ -7,12 +7,11 @@ import co.unicauca.infrastructure.client.MicroserviceClient;
 import co.unicauca.presentation.views.CoordinatorDashboardView;
 import co.unicauca.presentation.views.CoordinatorDashboardView.ProjectRow;
 import co.unicauca.presentation.views.LoginView;
-import co.unicauca.presentation.views.EvaluatorAssignmentDialog;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
-import javafx.util.Pair;
+import javafx.util.StringConverter;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,7 +30,6 @@ public class CoordinatorDashboardController {
     private final User user;
     private final SessionService sessionService;
     private final FormatAService formatAService;
-    private final co.unicauca.domain.services.AnteprojectService anteprojectService;
     private final co.unicauca.domain.services.UserService userService;
 
     public CoordinatorDashboardController(CoordinatorDashboardView view, Stage stage, User user,
@@ -43,11 +41,11 @@ public class CoordinatorDashboardController {
         MicroserviceClient client = new MicroserviceClient("http://localhost:8080");
         client.setToken(sessionService.getToken());
         this.formatAService = new FormatAService(client);
-        this.anteprojectService = new co.unicauca.domain.services.AnteprojectService(client);
-        this.userService = new co.unicauca.domain.services.UserService();
+        this.userService = new co.unicauca.domain.services.UserService(client);
     }
 
     public void loadProjects() {
+        view.showProjectsView();
         view.setStatusLabel("Cargando proyectos...");
         new Thread(() -> {
             try {
@@ -95,52 +93,95 @@ public class CoordinatorDashboardController {
         }).start();
     }
 
-    public void loadAnteprojects() {
-        view.setStatusLabel("Cargando anteproyectos...");
+    public void loadDepartmentHeadView() {
+        view.setStatusLabel("Cargando vista de jefe de departamento...");
+        
+        javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(20);
+        content.setPadding(new javafx.geometry.Insets(30));
+        
+        javafx.scene.control.Label title = new javafx.scene.control.Label("Asignación de Jefe de Departamento");
+        title.getStyleClass().add("h3");
+        
+        javafx.scene.control.Label desc = new javafx.scene.control.Label("Seleccione un docente para asignar como Jefe de Departamento.");
+        
+        javafx.scene.control.ComboBox<User> teacherCombo = new javafx.scene.control.ComboBox<>();
+        teacherCombo.setPromptText("Seleccione un docente");
+        teacherCombo.setPrefWidth(300);
+        teacherCombo.setConverter(new StringConverter<User>() {
+            @Override
+            public String toString(User user) {
+                if (user == null) return null;
+                return user.getNames() + " " + user.getSurnames() + " (" + user.getEmail() + ")";
+            }
+
+            @Override
+            public User fromString(String string) {
+                return null;
+            }
+        });
+        
+        // Cargar docentes
         new Thread(() -> {
             try {
-                logger.info("Cargando anteproyectos enviados para el jefe de departamento");
-                List<Map<String, Object>> anteprojects = anteprojectService.getSubmittedAnteprojects();
-
-                logger.info("Anteproyectos recibidos: " + anteprojects.size());
-
+                List<Map<String, Object>> teachers = userService.getSystemsTeachers();
                 Platform.runLater(() -> {
-                    view.getProjectsTable().getItems().clear();
-
-                    for (Map<String, Object> ante : anteprojects) {
-                        try {
-                            Long id = ((Number) ante.get("id")).longValue();
-                            String titulo = (String) ante.get("titulo");
-                            String modalidad = "Anteproyecto";
-                            String director = (String) ante.get("directorEmail");
-
-                            LocalDate fecha = null;
-                            Object fechaObj = ante.get("submissionDate");
-                            if (fechaObj instanceof List) {
-                                List<?> fechaList = (List<?>) fechaObj;
-                                if (fechaList.size() >= 3) {
-                                    int year = ((Number) fechaList.get(0)).intValue();
-                                    int month = ((Number) fechaList.get(1)).intValue();
-                                    int day = ((Number) fechaList.get(2)).intValue();
-                                    fecha = LocalDate.of(year, month, day);
-                                }
-                            }
-
-                            ProjectRow row = new ProjectRow(id, titulo, modalidad, director, fecha);
-                            view.getProjectsTable().getItems().add(row);
-                        } catch (Exception ex) {
-                            logger.warning("Error procesando anteproyecto: " + ex.getMessage());
-                        }
+                    for (Map<String, Object> t : teachers) {
+                        User u = new User();
+                        u.setId(((Number) t.get("id")).longValue());
+                        u.setNames((String) t.get("names"));
+                        u.setSurnames((String) t.get("surnames"));
+                        u.setEmail((String) t.get("email"));
+                        teacherCombo.getItems().add(u);
                     }
-
-                    view.setStatusLabel("Anteproyectos cargados: " + anteprojects.size());
                 });
             } catch (Exception e) {
-                logger.severe("Error cargando anteproyectos: " + e.getMessage());
+                logger.severe("Error cargando docentes: " + e.getMessage());
+                Platform.runLater(() -> view.showError("Error cargando docentes"));
+            }
+        }).start();
+        
+        javafx.scene.control.DatePicker startDate = new javafx.scene.control.DatePicker(LocalDate.now());
+        startDate.setPromptText("Fecha Inicio");
+        
+        javafx.scene.control.DatePicker endDate = new javafx.scene.control.DatePicker(LocalDate.now().plusYears(1));
+        endDate.setPromptText("Fecha Fin");
+        
+        javafx.scene.control.Button assignBtn = new javafx.scene.control.Button("Asignar Jefe");
+        assignBtn.getStyleClass().add("button-primary");
+        assignBtn.setOnAction(e -> {
+            User selected = teacherCombo.getValue();
+            if (selected == null || startDate.getValue() == null || endDate.getValue() == null) {
+                view.showError("Todos los campos son obligatorios");
+                return;
+            }
+            
+            handleAssignDepartmentHead(selected.getId(), startDate.getValue(), endDate.getValue());
+        });
+        
+        content.getChildren().addAll(title, desc, teacherCombo, new javafx.scene.layout.HBox(10, startDate, endDate), assignBtn);
+        
+        view.setCenterContent(content);
+        view.setStatusLabel("");
+    }
+
+    private void handleAssignDepartmentHead(Long teacherId, LocalDate start, LocalDate end) {
+        view.setStatusLabel("Asignando jefe...");
+        new Thread(() -> {
+            try {
+                boolean success = userService.assignDepartmentHead(teacherId, start.toString() + "T00:00:00", end.toString() + "T23:59:59");
                 Platform.runLater(() -> {
-                    String errorMsg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
-                    view.showError("Error cargando anteproyectos: " + errorMsg);
-                    view.setStatusLabel("Error al cargar anteproyectos");
+                    if (success) {
+                        view.showSuccess("Jefe de departamento asignado exitosamente");
+                    } else {
+                        view.showError("No se pudo asignar el jefe de departamento");
+                    }
+                    view.setStatusLabel("");
+                });
+            } catch (Exception e) {
+                logger.severe("Error asignando jefe: " + e.getMessage());
+                Platform.runLater(() -> {
+                    view.showError("Error: " + e.getMessage());
+                    view.setStatusLabel("Error");
                 });
             }
         }).start();
@@ -194,51 +235,6 @@ public class CoordinatorDashboardController {
                 }
             }).start();
         });
-    }
-
-    public void handleAssignEvaluators(ProjectRow project) {
-        view.setStatusLabel("Cargando docentes...");
-        new Thread(() -> {
-            try {
-                List<Map<String, Object>> teachers = userService.getSystemsTeachers();
-                
-                Platform.runLater(() -> {
-                    view.setStatusLabel("");
-                    EvaluatorAssignmentDialog dialog = new EvaluatorAssignmentDialog(teachers);
-                    
-                    Optional<Pair<String, String>> result = dialog.showAndWait();
-                    
-                    result.ifPresent(evaluators -> {
-                        assignEvaluators(project.getId(), evaluators.getKey(), evaluators.getValue());
-                    });
-                });
-            } catch (Exception e) {
-                logger.severe("Error cargando docentes: " + e.getMessage());
-                Platform.runLater(() -> {
-                    view.showError("Error cargando lista de docentes: " + e.getMessage());
-                    view.setStatusLabel("Error al cargar docentes");
-                });
-            }
-        }).start();
-    }
-
-    private void assignEvaluators(Long anteprojectId, String evaluator1, String evaluator2) {
-        view.setStatusLabel("Asignando evaluadores...");
-        new Thread(() -> {
-            try {
-                anteprojectService.assignEvaluators(anteprojectId, evaluator1, evaluator2);
-                Platform.runLater(() -> {
-                    view.showSuccess("Evaluadores asignados exitosamente");
-                    loadAnteprojects();
-                });
-            } catch (Exception e) {
-                logger.severe("Error asignando evaluadores: " + e.getMessage());
-                Platform.runLater(() -> {
-                    view.showError("Error asignando evaluadores: " + e.getMessage());
-                    view.setStatusLabel("Error en asignación");
-                });
-            }
-        }).start();
     }
 
     public void handleLogout() {
