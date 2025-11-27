@@ -1,4 +1,5 @@
-package co.unicauca.anteproject.model;
+package co.unicauca.anteproject.domain.model;
+
 public enum AnteprojectStatus {
     DRAFT("Borrador"),
     SUBMITTED("Enviado"),
@@ -7,11 +8,14 @@ public enum AnteprojectStatus {
     REJECTED("Rechazado"),
     NEEDS_CORRECTIONS("Requiere correcciones"),
     CORRECTIONS_SUBMITTED("Correcciones enviadas"),
-    FINAL_APPROVAL("Aprobación final");    
-    private final String displayName;    
+    FINAL_APPROVAL("Aprobación final");
+    
+    private final String displayName;
+    
     AnteprojectStatus(String displayName) {
         this.displayName = displayName;
-    }    
+    }
+    
     public String getDisplayName() {
         return displayName;
     }
