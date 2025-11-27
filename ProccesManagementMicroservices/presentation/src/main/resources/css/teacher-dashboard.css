@@ -1,0 +1,114 @@
+/* Fondo general del dashboard del profesor */
+.teacher-dashboard-root {
+    -fx-background-color: linear-gradient(to bottom, #f5f7fb, #ffffff);
+    -fx-padding: 0;
+    -fx-font-family: "Segoe UI", "Roboto", system;
+}
+
+/* Barra superior */
+.header-bar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d0d7e2;
+    -fx-border-width: 0 0 1 0;
+}
+
+.title-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f2933;
+}
+
+.subtitle-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6b7280;
+}
+
+/* Chip con cantidad de formatos */
+.badge {
+    -fx-background-color: #e3f2fd;
+    -fx-text-fill: #1565c0;
+    -fx-padding: 4 10 4 10;
+    -fx-background-radius: 12;
+    -fx-font-size: 11px;
+}
+
+/* Título de sección encima de la tabla */
+.section-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4b5563;
+    -fx-padding: 0 0 4 2;
+}
+
+/* Tabla de formatos */
+.table-view.formats-table {
+    -fx-background-color: transparent;
+    -fx-border-color: #d0d7e2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.table-view.formats-table .column-header-background {
+    -fx-background-color: #eef2ff;
+    -fx-background-radius: 8 8 0 0;
+    -fx-border-radius: 8 8 0 0;
+}
+
+.table-view.formats-table .column-header,
+.table-view.formats-table .filler {
+    -fx-size: 28px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.table-view.formats-table .column-header .label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+}
+
+.table-view.formats-table .table-row-cell:odd {
+    -fx-background-color: #f9fafb;
+}
+
+.table-view.formats-table .table-row-cell:selected {
+    -fx-background-color: #dbeafe;
+}
+
+/* Barra inferior */
+.footer-bar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d0d7e2;
+    -fx-border-width: 1 0 0 0;
+}
+
+.status-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6b7280;
+}
+
+/* Botones principales y secundarios */
+.button.primary-button {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-padding: 6 14 6 14;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+}
+
+.button.primary-button:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+.button.secondary-button {
+    -fx-background-color: #eef2ff;
+    -fx-text-fill: #111827;
+    -fx-padding: 5 12 5 12;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+}
+
+.button.secondary-button:hover {
+    -fx-background-color: #e0e7ff;
+}
