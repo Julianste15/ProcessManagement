@@ -78,10 +78,13 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     
     private void populateRequestWithHeaders(ServerWebExchange exchange, String token) {
         Claims claims = getAllClaimsFromToken(token);
+        String isDeptHead = claims.get("isDepartmentHead", Boolean.class) != null 
+            && claims.get("isDepartmentHead", Boolean.class) ? "true" : "false";
         
         exchange.getRequest().mutate()
                 .header("X-User-Email", claims.getSubject())
                 .header("X-User-Role", claims.get("role", String.class))
+                .header("X-User-IsDepartmentHead", isDeptHead)
                 .build();
     }
     

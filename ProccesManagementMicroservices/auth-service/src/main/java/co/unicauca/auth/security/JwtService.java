@@ -13,17 +13,18 @@ public class JwtService {
     public JwtService(JwtConfig jwtConfig) {
         this.jwtConfig = jwtConfig;
     }    
-    public String generateToken(String email, String role) {
+    public String generateToken(String email, String role, boolean isDepartmentHead) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtConfig.getExpiration());        
         return Jwts.builder()
                 .setSubject(email)
                 .claim("role", role)
+                .claim("isDepartmentHead", isDepartmentHead)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
-    }    
+    }   
     /**
      * Valida un token JWT
      */

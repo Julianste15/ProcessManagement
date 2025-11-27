@@ -173,18 +173,33 @@ public class TeacherFormatsView {
                 } else {
                     FormatRow format = getTableView().getItems().get(getIndex());
                     boolean isRechazado = format.getEstado().contains("RECHAZADO");
+                    boolean isAprobado = format.getEstado().contains("ACEPTADO"); // Assuming ACEPTADO is the approved status
                     boolean maxIntentos = format.getIntentos() >= 3;
                     
+                    HBox actions = new HBox(5);
+                    actions.setAlignment(Pos.CENTER);
+
                     if (isRechazado && !maxIntentos) {
                         reenviarBtn.setDisable(false);
                         reenviarBtn.setText("Reenviar");
-                        setGraphic(reenviarBtn);
+                        actions.getChildren().add(reenviarBtn);
                     } else if (isRechazado && maxIntentos) {
                         reenviarBtn.setDisable(true);
                         reenviarBtn.setText("Bloqueado");
-                        setGraphic(reenviarBtn);
-                    } else {
+                        actions.getChildren().add(reenviarBtn);
+                    }
+                    
+                    if (isAprobado) {
+                        Button uploadBtn = new Button("Subir Anteproyecto");
+                        uploadBtn.getStyleClass().add("button-success");
+                        uploadBtn.setOnAction(e -> controller.handleUploadAnteproject(format));
+                        actions.getChildren().add(uploadBtn);
+                    }
+
+                    if (actions.getChildren().isEmpty()) {
                         setGraphic(null);
+                    } else {
+                        setGraphic(actions);
                     }
                 }
             }

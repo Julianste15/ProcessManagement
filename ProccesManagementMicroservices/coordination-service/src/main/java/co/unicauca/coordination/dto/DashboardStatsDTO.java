@@ -12,12 +12,12 @@ public class DashboardStatsDTO {
     }
     public DashboardStatsDTO(Long coordinatorId) {
         this.coordinatorId = coordinatorId;
-        this.totalProjects = totalProjects;
-        this.pendingFormatA = pendingFormatA;
-        this.pendingAnteprojects = pendingAnteprojects;
-        this.approvedProjects = approvedProjects;
-        this.rejectedProjects = rejectedProjects;
-        this.lastUpdate = lastUpdate;
+        this.totalProjects = 0;
+        this.pendingFormatA = 0;
+        this.pendingAnteprojects = 0;
+        this.approvedProjects = 0;
+        this.rejectedProjects = 0;
+        this.lastUpdate = LocalDateTime.now();
     }
     public Long getCoordinatorId() {return coordinatorId;}
     public void setCoordinatorId(Long coordinatorId) {this.coordinatorId = coordinatorId;}

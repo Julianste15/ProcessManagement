@@ -1,7 +1,7 @@
 package co.unicauca.presentation.views;
 
 import co.unicauca.domain.entities.User;
-import co.unicauca.presentation.controllers.CoordinatorDashboardController;
+import co.unicauca.presentation.controllers.DepartmentHeadDashboardController;
 import co.unicauca.domain.services.SessionService;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,26 +13,23 @@ import javafx.stage.Stage;
 import java.time.LocalDate;
 
 /**
- * Vista del Dashboard del Coordinador - Diseño Moderno
+ * Vista del Dashboard del Jefe de Departamento - Gestión de Anteproyectos
  */
-public class CoordinatorDashboardView {
+public class DepartmentHeadDashboardView {
 
     private BorderPane root;
     private TableView<ProjectRow> projectsTable;
     private Label statusLabel;
-    private CoordinatorDashboardController controller;
+    private DepartmentHeadDashboardController controller;
     private User user;
-    private Button projectsBtn;
     private Button anteprojectsBtn;
 
-    public CoordinatorDashboardView(Stage stage, User user, SessionService sessionService) {
-        this.controller = new CoordinatorDashboardController(this, stage, user, sessionService);
+    public DepartmentHeadDashboardView(Stage stage, User user, SessionService sessionService) {
+        this.controller = new DepartmentHeadDashboardController(this, stage, user, sessionService);
         this.user = user;
         createUI();
-        controller.loadProjects();
+        controller.loadAnteprojects();
     }
-
-    private VBox mainContent;
 
     @SuppressWarnings("deprecation")
     private void createUI() {
@@ -47,20 +44,14 @@ public class CoordinatorDashboardView {
         logoText.getStyleClass().add("logo-text");
         logoBox.getChildren().add(logoText);
         VBox navMenu = new VBox(0);        
-        projectsBtn = createNavButton("Proyectos Pendientes", true);
-        projectsBtn.setOnAction(e -> {
-            setActiveButton(projectsBtn);
-            controller.loadProjects();
-        });        
         
-        // Changed from Anteprojects to Department Head
-        anteprojectsBtn = createNavButton("Jefe de Departamento", false);
+        anteprojectsBtn = createNavButton("Anteproyectos", true);
         anteprojectsBtn.setOnAction(e -> {
             setActiveButton(anteprojectsBtn);
-            controller.loadDepartmentHeadView();
+            controller.loadAnteprojects();
         });
         
-        navMenu.getChildren().addAll(projectsBtn, anteprojectsBtn);
+        navMenu.getChildren().addAll(anteprojectsBtn);
         
         // Spacer
         Region spacer = new Region();
@@ -75,7 +66,7 @@ public class CoordinatorDashboardView {
         root.setLeft(sidebar);
 
         // --- MAIN CONTENT ---
-        mainContent = new VBox(20);
+        VBox mainContent = new VBox(20);
         mainContent.setPadding(new Insets(30));
         
         // Header
@@ -84,7 +75,7 @@ public class CoordinatorDashboardView {
         header.setAlignment(Pos.CENTER_LEFT);
         
         VBox headerText = new VBox(2);
-        Label titleLabel = new Label("Dashboard del Coordinador");
+        Label titleLabel = new Label("Dashboard Jefe de Departamento");
         titleLabel.getStyleClass().add("h2");
         
         Label userLabel = new Label("Bienvenido, " + user.getFullName());
@@ -99,7 +90,7 @@ public class CoordinatorDashboardView {
         VBox contentBox = new VBox(15);
         VBox.setVgrow(contentBox, Priority.ALWAYS);
         
-        Label tableTitle = new Label("Proyectos Pendientes de Evaluación");
+        Label tableTitle = new Label("Anteproyectos Recibidos");
         tableTitle.getStyleClass().add("h3");
         
         // Table Card
@@ -112,7 +103,7 @@ public class CoordinatorDashboardView {
         
         Button refreshButton = new Button("Actualizar Lista");
         refreshButton.getStyleClass().add("button-primary");
-        refreshButton.setOnAction(e -> controller.loadProjects());
+        refreshButton.setOnAction(e -> controller.loadAnteprojects());
         
         tableActions.getChildren().add(refreshButton);
 
@@ -128,39 +119,29 @@ public class CoordinatorDashboardView {
         titleCol.setCellValueFactory(new PropertyValueFactory<>("titulo"));
         titleCol.setPrefWidth(250);
 
-        TableColumn<ProjectRow, String> modalityCol = new TableColumn<>("Modalidad");
-        modalityCol.setCellValueFactory(new PropertyValueFactory<>("modalidad"));
-        modalityCol.setPrefWidth(150);
-
         TableColumn<ProjectRow, String> directorCol = new TableColumn<>("Director");
         directorCol.setCellValueFactory(new PropertyValueFactory<>("director"));
         directorCol.setPrefWidth(200);
 
-        TableColumn<ProjectRow, LocalDate> dateCol = new TableColumn<>("Fecha");
+        TableColumn<ProjectRow, String> studentCol = new TableColumn<>("Estudiante");
+        studentCol.setCellValueFactory(new PropertyValueFactory<>("student"));
+        studentCol.setPrefWidth(200);
+
+        TableColumn<ProjectRow, LocalDate> dateCol = new TableColumn<>("Fecha Envío");
         dateCol.setCellValueFactory(new PropertyValueFactory<>("fecha"));
         dateCol.setPrefWidth(100);
 
         TableColumn<ProjectRow, Void> actionsCol = new TableColumn<>("Acciones");
         actionsCol.setPrefWidth(150);
         actionsCol.setCellFactory(param -> new TableCell<>() {
-            private final Button approveBtn = new Button("Aprobar");
-            private final Button rejectBtn = new Button("Rechazar");
+            private final Button assignEvaluatorsBtn = new Button("Asignar Evaluadores");
             private final HBox pane = new HBox(5);
 
             {
-                approveBtn.getStyleClass().add("button-success");
-                approveBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white;");
-                
-                rejectBtn.getStyleClass().add("button-danger");
-                
-                approveBtn.setOnAction(event -> {
+                assignEvaluatorsBtn.getStyleClass().add("button-primary");
+                assignEvaluatorsBtn.setOnAction(event -> {
                     ProjectRow project = getTableView().getItems().get(getIndex());
-                    controller.handleApprove(project);
-                });
-
-                rejectBtn.setOnAction(event -> {
-                    ProjectRow project = getTableView().getItems().get(getIndex());
-                    controller.handleReject(project);
+                    controller.handleAssignEvaluators(project);
                 });
             }
 
@@ -170,7 +151,7 @@ public class CoordinatorDashboardView {
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    pane.getChildren().setAll(approveBtn, rejectBtn);
+                    pane.getChildren().setAll(assignEvaluatorsBtn);
                     setGraphic(pane);
                 }
             }
@@ -178,8 +159,8 @@ public class CoordinatorDashboardView {
 
         projectsTable.getColumns().add(idCol);
         projectsTable.getColumns().add(titleCol);
-        projectsTable.getColumns().add(modalityCol);
         projectsTable.getColumns().add(directorCol);
+        projectsTable.getColumns().add(studentCol);
         projectsTable.getColumns().add(dateCol);
         projectsTable.getColumns().add(actionsCol);
         
@@ -205,9 +186,7 @@ public class CoordinatorDashboardView {
     }
     
     private void setActiveButton(Button activeBtn) {
-        projectsBtn.getStyleClass().remove("nav-button-active");
         anteprojectsBtn.getStyleClass().remove("nav-button-active");
-        
         if (!activeBtn.getStyleClass().contains("nav-button-active")) {
             activeBtn.getStyleClass().add("nav-button-active");
         }
@@ -242,38 +221,26 @@ public class CoordinatorDashboardView {
         alert.setContentText(message);
         alert.showAndWait();
     }
-    
-    // Método para cambiar el contenido central (usado por el controlador)
-    public void setCenterContent(javafx.scene.Node content) {
-        root.setCenter(content);
-    }
 
-    public void showProjectsView() {
-        root.setCenter(mainContent);
-    }
-
-    /**
-     * Inner class to represent a project row in the table
-     */
     public static class ProjectRow {
         private final Long id;
         private final String titulo;
-        private final String modalidad;
         private final String director;
+        private final String student;
         private final LocalDate fecha;
 
-        public ProjectRow(Long id, String titulo, String modalidad, String director, LocalDate fecha) {
+        public ProjectRow(Long id, String titulo, String director, String student, LocalDate fecha) {
             this.id = id;
             this.titulo = titulo;
-            this.modalidad = modalidad;
             this.director = director;
+            this.student = student;
             this.fecha = fecha;
         }
 
         public Long getId() { return id; }
         public String getTitulo() { return titulo; }
-        public String getModalidad() { return modalidad; }
         public String getDirector() { return director; }
+        public String getStudent() { return student; }
         public LocalDate getFecha() { return fecha; }
     }
 }

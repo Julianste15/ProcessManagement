@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import java.util.Comparator;
 import java.util.List;
@@ -20,7 +21,7 @@ public class AuthService {
     private RestTemplate restTemplate;    
     @Autowired
     private JwtService jwtService;
-    @SuppressWarnings("unchecked")
+
     public AuthResponse authenticate(LoginRequest request) {
         try {
             logger.info("Autenticando usuario: " + request.getEmail());            
@@ -29,10 +30,11 @@ public class AuthService {
                 "email", request.getEmail(),
                 "password", request.getPassword()
             );            
-            ResponseEntity<Map> response = restTemplate.postForEntity(
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                 userServiceUrl,
-                userRequest,
-                Map.class
+                HttpMethod.POST,
+                new HttpEntity<>(userRequest),
+                new ParameterizedTypeReference<Map<String, Object>>() {}
             );            
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 Map<String, Object> userData = response.getBody();                
@@ -80,8 +82,24 @@ public class AuthService {
                     } catch (Exception ex) {
                         logger.warning("No se pudo verificar el estado del Formato A para " + email + ": " + ex.getMessage());
                     }
-                }                
-                String token = jwtService.generateToken(email, role);                
+                }             
+                // Check if user is department head
+                boolean isDepartmentHead = false;
+                if (role != null && "TEACHER".equalsIgnoreCase(role)) {
+                    try {
+                        String deptHeadUrl = "http://user-service/api/department-head/current";
+                        ResponseEntity<String> deptHeadResponse = restTemplate.getForEntity(deptHeadUrl, String.class);
+                        if (deptHeadResponse.getStatusCode().is2xxSuccessful() && deptHeadResponse.getBody() != null) {
+                            String deptHeadEmail = deptHeadResponse.getBody().replace("\"", "").trim();
+                            isDepartmentHead = email.equalsIgnoreCase(deptHeadEmail);
+                            logger.info("Usuario " + email + " es jefe de departamento: " + isDepartmentHead);
+                        }
+                    } catch (Exception ex) {
+                        logger.warning("No se pudo verificar si es jefe de departamento: " + ex.getMessage());
+                    }
+                }   
+                String token = jwtService.generateToken(email, role,isDepartmentHead);   
+
                 return new AuthResponse(
                     token,
                     email,

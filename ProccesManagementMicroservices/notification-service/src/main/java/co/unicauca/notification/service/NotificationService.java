@@ -18,6 +18,9 @@ public class NotificationService {
     @Autowired
     private TemplateService templateService;
 
+    @Autowired
+    private co.unicauca.notification.client.UserServiceClient userServiceClient;
+
     @Value("${notification.email.enabled:true}")
     private boolean notificationsEnabled;
 
@@ -139,6 +142,42 @@ public class NotificationService {
             }
         } catch (Exception e) {
             logger.severe("Error notificando asignación de evaluadores: " + e.getMessage());
+        }
+    }
+
+    /** Notifica al jefe de departamento sobre un anteproyecto enviado */
+    public void notifyDepartmentHead(co.unicauca.anteproject.events.AnteprojectSubmittedEvent event) {
+        if (!notificationsEnabled) {
+            logger.info("Notificaciones deshabilitadas - omitiendo notificación a jefe de departamento");
+            return;
+        }
+        try {
+            String departmentHeadEmail = userServiceClient.getCurrentDepartmentHeadEmail();
+            if (departmentHeadEmail == null || departmentHeadEmail.isEmpty()) {
+                logger.warning("No se encontró un jefe de departamento asignado actualmente");
+                return;
+            }
+
+            String subject = "Nuevo Anteproyecto Enviado - ID: " + event.getAnteprojectId();
+            String message = String.format(
+                    "Estimado Jefe de Departamento,\n\n" +
+                    "Se ha enviado un nuevo anteproyecto para su revisión.\n" +
+                    "ID: %d\n" +
+                    "Estudiante: %s\n" +
+                    "Fecha: %s\n" +
+                    "Documento: %s\n\n" +
+                    "Por favor ingrese a la plataforma para asignar evaluadores.\n\n" +
+                    "Atentamente,\nSistema de Gestión de Procesos",
+                    event.getAnteprojectId(),
+                    event.getStudentEmail(),
+                    event.getSubmissionDate(),
+                    event.getDocumentUrl()
+            );
+
+            logger.info("Notificando a jefe de departamento: " + departmentHeadEmail);
+            emailService.sendEmail(new EmailMessage(departmentHeadEmail, subject, message));
+        } catch (Exception e) {
+            logger.severe("Error notificando a jefe de departamento: " + e.getMessage());
         }
     }
 

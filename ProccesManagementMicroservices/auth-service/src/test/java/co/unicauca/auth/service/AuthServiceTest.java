@@ -7,11 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-import java.util.List;
 import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -47,19 +44,7 @@ class AuthServiceTest {
                 any(Map.class),
                 eq(Map.class))).thenReturn(userResponse);
 
-        List<Map<String, Object>> formatos = List.of(
-                Map.of("id", 1L, "estado", "FORMATO_A_EN_EVALUACION"),
-                Map.of("id", 5L, "estado", "FORMATO_A_ACEPTADO"));
-        ResponseEntity<List<Map<String, Object>>> formatosResponse = ResponseEntity.ok(formatos);
-
-        when(restTemplate.exchange(
-                eq("http://format-a-service/api/format-a/user/teacher@unicauca.edu.co"),
-                eq(HttpMethod.GET),
-                isNull(),
-                any(ParameterizedTypeReference.class))).thenReturn(formatosResponse);
-
-        when(jwtService.generateToken("teacher@unicauca.edu.co", "TEACHER"))
-                .thenReturn("jwt-token-123");
+        
 
         AuthResponse response = authService.authenticate(request);
 

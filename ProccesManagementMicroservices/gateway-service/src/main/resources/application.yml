@@ -46,7 +46,7 @@ spring:
         - id: user-service-protected
           uri: lb://USER-SERVICE  
           predicates:
-            - Path=/api/users/**
+            - Path=/api/users/**,/api/department-head/**
           filters:
             - AuthenticationFilter
             - LoggingFilter
