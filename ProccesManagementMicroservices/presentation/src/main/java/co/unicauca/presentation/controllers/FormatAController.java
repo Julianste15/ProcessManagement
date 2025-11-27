@@ -64,11 +64,11 @@ public class FormatAController {
                 view.showError("Debe ingresar al menos un objetivo específico.");
                 return;
             }
-            
+
             // Validate PDF
             if (view.getSelectedPdfFile() == null && !view.isResubmitMode()) {
-                 view.showError("Debe adjuntar el archivo PDF del anteproyecto.");
-                 return;
+                view.showError("Debe adjuntar el archivo PDF del anteproyecto.");
+                return;
             }
 
             // Validate Carta Aceptacion for PRACTICA_PROFESIONAL
@@ -83,12 +83,12 @@ public class FormatAController {
             request.put("titulo", titulo);
             request.put("modalidad", modalidad.name());
             request.put("directorEmail", user.getEmail());
-            
+
             String codirector = view.getCodirectorEmail();
             if (!codirector.isEmpty()) {
                 request.put("codirectorEmail", codirector);
             }
-            
+
             String studentEmail = view.getStudentEmail();
             if (studentEmail.isEmpty()) {
                 view.showError("El correo del estudiante es obligatorio.");
@@ -101,26 +101,27 @@ public class FormatAController {
             request.put("studentEmail", studentEmail);
             request.put("objetivoGeneral", objetivoGeneral);
             request.put("objetivosEspecificos", objetivosEspecificos);
-            
+
             handlePdfPayload(request);
             handleCartaPayload(request);
-            
+
             Map<String, Object> response;
-            
+
             // Verificar si está en modo reenvío o creación
             if (view.isResubmitMode()) {
                 Long formatoAId = view.getFormatoAIdToResubmit();
                 logger.info("Reenviando Formato A ID: " + formatoAId + " para el docente: " + user.getEmail());
                 response = formatAService.resubmitFormatoA(formatoAId, request);
-                view.showInfo("Formato A reenviado exitosamente. El formato ha sido actualizado y está en revisión nuevamente.");
+                view.showInfo(
+                        "Formato A reenviado exitosamente. El formato ha sido actualizado y está en revisión nuevamente.");
             } else {
                 logger.info("Enviando nuevo Formato A para el docente: " + user.getEmail());
                 response = formatAService.submitFormatoA(request);
                 view.showInfo("Formato A enviado exitosamente. El estado actual es: " + user.getFormatoAEstado());
             }
-            
+
             actualizarEstadoUsuario(response);
-            
+
             if (onSuccess != null) {
                 onSuccess.accept(sessionService != null ? sessionService.getCurrentUser() : user);
             }
@@ -129,7 +130,21 @@ public class FormatAController {
             view.showError("No se pudo enviar el Formato A. Verifique la configuración del cliente.");
         } catch (RuntimeException ex) {
             logger.severe("Error del microservicio FormatA: " + ex.getMessage());
-            view.showError(ex.getMessage());
+            if (ex.getMessage() != null && ex.getMessage().contains("menos de 3 rechazos")) {
+                javafx.application.Platform.runLater(() -> {
+                    javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+                            javafx.scene.control.Alert.AlertType.WARNING);
+                    alert.setTitle("No se puede crear otro Formato A");
+                    alert.setHeaderText("Límite de Formato A");
+                    alert.setContentText(
+                            "Solo puedes crear un Formato A a la vez.\n" +
+                                    "Podrás crear uno nuevo cuando el actual haya sido " +
+                                    "rechazado 3 veces por el coordinador.");
+                    alert.showAndWait();
+                });
+            } else {
+                view.showError(ex.getMessage());
+            }
         } catch (IOException ex) {
             logger.severe("No se pudo leer el archivo seleccionado: " + ex.getMessage());
             view.showError("No se pudo leer el archivo seleccionado. Verifique el archivo e intente nuevamente.");
@@ -208,7 +223,7 @@ public class FormatAController {
             view.setSelectedPdfFile(selected);
         }
     }
-    
+
     public void handleSelectCarta() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Seleccionar Carta de Aceptación (PDF)");
@@ -243,7 +258,7 @@ public class FormatAController {
             request.put("archivoPDF", archivoPdf);
         }
     }
-    
+
     private void handleCartaPayload(Map<String, Object> request) throws IOException {
         File selectedCarta = view.getSelectedCartaFile();
         if (selectedCarta != null) {
