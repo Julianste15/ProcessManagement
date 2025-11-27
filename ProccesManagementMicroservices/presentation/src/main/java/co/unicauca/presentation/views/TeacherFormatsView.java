@@ -16,107 +16,124 @@ import java.time.LocalDate;
  * Diseño Moderno
  */
 public class TeacherFormatsView {
-    
+
+    private final Stage stage;
+    private final TeacherFormatsController controller;
+    private final User teacher;       
     private BorderPane root;
     private TableView<FormatRow> formatsTable;
     private Label statusLabel;
+    private Label teacherNameLabel;
+    private Label countBadge;
+    private Button refreshButton;
     private Button backButton;
-    private TeacherFormatsController controller;
+    
     
     public TeacherFormatsView(Stage stage, User user, SessionService sessionService) {
+        this.stage = stage;
+        this.teacher = user;
         this.controller = new TeacherFormatsController(this, stage, sessionService, user);
-        createUI(user);
+        initUI();
         controller.loadFormats();
     }
     
-    private void createUI(User user) {
+    /**
+     * Construye toda la interfaz con mejor estilo.
+     */
+    private void initUI() {
         root = new BorderPane();
-        root.getStyleClass().add("main-container");
+        root.getStyleClass().add("teacher-dashboard-root");
         
         // --- HEADER ---
-        HBox header = new HBox();
-        header.getStyleClass().add("header");
-        header.setAlignment(Pos.CENTER_LEFT);
-        header.setSpacing(20);
+        HBox headerBar = new HBox(12);
+        headerBar.setAlignment(Pos.CENTER_LEFT);
+        headerBar.setPadding(new Insets(16, 16, 12, 16));
+        headerBar.getStyleClass().add("header-bar");
         
-        VBox headerText = new VBox(2);
         Label titleLabel = new Label("Mis Formatos A");
-        titleLabel.getStyleClass().add("h2");
-        
-        Label subtitleLabel = new Label("Docente: " + user.getFullName());
-        subtitleLabel.getStyleClass().add("subtitle");
-        
-        headerText.getChildren().addAll(titleLabel, subtitleLabel);
-        
+        titleLabel.getStyleClass().add("title-label");
+
+        teacherNameLabel = new Label("Docente: " + teacher.getFullName());
+        teacherNameLabel.getStyleClass().add("subtitle-label");
+
+        countBadge = new Label("0 formatos");
+        countBadge.getStyleClass().add("badge");
+
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         
         backButton = new Button("Volver al Dashboard");
-        backButton.getStyleClass().add("button-secondary");
+        backButton.getStyleClass().add("primary-button");
         backButton.setOnAction(e -> controller.handleBack());
-        
-        header.getChildren().addAll(headerText, spacer, backButton);
-        root.setTop(header);
-        
-        // --- CONTENT ---
-        VBox content = new VBox(20);
-        content.setPadding(new Insets(30));
-        content.setAlignment(Pos.TOP_CENTER);
-        
-        // Status Message
-        statusLabel = new Label();
-        statusLabel.getStyleClass().add("status-badge");
-        statusLabel.setVisible(false);
-        statusLabel.setManaged(false);
-        
-        // Table Container (Card)
-        VBox tableCard = new VBox(15);
-        tableCard.getStyleClass().add("card");
-        VBox.setVgrow(tableCard, Priority.ALWAYS);
-        
-        HBox tableActions = new HBox(10);
-        tableActions.setAlignment(Pos.CENTER_RIGHT);
-        
-        Button refreshButton = new Button("Actualizar Lista");
-        refreshButton.getStyleClass().add("button-primary");
-        refreshButton.setOnAction(e -> controller.loadFormats());
-        
-        tableActions.getChildren().add(refreshButton);
-        
-        formatsTable = createFormatsTable();
+
+        Separator verticalSep = new Separator(javafx.geometry.Orientation.VERTICAL);
+        verticalSep.setPrefHeight(24);
+
+        headerBar.getChildren().addAll(
+                titleLabel,
+                verticalSep,
+                teacherNameLabel,
+                countBadge,
+                spacer,
+                backButton);
+
+        root.setTop(headerBar);
+
+        // ---------- CONTENIDO CENTRAL (TABLA) ----------
+        VBox centerBox = new VBox(10);
+        centerBox.setPadding(new Insets(8, 16, 8, 16));
+
+        Label tableTitle = new Label("Formatos cargados");
+        tableTitle.getStyleClass().add("section-title");
+
+        formatsTable = buildFormatsTable();
+        formatsTable.getStyleClass().add("formats-table");
         VBox.setVgrow(formatsTable, Priority.ALWAYS);
-        
-        tableCard.getChildren().addAll(tableActions, formatsTable);
-        
-        content.getChildren().addAll(statusLabel, tableCard);
-        root.setCenter(content);
+        centerBox.getChildren().addAll(tableTitle, formatsTable);
+
+        root.setCenter(centerBox);
+
+        // ---------- BARRA INFERIOR ----------
+        HBox bottomBar = new HBox(12);
+        bottomBar.setAlignment(Pos.CENTER_LEFT);
+        bottomBar.setPadding(new Insets(10, 16, 12, 16));
+        bottomBar.getStyleClass().add("footer-bar");
+
+        statusLabel = new Label("Formatos cargados: 0");
+        statusLabel.getStyleClass().add("status-label");
+
+        Region bottomSpacer = new Region();
+        HBox.setHgrow(bottomSpacer, Priority.ALWAYS);
+
+        refreshButton = new Button("Actualizar lista");
+        refreshButton.getStyleClass().add("secondary-button");
+        refreshButton.setOnAction(e -> controller.loadFormats());
+
+        bottomBar.getChildren().addAll(statusLabel, bottomSpacer, refreshButton);
+        root.setBottom(bottomBar);
     }
     
-    @SuppressWarnings("unchecked")
-    private TableView<FormatRow> createFormatsTable() {
+    /**
+     * Construye la tabla con sus columnas.
+     */
+    private TableView<FormatRow> buildFormatsTable() {
         TableView<FormatRow> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         
-        // ID Column
         TableColumn<FormatRow, Long> idCol = new TableColumn<>("ID");
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-        idCol.setPrefWidth(50);
-        
-        // Título Column
-        TableColumn<FormatRow, String> tituloCol = new TableColumn<>("Título");
-        tituloCol.setCellValueFactory(new PropertyValueFactory<>("titulo"));
-        tituloCol.setPrefWidth(200);
-        
-        // Modalidad Column
-        TableColumn<FormatRow, String> modalidadCol = new TableColumn<>("Modalidad");
-        modalidadCol.setCellValueFactory(new PropertyValueFactory<>("modalidad"));
-        modalidadCol.setPrefWidth(120);
-        
-        // Estado Column
-        TableColumn<FormatRow, String> estadoCol = new TableColumn<>("Estado");
-        estadoCol.setCellValueFactory(new PropertyValueFactory<>("estado"));
-        estadoCol.setPrefWidth(150);
-        estadoCol.setCellFactory(column -> new TableCell<FormatRow, String>() {
+        idCol.setMaxWidth(60);
+
+        TableColumn<FormatRow, String> titleCol = new TableColumn<>("Título");
+        titleCol.setCellValueFactory(new PropertyValueFactory<>("titulo"));
+
+        TableColumn<FormatRow, String> modCol = new TableColumn<>("Modalidad");
+        modCol.setCellValueFactory(new PropertyValueFactory<>("modalidad"));
+
+        TableColumn<FormatRow, String> statusCol = new TableColumn<>("Estado");
+        statusCol.setCellValueFactory(new PropertyValueFactory<>("estado"));
+        statusCol.setCellFactory(column -> new TableCell<FormatRow, String>() {
+
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -129,11 +146,14 @@ public class TeacherFormatsView {
                     badge.getStyleClass().add("status-badge");
                     
                     if (item.contains("RECHAZADO")) {
-                        badge.getStyleClass().add("status-error");
+                        badge.setStyle(
+                                "-fx-background-color: #fee2e2; -fx-text-fill: #991b1b; -fx-padding: 4 8; -fx-background-radius: 12;");
                     } else if (item.contains("ACEPTADO")) {
-                        badge.getStyleClass().add("status-success");
+                        badge.setStyle(
+                                "-fx-background-color: #dcfce7; -fx-text-fill: #166534; -fx-padding: 4 8; -fx-background-radius: 12;");
                     } else {
-                        badge.getStyleClass().add("status-warning");
+                        badge.setStyle(
+                                "-fx-background-color: #fff7ed; -fx-text-fill: #991b1b; -fx-padding: 4 8; -fx-background-radius: 12;");
                     }
                     setGraphic(badge);
                     setText(null);
@@ -142,23 +162,22 @@ public class TeacherFormatsView {
         });
         
         // Intento Column
-        TableColumn<FormatRow, String> intentoCol = new TableColumn<>("Intento");
-        intentoCol.setCellValueFactory(new PropertyValueFactory<>("intentoDisplay"));
-        intentoCol.setPrefWidth(80);
+        TableColumn<FormatRow, String> attemptCol = new TableColumn<>("Intento");
+        attemptCol.setCellValueFactory(new PropertyValueFactory<>("intentoDisplay"));
+        attemptCol.setPrefWidth(90);
         
         // Fecha Column
-        TableColumn<FormatRow, LocalDate> fechaCol = new TableColumn<>("Fecha");
-        fechaCol.setCellValueFactory(new PropertyValueFactory<>("fechaCreacion"));
-        fechaCol.setPrefWidth(100);
+        TableColumn<FormatRow, LocalDate> dateCol = new TableColumn<>("Fecha");
+        dateCol.setCellValueFactory(new PropertyValueFactory<>("fechaCreacion"));
         
         // Acciones Column
-        TableColumn<FormatRow, Void> accionesCol = new TableColumn<>("Acciones");
-        accionesCol.setPrefWidth(120);
-        accionesCol.setCellFactory(param -> new TableCell<FormatRow, Void>() {
+        TableColumn<FormatRow, Void> actionsCol = new TableColumn<>("Acciones");
+        actionsCol.setCellFactory(param -> new TableCell<FormatRow, Void>() {
             private final Button reenviarBtn = new Button("Reenviar");
             
             {
-                reenviarBtn.getStyleClass().add("button-primary");
+                reenviarBtn.getStyleClass().add("primary-button");
+                reenviarBtn.setStyle("-fx-font-size: 11px; -fx-padding: 4 10;");
                 reenviarBtn.setOnAction(event -> {
                     FormatRow format = getTableView().getItems().get(getIndex());
                     controller.handleResubmit(format);
@@ -173,7 +192,7 @@ public class TeacherFormatsView {
                 } else {
                     FormatRow format = getTableView().getItems().get(getIndex());
                     boolean isRechazado = format.getEstado().contains("RECHAZADO");
-                    boolean isAprobado = format.getEstado().contains("ACEPTADO"); // Assuming ACEPTADO is the approved status
+                    boolean isAprobado = format.getEstado().contains("ACEPTADO"); 
                     boolean maxIntentos = format.getIntentos() >= 3;
                     
                     HBox actions = new HBox(5);
@@ -205,7 +224,7 @@ public class TeacherFormatsView {
             }
         });
         
-        table.getColumns().addAll(idCol, tituloCol, modalidadCol, estadoCol, intentoCol, fechaCol, accionesCol);
+        table.getColumns().addAll(idCol, titleCol, modCol, statusCol, attemptCol, dateCol, actionsCol);
         
         return table;
     }
@@ -220,15 +239,19 @@ public class TeacherFormatsView {
     
     public void showStatus(String message, boolean isError) {
         statusLabel.setText(message);
-        statusLabel.getStyleClass().removeAll("status-success", "status-error");
-        statusLabel.getStyleClass().add(isError ? "status-error" : "status-success");
-        statusLabel.setVisible(true);
-        statusLabel.setManaged(true);
+         if (message.startsWith("Formatos cargados:")) {
+            try {
+                String countStr = message.replace("Formatos cargados:", "").trim();
+                int count = Integer.parseInt(countStr);
+                countBadge.setText(count + (count == 1 ? " formato" : " formatos"));
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+        }
     }
     
     public void hideStatus() {
-        statusLabel.setVisible(false);
-        statusLabel.setManaged(false);
+        statusLabel.setText("");
     }
     
     public void showError(String message) {

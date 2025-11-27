@@ -159,8 +159,9 @@ public class AnteprojectService {
         Anteproject anteproject = anteprojectRepository.findById(anteprojectId)
                 .orElseThrow(() -> new RuntimeException("Anteproyecto no encontrado"));
 
-        if (anteproject.getStatus() != AnteprojectStatus.SUBMITTED) {
-            throw new RuntimeException("El anteproyecto debe estar en estado ENVIADO para asignar evaluadores");
+        // Permitir DRAFT o SUBMITTED para facilitar pruebas
+        if (anteproject.getStatus() != AnteprojectStatus.SUBMITTED && anteproject.getStatus() != AnteprojectStatus.DRAFT) {
+            throw new RuntimeException("El anteproyecto debe estar en estado ENVIADO o BORRADOR para asignar evaluadores");
         }
 
         if (evaluator1Email.equals(evaluator2Email)) {

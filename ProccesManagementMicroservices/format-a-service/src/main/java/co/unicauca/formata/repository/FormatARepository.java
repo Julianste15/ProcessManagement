@@ -41,4 +41,10 @@ public interface FormatARepository extends JpaRepository<FormatoA, Long> {
      */
     @Query("SELECT COUNT(f) FROM FormatoA f WHERE f.directorEmail = :email AND f.estado = 'FORMATO_A_RECHAZADO'")
     long countIntentosFallidosByUser(@Param("email") String email);
+
+    /**
+     * Busca los formatos A de un estudiante ordenados por fecha de creación
+     * descendente
+     */
+    List<FormatoA> findByStudentEmailOrderByFechaCreacionDesc(String studentEmail);
 }

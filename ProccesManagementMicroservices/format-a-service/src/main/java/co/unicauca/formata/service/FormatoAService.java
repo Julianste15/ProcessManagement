@@ -44,6 +44,11 @@ public class FormatoAService {
      */
     public FormatAResponse submitFormatoA(FormatARequest request) throws FormatoAException {
         logger.info("Procesando envío de Formato A: " + request.getTitulo());
+        // Regla de negocio: Validar si el estudiante puede crear un nuevo formato
+        if (!canStudentCreateFormatA(request.getStudentEmail())) {
+            throw new FormatoAException(
+                    "El estudiante ya tiene un Formato A activo o con menos de 3 rechazos. No puede crear otro.");
+        }
         validateUserExists(request.getDirectorEmail());
         if (request.getCodirectorEmail() != null && !request.getCodirectorEmail().isEmpty()) {
             validateUserExists(request.getCodirectorEmail());
@@ -69,10 +74,40 @@ public class FormatoAService {
                 request.getObjetivosEspecificos(),
                 archivoPdf,
                 cartaAceptacion);
+        formatoA.setIntentos(1);
         FormatoA savedFormatoA = formatoARepository.save(formatoA);
         eventPublisher.publishFormatoAEnviado(savedFormatoA);
         logger.info("Formato A guardado con ID: " + savedFormatoA.getId());
         return convertToResponse(savedFormatoA);
+    }
+    /**
+     * Regla de negocio:
+     * - Un estudiante solo puede tener un Formato A activo.
+     * - Puede crear otro solo si el último Formato A fue RECHAZADO
+     * y ya alcanzó el 3er rechazo (intentos >= 3).
+     */
+    public boolean canStudentCreateFormatA(String studentEmail) {
+        List<FormatoA> formatos = formatoARepository.findByStudentEmailOrderByFechaCreacionDesc(studentEmail);
+
+        if (formatos.isEmpty()) {
+            // Nunca ha creado un Formato A -> permitido
+            return true;
+        }
+
+        FormatoA ultimo = formatos.get(0);
+
+        // Si el último NO está rechazado -> aún tiene un Formato A activo
+        if (ultimo.getEstado() != EstadoProyecto.FORMATO_A_RECHAZADO) {
+            return false;
+        }
+
+        // Si está rechazado pero tiene menos de 3 intentos -> no puede crear otro
+        Integer intentos = ultimo.getIntentos();
+        if (intentos == null) {
+            intentos = 0;
+        }
+
+        return intentos >= 3;
     }
     /**
      * Evalúa un Formato A

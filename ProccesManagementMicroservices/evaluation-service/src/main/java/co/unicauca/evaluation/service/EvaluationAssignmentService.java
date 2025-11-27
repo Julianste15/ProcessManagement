@@ -35,6 +35,13 @@ public class EvaluationAssignmentService {
     public Optional<EvaluationAssignment> getAssignmentByProject(Long projectId) {
         return assignmentRepository.findByProjectId(projectId);
     }    
+    
+    public List<EvaluationAssignment> getAssignmentsByProject(Long projectId) {
+        return assignmentRepository.findByProjectId(projectId)
+            .map(List::of)
+            .orElse(List.of());
+    }    
+    
     public List<EvaluationAssignment> getAllAssignments() {
         return assignmentRepository.findAll();
     }    
