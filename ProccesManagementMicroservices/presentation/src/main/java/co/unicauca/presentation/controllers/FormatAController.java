@@ -129,7 +129,21 @@ public class FormatAController {
             view.showError("No se pudo enviar el Formato A. Verifique la configuración del cliente.");
         } catch (RuntimeException ex) {
             logger.severe("Error del microservicio FormatA: " + ex.getMessage());
-            view.showError(ex.getMessage());
+            if (ex.getMessage() != null && ex.getMessage().contains("menos de 3 rechazos")) {
+                javafx.application.Platform.runLater(() -> {
+                    javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+                            javafx.scene.control.Alert.AlertType.WARNING);
+                    alert.setTitle("No se puede crear otro Formato A");
+                    alert.setHeaderText("Límite de Formato A");
+                    alert.setContentText(
+                            "Solo puedes crear un Formato A a la vez.\n" +
+                                    "Podrás crear uno nuevo cuando el actual haya sido " +
+                                    "rechazado 3 veces por el coordinador.");
+                    alert.showAndWait();
+                });
+            } else {
+                view.showError(ex.getMessage());
+            }
         } catch (IOException ex) {
             logger.severe("No se pudo leer el archivo seleccionado: " + ex.getMessage());
             view.showError("No se pudo leer el archivo seleccionado. Verifique el archivo e intente nuevamente.");

@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import co.unicauca.user.validation.iValidator;
 import co.unicauca.user.exceptions.UserExceptionEnum;
+import java.util.List;
 import java.util.Optional;
+
 @Service
 public class UserService {    
     @Autowired
@@ -15,6 +17,7 @@ public class UserService {
     private iValidator userValidator;    
     @Autowired
     private PasswordEncryptor passwordEncryptor;    
+    
     /**
      * Registra un nuevo usuario
      */
@@ -39,6 +42,7 @@ public class UserService {
         }        
         return savedUser;
     }    
+    
     /**
      * Obtiene usuario por email
      */
@@ -53,6 +57,7 @@ public class UserService {
             throw new UserException(UserExceptionEnum.EMAIL, "Error al buscar usuario: " + ex.getMessage());
         }
     }    
+    
     /**
      * Valida si la contraseña coincide
      */
@@ -62,6 +67,7 @@ public class UserService {
         }
         return passwordEncryptor.matches(rawPassword, encryptedPassword);
     }    
+    
     /**
      * Obtiene usuario por ID
      */
@@ -70,5 +76,18 @@ public class UserService {
             UserException.throwException(UserExceptionEnum.NAMES, "ID cannot be null or negative");
         }
         return userRepository.findById(id);
+    }
+    
+    /**
+     * Obtiene docentes por carrera
+     */
+    public List<User> getTeachersByCareer(String career) {
+        try {
+            co.unicauca.user.model.enums.Career careerEnum = co.unicauca.user.model.enums.Career.fromValue(career);
+            return userRepository.findByRoleAndCareer(co.unicauca.user.model.enums.Role.TEACHER, careerEnum);
+        } catch (IllegalArgumentException e) {
+            // Si no se encuentra el enum, retornar lista vacía
+            return List.of();
+        }
     }
 }

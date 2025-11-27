@@ -5,6 +5,7 @@ import co.unicauca.domain.services.FormatAService;
 import co.unicauca.domain.services.SessionService;
 import co.unicauca.presentation.views.AnteprojectFormView;
 import co.unicauca.presentation.views.DashboardView;
+import co.unicauca.presentation.views.FormatAFormView;
 import co.unicauca.presentation.views.TeacherFormatsView;
 import co.unicauca.presentation.views.TeacherFormatsView.FormatRow;
 import javafx.application.Platform;
@@ -127,12 +128,42 @@ public class TeacherFormatsController {
         }
     }
 
-    /** Abre el formulario para reenviar el formato (mantiene lógica anterior) */
+    /** Abre el formulario para reenviar el formato */
     private void openResubmitForm(FormatRow format) {
-        // Reuse existing FormatAFormView for resubmission (not modified here)
-        // This method remains unchanged from previous implementation.
-        // For brevity, we delegate to the existing view.
-        // You may implement similar to handleUploadAnteproject if needed.
+        try {
+            String objetivosEspecificos = format.getObjetivosEspecificos();
+            
+            FormatAFormView formatAFormView = new FormatAFormView(
+                stage,
+                user,
+                sessionService,
+                updatedUser -> {
+                    TeacherFormatsView newView = new TeacherFormatsView(stage, user, sessionService);
+                    Scene scene = new Scene(newView.getRoot(), 900, 700);
+                    scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
+                    stage.setScene(scene);
+                    stage.setTitle("Mis Formatos A");
+                },
+                format.getId(),
+                format.getTitulo(),
+                format.getModalidad(),
+                format.getDirectorEmail(),
+                format.getCodirectorEmail(),
+                format.getStudentEmail(),
+                format.getObjetivoGeneral(),
+                objetivosEspecificos,
+                format.getIntentos()
+            );
+            
+            Scene scene = new Scene(formatAFormView.getRoot(), 900, 750);
+            scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
+            stage.setScene(scene);
+            stage.setTitle("Reenviar Formato A - Intento " + (format.getIntentos() + 1) + "/3");
+        } catch (Exception e) {
+            logger.severe("Error abriendo formulario de reenvío: " + e.getMessage());
+            e.printStackTrace();
+            view.showError("Error abriendo formulario: " + e.getMessage());
+        }
     }
 
     /** Abre el formulario para crear y subir un anteproyecto asociado al Formato A */
@@ -142,16 +173,15 @@ public class TeacherFormatsController {
                 user,
                 sessionService,
                 updatedUser -> {
-                    loadFormats();
-                    Scene scene = new Scene(view.getRoot(), 900, 700);
+                    TeacherFormatsView newView = new TeacherFormatsView(stage, user, sessionService);
+                    Scene scene = new Scene(newView.getRoot(), 900, 700);
                     scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
                     stage.setScene(scene);
                     stage.setTitle("Mis Formatos A");
                 },
                 () -> {
-                    // onBack action: restore TeacherFormatsView
-                    loadFormats();
-                    Scene scene = new Scene(view.getRoot(), 900, 700);
+                    TeacherFormatsView newView = new TeacherFormatsView(stage, user, sessionService);
+                    Scene scene = new Scene(newView.getRoot(), 900, 700);
                     scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
                     stage.setScene(scene);
                     stage.setTitle("Mis Formatos A");
@@ -159,7 +189,6 @@ public class TeacherFormatsController {
                 format.getId(),
                 format.getTitulo()
         );
-        // Pre‑fill director email (current logged‑in professor)
         anteprojectFormView.setDirectorEmail(user.getEmail());
         Scene scene = new Scene(anteprojectFormView.getRoot(), 900, 750);
         stage.setScene(scene);

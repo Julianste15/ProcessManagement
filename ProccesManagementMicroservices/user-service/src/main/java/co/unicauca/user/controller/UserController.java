@@ -134,23 +134,27 @@ public class UserController {
     }
     
     /**
-     * ENDPOINT PROTEGIDO - Solo para coordinadores
-     * Obtiene docentes del departamento de sistemas
+     * ENDPOINT PROTEGIDO - Obtiene docentes del programa de Sistemas
+     * Accesible por COORDINATOR o DEPARTMENT_HEAD (TEACHER con header isDepartmentHead=true)
      */
     @GetMapping("/teachers/systems")
     public ResponseEntity<?> getSystemsTeachers(HttpServletRequest request) {
         try {
             String userRole = request.getHeader("X-User-Role");
+            String isDeptHead = request.getHeader("X-User-IsDepartmentHead");
             
-            if (!"COORDINATOR".equals(userRole)) {
+            // Permitir acceso a COORDINATOR o a TEACHER que sea jefe de departamento
+            boolean isCoordinator = "COORDINATOR".equals(userRole);
+            boolean isDepartmentHead = "TEACHER".equals(userRole) && "true".equalsIgnoreCase(isDeptHead);
+            
+            if (!isCoordinator && !isDepartmentHead) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Acceso denegado: Se requiere rol COORDINATOR");
+                    .body("Acceso denegado: Se requiere ser Coordinador o Jefe de Departamento");
             }
             
-            List<User> teachers = userRepository.findByRoleAndCareer(
-                co.unicauca.user.model.enums.Role.TEACHER,
-                co.unicauca.user.model.enums.Career.SYSTEMS_ENGINEERING
-            );
+            logger.info("Obteniendo docentes de sistemas - Usuario: " + request.getHeader("X-User-Email"));
+            
+            List<User> teachers = userService.getTeachersByCareer("Ingeniería de Sistemas");
             
             List<UserDTO> teacherDTOs = teachers.stream()
                 .map(this::convertToDTO)
