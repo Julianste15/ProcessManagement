@@ -51,19 +51,21 @@ public class AnteprojectFormController {
 
     /**
      * Submits the anteproject: creates the record then uploads the PDF.
+     * The student email is automatically fetched from the Format A by the backend.
      */
     public void handleSubmit() {
         String titulo = view.getTitulo();
-        String studentEmail = view.getStudentEmail();
         String directorEmail = view.getDirectorEmail();
         File pdfFile = view.getSelectedPdfFile();
-        if (titulo == null || titulo.isBlank() || studentEmail == null || studentEmail.isBlank() || pdfFile == null) {
-            view.showError("Todos los campos obligatorios y el PDF deben estar completados.");
+        
+        if (titulo == null || titulo.isBlank() || pdfFile == null) {
+            view.showError("El título y el PDF son obligatorios.");
             return;
         }
+        
         try {
-            // 1. Create anteproject record
-            Map<String, Object> created = formatAService.createAnteproject(formatoAId, titulo, studentEmail, directorEmail);
+            // 1. Create anteproject record (studentEmail is fetched automatically from Format A)
+            Map<String, Object> created = formatAService.createAnteproject(formatoAId, titulo, directorEmail);
             Long anteprojectId = null;
             Object idObj = created.get("id");
             if (idObj instanceof Number) {

@@ -187,7 +187,8 @@ public class TeacherFormatsController {
                     stage.setTitle("Mis Formatos A");
                 },
                 format.getId(),
-                format.getTitulo()
+                format.getTitulo(),
+                format.getStudentEmail()
         );
         anteprojectFormView.setDirectorEmail(user.getEmail());
         Scene scene = new Scene(anteprojectFormView.getRoot(), 900, 750);
