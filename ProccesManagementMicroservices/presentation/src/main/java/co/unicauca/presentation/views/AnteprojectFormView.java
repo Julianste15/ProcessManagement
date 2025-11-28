@@ -27,19 +27,19 @@ public class AnteprojectFormView {
     private Button backButton;
     private Label statusLabel;
     private File selectedPdfFile;
-    private Long formatoAId; // id del Formato A al que pertenece este anteproyecto
+    private Long formatoAId;
 
     private final AnteprojectFormController controller;
 
     public AnteprojectFormView(Stage stage, User user, SessionService sessionService,
                                Consumer<User> onSuccess, Runnable onBack, Long formatoAId,
-                               String tituloPrefill) {
+                               String tituloPrefill, String studentEmailPrefill) {
         this.formatoAId = formatoAId;
         this.controller = new AnteprojectFormController(this, stage, sessionService, user, onSuccess, onBack, formatoAId);
-        createUI(tituloPrefill);
+        createUI(tituloPrefill, studentEmailPrefill);
     }
 
-    private void createUI(String tituloPrefill) {
+    private void createUI(String tituloPrefill, String studentEmailPrefill) {
         root = new VBox(20);
         root.setAlignment(Pos.TOP_CENTER);
         root.setPadding(new Insets(30));
@@ -71,21 +71,26 @@ public class AnteprojectFormView {
             tituloField.setText(tituloPrefill);
         }
 
-        // Estudiante (email)
+        // Estudiante (email - READ ONLY, obtenido del Formato A)
         Label estudianteLabel = new Label("Email del Estudiante *");
         estudianteLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
         estudianteField = new TextField();
-        estudianteField.setPromptText("estudiante@unicauca.edu.co");
+        estudianteField.setEditable(false); // SOLO LECTURA
+        estudianteField.setStyle("-fx-background-color: #E9ECEF;");
         estudianteField.setPrefHeight(35);
+        if (studentEmailPrefill != null && !studentEmailPrefill.isBlank()) {
+            estudianteField.setText(studentEmailPrefill);
+        } else {
+            estudianteField.setPromptText("(Se obtiene del Formato A)");
+        }
 
-        // Director (email – read‑only, current user)
+        // Director (email – read-only, current user)
         Label directorLabel = new Label("Email del Director *");
         directorLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
         directorField = new TextField();
         directorField.setEditable(false);
         directorField.setStyle("-fx-background-color: #E9ECEF;");
         directorField.setPrefHeight(35);
-        // the controller will fill this with the logged‑in user email
 
         // PDF selection
         pdfLabel = new Label("Archivo PDF del Anteproyecto *");
