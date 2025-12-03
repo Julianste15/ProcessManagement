@@ -1,5 +1,7 @@
 package co.unicauca.anteproject.application.usecases;
 
+import co.unicauca.anteproject.client.FormatADTO;
+import co.unicauca.anteproject.client.FormatAServiceClient;
 import co.unicauca.anteproject.domain.model.Anteproject;
 import co.unicauca.anteproject.domain.model.AnteprojectStatus;
 import co.unicauca.anteproject.domain.ports.in.CreateAnteprojectUseCase;
@@ -23,25 +25,48 @@ public class AnteprojectApplicationService implements CreateAnteprojectUseCase, 
     private final AnteprojectRepositoryPort anteprojectRepository;
     private final EvaluationServicePort evaluationService;
     private final AnteprojectEventPublisherPort eventPublisher;
+    private final FormatAServiceClient formatAServiceClient;
 
     public AnteprojectApplicationService(AnteprojectRepositoryPort anteprojectRepository,
                                          EvaluationServicePort evaluationService,
-                                         AnteprojectEventPublisherPort eventPublisher) {
+                                         AnteprojectEventPublisherPort eventPublisher,
+                                         FormatAServiceClient formatAServiceClient) {
         this.anteprojectRepository = anteprojectRepository;
         this.evaluationService = evaluationService;
         this.eventPublisher = eventPublisher;
+        this.formatAServiceClient = formatAServiceClient;
     }
 
     @Override
     @Transactional
     public Anteproject createAnteproject(CreateAnteprojectRequest request) {
+        // Validar que no exista un anteproyecto para este Formato A
         if (anteprojectRepository.findByFormatoAId(request.getFormatoAId()).isPresent()) {
             throw new RuntimeException("Ya existe un anteproyecto para este Formato A");
         }
+        
+        // Obtener el Formato A para extraer el studentEmail automáticamente
+        FormatADTO formatA;
+        try {
+            formatA = formatAServiceClient.getFormatoAById(request.getFormatoAId());
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudo obtener el Formato A con ID: " + request.getFormatoAId() + ". Error: " + e.getMessage());
+        }
+        
+        // Validar que el Formato A tenga un estudiante asignado
+        if (formatA.getStudentEmail() == null || formatA.getStudentEmail().trim().isEmpty()) {
+            throw new RuntimeException("El Formato A no tiene un estudiante asignado");
+        }
+        
+        // Validar que el director del request coincida con el del Formato A
+        if (!request.getDirectorEmail().equals(formatA.getDirectorEmail())) {
+            throw new RuntimeException("El director especificado no coincide con el director del Formato A");
+        }
+        
         Anteproject anteproject = new Anteproject();
         anteproject.setFormatoAId(request.getFormatoAId());
         anteproject.setTitulo(request.getTitulo());
-        anteproject.setStudentEmail(request.getStudentEmail());
+        anteproject.setStudentEmail(formatA.getStudentEmail()); // Obtenido automáticamente del Formato A
         anteproject.setDirectorEmail(request.getDirectorEmail());
         
         return anteprojectRepository.save(anteproject);

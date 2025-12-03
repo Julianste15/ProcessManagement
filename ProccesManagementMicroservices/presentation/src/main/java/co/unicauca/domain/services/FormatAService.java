@@ -102,14 +102,14 @@ public class FormatAService {
 
     /**
      * Crea un anteproyecto asociado al Formato A especificado.
+     * El email del estudiante se obtiene automáticamente del Formato A en el backend.
      * @param formatoAId Id del Formato A al que pertenece el anteproyecto.
      * @param titulo Título del anteproyecto.
-     * @param studentEmail Email del estudiante.
      * @param directorEmail Email del director.
      * @return Map que contiene al menos el campo "id" del anteproyecto creado.
      */
     @SuppressWarnings("unchecked")
-    public Map<String, Object> createAnteproject(Long formatoAId, String titulo, String studentEmail, String directorEmail) throws Exception {
+    public Map<String, Object> createAnteproject(Long formatoAId, String titulo, String directorEmail) throws Exception {
         if (client == null) {
             throw new IllegalStateException("No se ha inicializado el cliente para microservicios");
         }
@@ -117,8 +117,8 @@ public class FormatAService {
         Map<String, Object> request = Map.of(
                 "formatoAId", formatoAId,
                 "titulo", titulo,
-                "studentEmail", studentEmail,
                 "directorEmail", directorEmail
+                // studentEmail ya NO se envía - el backend lo obtiene del Formato A
         );
         Object response = client.post("/api/anteprojects", request, Map.class);
         if (response instanceof Map) {
