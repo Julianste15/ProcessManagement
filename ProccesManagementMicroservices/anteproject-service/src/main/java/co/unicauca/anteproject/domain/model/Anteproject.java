@@ -1,8 +1,6 @@
 package co.unicauca.anteproject.domain.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Anteproject {
     private Long id;

@@ -469,6 +469,21 @@ mvn test
 
 ---
 
+## Documentación de API
+
+El proyecto cuenta con documentación interactiva generada con **Swagger/OpenAPI**.
+
+### Acceso a la Documentación
+
+Una vez iniciados los microservicios, puedes acceder a la interfaz de Swagger UI para explorar y probar los endpoints:
+
+| Servicio | URL de Swagger UI |
+|----------|-------------------|
+| **format-a-service** | `http://localhost:8083/swagger-ui/index.html` |
+| *Otros servicios* | *Próximamente* |
+
+---
+
 ## Roadmap y Mejoras Futuras
 
 - [ ] Implementación de tests de integración
@@ -478,7 +493,7 @@ mvn test
 - [ ] Métricas y monitoreo con Prometheus y Grafana
 - [ ] Containerización con Docker y orquestación con Kubernetes
 - [ ] CI/CD con GitHub Actions
-- [ ] Documentación de API con Swagger/OpenAPI
+- [x] Documentación de API con Swagger/OpenAPI (Implementado en format-a-service)
 
 ---
 
