@@ -82,6 +82,7 @@ public class FormatoAServiceTest {
         request.setTitulo("Large Project");
         request.setModalidad(Modalidad.INVESTIGACION);
         request.setDirectorEmail("director@test.com");
+        request.setStudentEmail("student@test.com");
         request.setObjetivoGeneral("General Objective");
         request.setArchivoPdfNombre("large.pdf");
 
@@ -102,5 +103,79 @@ public class FormatoAServiceTest {
         // Assert
         assertNotNull(response);
         assertEquals("Large Project", response.getTitulo());
+    }
+
+    @Test
+    void submitFormatoA_WithTooLargePdf_ThrowsException() {
+        // Arrange
+        FormatARequest request = new FormatARequest();
+        request.setTitulo("Too Large Project");
+        request.setModalidad(Modalidad.INVESTIGACION);
+        request.setDirectorEmail("director@test.com");
+        request.setStudentEmail("student@test.com");
+        request.setObjetivoGeneral("General Objective");
+        request.setArchivoPdfNombre("huge.pdf");
+
+        // Create 11MB dummy content (over 10MB limit)
+        byte[] hugeContent = new byte[11 * 1024 * 1024];
+        request.setArchivoPdfContenido(Base64.getEncoder().encodeToString(hugeContent));
+
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> 
+            formatoAService.submitFormatoA(request));
+        
+        assertTrue(exception.getMessage().contains("El archivo PDF supera el tamaño máximo permitido"));
+    }
+
+    @Test
+    void simulateConcurrentSubmissions_ShouldHandleLoad() throws InterruptedException {
+        int numberOfUsers = 100;
+        java.util.concurrent.ExecutorService executorService = java.util.concurrent.Executors.newFixedThreadPool(20);
+        java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(numberOfUsers);
+        java.util.concurrent.atomic.AtomicInteger successCount = new java.util.concurrent.atomic.AtomicInteger(0);
+        java.util.concurrent.atomic.AtomicInteger errorCount = new java.util.concurrent.atomic.AtomicInteger(0);
+
+        // Mock setup for concurrent use
+        when(restTemplate.getForObject(anyString(), any())).thenReturn(new Object());
+        when(formatoARepository.save(any(FormatoA.class))).thenAnswer(invocation -> {
+            FormatoA f = invocation.getArgument(0);
+            f.setId((long) (Math.random() * 1000));
+            return f;
+        });
+
+        long startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < numberOfUsers; i++) {
+            final int index = i;
+            executorService.submit(() -> {
+                try {
+                    FormatARequest request = new FormatARequest();
+                    request.setTitulo("Project " + index);
+                    request.setModalidad(Modalidad.INVESTIGACION);
+                    request.setDirectorEmail("director" + index + "@test.com");
+                    request.setStudentEmail("student" + index + "@test.com");
+                    request.setObjetivoGeneral("Objective " + index);
+                    request.setArchivoPdfNombre("doc" + index + ".pdf");
+                    request.setArchivoPdfContenido(Base64.getEncoder().encodeToString("content".getBytes()));
+
+                    formatoAService.submitFormatoA(request);
+                    successCount.incrementAndGet();
+                } catch (Exception e) {
+                    errorCount.incrementAndGet();
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        boolean completed = latch.await(20, java.util.concurrent.TimeUnit.SECONDS);
+        executorService.shutdown();
+
+        long duration = System.currentTimeMillis() - startTime;
+        System.out.println("FormatoA Concurrent Load Test: " + numberOfUsers + " submissions processed in " + duration + "ms");
+
+        assertTrue(completed, "Timeout during load test");
+        assertEquals(numberOfUsers, successCount.get(), "All submissions should succeed");
+        assertEquals(0, errorCount.get(), "There should be no errors");
     }
 }
