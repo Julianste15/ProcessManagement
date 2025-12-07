@@ -1,346 +1,541 @@
-# Sistema de Gestión de Procesos Académicos - Microservicios
+# Sistema de Gestión de Trabajos de Grado - FIET
 
-## Descripción General
+<div align="center">
 
-Sistema distribuido basado en microservicios para la gestión de procesos académicos universitarios, específicamente para el manejo de Formatos A, Anteproyectos y Evaluaciones. El sistema implementa una arquitectura hexagonal con comunicación asíncrona mediante eventos.
+![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=java)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen?style=for-the-badge&logo=spring)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue?style=for-the-badge&logo=postgresql)
+![RabbitMQ](https://img.shields.io/badge/RabbitMQ-Messaging-orange?style=for-the-badge&logo=rabbitmq)
+![Microservices](https://img.shields.io/badge/Architecture-Microservices-blueviolet?style=for-the-badge)
+
+**Sistema integral para la gestión del proceso de trabajos de grado en la Facultad de Ingeniería Electrónica y Telecomunicaciones (FIET) de la Universidad del Cauca**
+
+[Características](#-características-principales) •
+[Arquitectura](#-arquitectura-del-sistema) •
+[Tecnologías](#-stack-tecnológico) •
+[Instalación](#-instalación-y-configuración) •
+[Equipo](#-equipo-de-desarrollo)
+
+</div>
+
+---
+
+## Descripción del Proyecto
+
+El **Sistema de Gestión de Trabajos de Grado** es una plataforma completa diseñada para digitalizar y optimizar el flujo de trabajo de proyectos de grado en la FIET. El sistema permite a docentes, estudiantes, coordinadores y jefes de departamento gestionar eficientemente todo el ciclo de vida de un proyecto de grado, desde la presentación inicial del Formato A hasta la evaluación del anteproyecto.
+
+### Objetivos
+
+- **Digitalizar** el proceso de gestión de trabajos de grado
+- **Automatizar** las notificaciones y el flujo de aprobaciones
+- **Centralizar** la información de proyectos en una plataforma única
+- **Facilitar** la comunicación entre todos los actores del proceso
+- **Garantizar** la trazabilidad y el seguimiento de cada proyecto
+
+---
+
+## Características Principales
+
+### Para Docentes
+- Registro en el sistema con validación de credenciales institucionales
+- Presentación del Formato A con información completa del proyecto
+- Reenvío de Formato A rechazado (hasta 3 intentos)
+- Carga de anteproyectos una vez aprobado el Formato A
+- Visualización del estado de sus proyectos
+
+### Para Estudiantes
+- Consulta del estado de su proyecto de grado en tiempo real
+- Recepción de notificaciones sobre evaluaciones
+- Seguimiento del progreso del proyecto
+
+### Para Coordinadores de Programa
+- Evaluación de Formatos A presentados
+- Aprobación o rechazo con observaciones detalladas
+- Listado completo de proyectos y sus estados
+- Notificaciones automáticas de nuevos envíos
+
+### Para Jefes de Departamento
+- Visualización de anteproyectos enviados
+- Asignación de evaluadores del departamento
+- Notificación automática a evaluadores designados
+
+---
 
 ## Arquitectura del Sistema
 
-### Diagrama de Contexto (C4)
-![Diagrama de Contexto](./docs/diagrams/context_diagram.png)
+El sistema está construido siguiendo una **arquitectura de microservicios**, lo que garantiza escalabilidad, mantenibilidad y desacoplamiento de responsabilidades.
 
-El sistema interactúa con cuatro tipos de usuarios principales:
-- **Estudiantes**: Envían Formatos A y Anteproyectos
-- **Profesores/Directores**: Revisan y aprueban documentos
-- **Jefes de Departamento**: Asignan evaluadores
-- **Coordinadores**: Gestionan el proceso completo
+### Diagrama de Arquitectura
 
-### Diagrama de Contenedores (C4)
-![Diagrama de Contenedores](./docs/diagrams/container_diagram.png)
+```mermaid
+graph TB
+    subgraph "Capa de Presentación"
+        UI[JavaFX Desktop Application]
+    end
+    
+    subgraph "API Gateway Layer"
+        GW[Gateway Service<br/>Port: 8080<br/>JWT Authentication]
+    end
+    
+    subgraph "Service Discovery"
+        EUREKA[Eureka Server<br/>Port: 8761<br/>Service Registry]
+    end
+    
+    subgraph "Microservicios de Negocio"
+        AUTH[Auth Service<br/>Port: 8081<br/>Authentication & JWT]
+        USER[User Service<br/>Port: 8082<br/>User Management]
+        FORMATA[Format-A Service<br/>Port: 8083<br/>Format A Workflow]
+        COORD[Coordination Service<br/>Port: 8084<br/>Evaluation & Coordination]
+        ANTE[Anteproject Service<br/>Port: 8085<br/>Anteproject Management]
+        EVAL[Evaluation Service<br/>Port: 8086<br/>Evaluator Assignment]
+        NOTIF[Notification Service<br/>Port: 8087<br/>Email Notifications]
+    end
+    
+    subgraph "Message Broker"
+        RABBIT[RabbitMQ<br/>Asynchronous Events]
+    end
+    
+    subgraph "Bases de Datos"
+        DB1[(PostgreSQL<br/>Auth DB)]
+        DB2[(PostgreSQL<br/>Users DB)]
+        DB3[(PostgreSQL<br/>Format-A DB)]
+        DB4[(PostgreSQL<br/>Coordination DB)]
+        DB5[(PostgreSQL<br/>Anteproject DB)]
+        DB6[(PostgreSQL<br/>Evaluation DB)]
+        DB7[(PostgreSQL<br/>Notification DB)]
+    end
+    
+    UI -->|HTTP/REST| GW
+    GW --> EUREKA
+    GW --> AUTH
+    GW --> USER
+    GW --> FORMATA
+    GW --> COORD
+    GW --> ANTE
+    GW --> EVAL
+    
+    AUTH --> EUREKA
+    USER --> EUREKA
+    FORMATA --> EUREKA
+    COORD --> EUREKA
+    ANTE --> EUREKA
+    EVAL --> EUREKA
+    NOTIF --> EUREKA
+    
+    FORMATA -.->|Events| RABBIT
+    COORD -.->|Events| RABBIT
+    ANTE -.->|Events| RABBIT
+    EVAL -.->|Events| RABBIT
+    RABBIT -.->|Consume| NOTIF
+    
+    AUTH --> DB1
+    USER --> DB2
+    FORMATA --> DB3
+    COORD --> DB4
+    ANTE --> DB5
+    EVAL --> DB6
+    NOTIF --> DB7
+    
+    FORMATA -->|Feign Client| USER
+    COORD -->|Feign Client| USER
+    ANTE -->|Feign Client| FORMATA
+    EVAL -->|Feign Client| USER
 
-#### Componentes Principales:
-- **API Gateway**: Punto de entrada único, enrutamiento y seguridad
-- **Eureka Server**: Descubrimiento de servicios
-- **Microservicios**:
-  - User Service (Gestión de usuarios y autenticación)
-  - Format-A Service (Gestión de Formatos A)
-  - Anteproject Service (Gestión de Anteproyectos)
-  - Evaluation Service (Gestión de Evaluaciones)
-  - Notification Service (Envío de notificaciones)
-- **RabbitMQ**: Message broker para comunicación asíncrona
-- **PostgreSQL**: Base de datos por microservicio
-- **JavaFX Client**: Interfaz de escritorio
+    style UI fill:#e1f5ff
+    style GW fill:#fff4e1
+    style EUREKA fill:#ffe1f5
+    style RABBIT fill:#f5e1ff
+    style AUTH fill:#e1ffe1
+    style USER fill:#e1ffe1
+    style FORMATA fill:#e1ffe1
+    style COORD fill:#e1ffe1
+    style ANTE fill:#e1ffe1
+    style EVAL fill:#e1ffe1
+    style NOTIF fill:#e1ffe1
+```
 
-### Diagrama de Componentes (C4)
-![Diagrama de Componentes](./docs/diagrams/component_diagram.png)
+### Componentes del Sistema
 
-Cada microservicio implementa **Arquitectura Hexagonal**:
-- **Núcleo de Dominio**: Entidades, lógica de negocio, puertos
-- **Adaptadores de Entrada**: REST Controllers, Event Consumers
-- **Adaptadores de Salida**: Repositorios JPA, Event Publishers, REST Clients
+#### 1. **Presentation Layer** (JavaFX)
+- Aplicación de escritorio desarrollada con JavaFX 21
+- Interfaz gráfica intuitiva para todos los roles de usuario
+- Comunicación con microservicios a través del API Gateway
 
-### Diagrama de Contextos Acotados (DDD)
-![Diagrama de Bounded Contexts](./docs/diagrams/bounded_context_diagram.png)
+#### 2. **API Gateway** (Spring Cloud Gateway)
+- Punto de entrada único para todas las peticiones
+- Autenticación y autorización con JWT
+- Enrutamiento dinámico a microservicios
+- Circuit breaker con Resilience4j
 
-#### Bounded Contexts:
-1. **User Management Context**: Autenticación, autorización, perfiles
-2. **Format Management Context**: Gestión de Formatos A
-3. **Anteproject Management Context**: Gestión de Anteproyectos
-4. **Evaluation Context**: Asignación y gestión de evaluaciones
-5. **Notification Context**: Notificaciones por email
+#### 3. **Service Discovery** (Eureka)
+- Registro y descubrimiento de servicios
+- Balanceo de carga automático
+- Alta disponibilidad de servicios
 
-## Tecnologías Utilizadas
+#### 4. **Microservicios de Negocio**
+
+| Servicio | Puerto | Responsabilidad |
+|----------|--------|-----------------|
+| **auth-service** | 8081 | Autenticación de usuarios, generación de tokens JWT |
+| **user-service** | 8082 | Gestión de usuarios (docentes, estudiantes, coordinadores) |
+| **format-a-service** | 8083 | Gestión del Formato A, validaciones, control de intentos |
+| **coordination-service** | 8084 | Evaluación de Formatos A, aprobaciones/rechazos |
+| **anteproject-service** | 8085 | Gestión de anteproyectos, carga de documentos |
+| **evaluation-service** | 8086 | Asignación de evaluadores, gestión de evaluaciones |
+| **notification-service** | 8087 | Envío de notificaciones por email (asíncrono) |
+
+#### 5. **Message Broker** (RabbitMQ)
+- Comunicación asíncrona entre microservicios
+- Patrón de eventos para notificaciones
+- Desacoplamiento de servicios
+
+#### 6. **Bases de Datos** (PostgreSQL)
+- Base de datos independiente por microservicio
+- Aislamiento de datos y autonomía de servicios
+
+---
+
+## Stack Tecnológico
 
 ### Backend
-- **Java 17**: Lenguaje de programación
-- **Spring Boot 3.x**: Framework principal
-- **Spring Cloud**: Microservicios (Gateway, Eureka, Config)
-- **PostgreSQL**: Base de datos relacional
-- **RabbitMQ**: Message broker
-- **Maven**: Gestión de dependencias
+- **Java 17** - Lenguaje de programación
+- **Spring Boot 3.2.0** - Framework principal
+- **Spring Cloud 2023.0.0** - Microservicios y patrones cloud-native
+  - Spring Cloud Gateway - API Gateway
+  - Spring Cloud Netflix Eureka - Service Discovery
+  - Spring Cloud OpenFeign - Client HTTP declarativo
+  - Resilience4j - Circuit Breaker
+- **Spring Data JPA** - Persistencia de datos
+- **Spring AMQP** - Integración con RabbitMQ
+- **Spring Security** - Seguridad (en desarrollo)
 
 ### Frontend
-- **JavaFX**: Interfaz gráfica de escritorio
-- **Scene Builder**: Diseño de interfaces
+- **JavaFX 21** - Framework para aplicaciones de escritorio
+- **Jackson** - Serialización/deserialización JSON
 
-### Testing
-- **JUnit 5**: Framework de pruebas
-- **Mockito**: Mocking para pruebas unitarias
-- **Spring Boot Test**: Pruebas de integración
+### Bases de Datos
+- **PostgreSQL** - Base de datos relacional
 
-## Pruebas Implementadas
+### Mensajería
+- **RabbitMQ** - Message broker para comunicación asíncrona
 
-### 1. Anteproject Service Tests
-**Archivo**: `AnteprojectApplicationServiceTest.java`
+### Autenticación
+- **JWT (JSON Web Tokens)** - Autenticación stateless
+- **JJWT 0.11.5** - Librería para manejo de JWT
 
-#### Pruebas Funcionales:
-- ✅ **createAnteproject_Success**: Creación exitosa de anteproyecto
-- ✅ **createAnteproject_AlreadyExists_ThrowsException**: Validación de duplicados
-- ✅ **createAnteproject_DirectorMismatch_ThrowsException**: Validación de director
-- ✅ **createAnteproject_FormatANoStudent_ThrowsException**: Validación de estudiante
-- ✅ **submitDocument_AsStudent_Success**: Envío de documento por estudiante
-- ✅ **submitDocument_UnauthorizedUser_ThrowsException**: Control de acceso
-- ✅ **assignEvaluators_Success**: Asignación de evaluadores
-- ✅ **assignEvaluators_SameEvaluator_ThrowsException**: Validación de evaluadores únicos
-- ✅ **getSubmittedAnteprojectsForDepartmentHead_Success**: Consulta de anteproyectos
-- ✅ **getAnteprojectById_Success**: Búsqueda por ID
-- ✅ **getAnteprojectById_NotFound_ThrowsException**: Manejo de errores
-- ✅ **updateStatus_Success**: Actualización de estado
+### Herramientas de Desarrollo
+- **Maven** - Gestión de dependencias y build
+- **Git** - Control de versiones
+- **Lombok** - Reducción de código boilerplate
 
-#### Pruebas de Carga:
-- ✅ **simulateConcurrentUsage_ShouldHandleMultipleUsers**: 
-  - Simula 100 usuarios concurrent
-  - Pool de 20 hilos
-  - Timeout de 10 segundos
-  - Verifica que todas las peticiones se completen exitosamente
+---
 
-### 2. Evaluation Service Tests
-**Archivo**: `EvaluationServiceTest.java`
+## Requisitos Funcionales
 
-#### Pruebas Funcionales:
-- ✅ **createEvaluation_Success**: Creación de evaluación
-- ✅ **createEvaluation_AlreadyExists_ThrowsException**: Validación de duplicados
-- ✅ **submitEvaluation_Success_Approved**: Evaluación aprobada (score >= 3.0)
-- ✅ **submitEvaluation_Success_Rejected**: Evaluación rechazada (score < 3.0)
+El sistema implementa los siguientes requisitos funcionales de alto valor:
 
-#### Pruebas de Carga:
-- ✅ **simulateConcurrentEvaluations_ShouldHandleLoad**:
-  - Simula 100 evaluadores concurrentes
-  - Pool de 20 hilos
-  - Timeout de 10 segundos
-  - Verifica procesamiento exitoso de todas las evaluaciones
+### RF-01: Registro de Docentes
+**Como** docente **necesito** registrarme en el sistema **para** iniciar el flujo de un proyecto de grado.
 
-### 3. Format-A Service Tests
-**Archivo**: `FormatoAServiceTest.java`
+**Datos requeridos:**
+- Nombres y apellidos
+- Celular (opcional)
+- Programa académico (Ingeniería de Sistemas, Ingeniería Electrónica y Telecomunicaciones, Automática Industrial, Tecnología en Telemática)
+- Email institucional
+- Contraseña (mínimo 6 caracteres, al menos un dígito, un carácter especial y una mayúscula)
 
-#### Pruebas Funcionales:
-- ✅ **submitFormatoA_WithValidPdf_ShouldSuccess**: Envío con PDF válido
-- ✅ **submitFormatoA_WithLargePdf_ShouldSuccess**: PDF de 6MB (dentro del límite)
-- ✅ **submitFormatoA_WithTooLargePdf_ThrowsException**: PDF > 10MB rechazado
+### RF-02: Presentación del Formato A
+**Como** docente **necesito** subir el Formato A **para** comenzar el proceso de proyecto de grado.
 
-#### Pruebas de Carga:
-- ✅ **simulateConcurrentSubmissions_ShouldHandleLoad**:
-  - Simula 100 envíos concurrentes
-  - Pool de 20 hilos
-  - Timeout de 20 segundos
-  - Verifica procesamiento exitoso de todos los envíos
+**Datos del formulario:**
+- Título del proyecto
+- Modalidad (Investigación, Práctica Profesional)
+- Fecha actual
+- Director del proyecto
+- Codirector del proyecto
+- Objetivo general
+- Objetivos específicos
+- Archivo PDF adjunto
+- Carta de aceptación de empresa (si es Práctica Profesional)
 
-### Resultados de Pruebas de Carga
+> **Nota:** El sistema envía una notificación asíncrona al coordinador al enviar el Formato A.
 
-Todas las pruebas de concurrencia demuestran que el sistema puede manejar:
-- **100 usuarios simultáneos** sin errores
-- **Tiempo de respuesta**: < 10 segundos para 100 operaciones
-- **Tasa de éxito**: 100% (0 errores)
-- **Escalabilidad horizontal**: Preparado para múltiples instancias
+### RF-03: Evaluación del Formato A
+**Como** coordinador **necesito** evaluar un Formato A **para** aprobar, rechazar o dejar observaciones.
 
-## Escalabilidad
+**Funcionalidades:**
+- Listado de proyectos con su estado
+- Evaluación con opciones: Aprobado, Rechazado
+- Campo de observaciones
+- Notificación automática a docentes y estudiantes implicados
 
-### Estrategias de Escalabilidad Implementadas
+### RF-04: Reenvío del Formato A
+**Como** docente **necesito** subir una nueva versión del Formato A **para** continuar con el proceso tras un rechazo.
 
-#### 1. Escalabilidad Horizontal
-- **Microservicios Stateless**: Cada servicio puede replicarse sin compartir estado
-- **Service Discovery (Eureka)**: Registro automático de nuevas instancias
-- **Load Balancing**: API Gateway distribuye carga entre instancias
-- **Base de Datos por Servicio**: Evita cuellos de botella en BD
+**Reglas de negocio:**
+- Control de intentos (máximo 3)
+- Rechazo definitivo después del tercer intento
+- Notificación asíncrona al coordinador en cada reenvío
 
-#### 2. Comunicación Asíncrona
-- **RabbitMQ**: Desacopla servicios mediante eventos
-- **Event-Driven Architecture**: Reduce dependencias síncronas
-- **Message Queues**: Buffer para picos de carga
-- **Retry Mechanisms**: Tolerancia a fallos temporales
+### RF-05: Consulta de Estado (Estudiante)
+**Como** estudiante **necesito** ver el estado de mi proyecto **para** hacer seguimiento del proceso.
 
-#### 3. Optimización de Recursos
+**Estados posibles:**
+- En primera evaluación Formato A
+- En segunda evaluación Formato A
+- En tercera evaluación Formato A
+- Formato A aceptado
+- Formato A rechazado
 
-##### Límites Configurables:
-```properties
-# Format-A Service
-max.pdf.size.bytes=10485760  # 10MB
-storage.path=./storage/formata
+### RF-06: Carga de Anteproyecto
+**Como** docente **necesito** subir el anteproyecto **para** continuar con el proceso tras la aprobación del Formato A.
 
-# Connection Pools
-spring.datasource.hikari.maximum-pool-size=10
-spring.datasource.hikari.minimum-idle=5
-```
+**Funcionalidades:**
+- Carga de documento de anteproyecto
+- Registro de fecha de envío
+- Notificación asíncrona al jefe de departamento
 
-##### Gestión de Archivos:
-- Almacenamiento local con límite de 10MB por PDF
-- Posibilidad de migrar a S3/Cloud Storage
-- Compresión de archivos históricos
+### RF-07: Listado de Anteproyectos
+**Como** jefe de departamento **necesito** ver los anteproyectos enviados **para** proceder con la asignación de evaluadores.
 
-#### 4. Caché y Optimización de Consultas
-- **JPA Second Level Cache**: Reduce consultas a BD
-- **Query Optimization**: Índices en campos frecuentes
-- **Lazy Loading**: Carga bajo demanda de relaciones
+**Funcionalidades:**
+- Visualización de anteproyectos pendientes
+- Información del proyecto y docente director
 
-#### 5. Monitoreo y Observabilidad
-- **Spring Boot Actuator**: Métricas de salud
-- **Eureka Dashboard**: Estado de servicios
-- **Logs Centralizados**: Trazabilidad de operaciones
+### RF-08: Asignación de Evaluadores
+**Como** jefe de departamento **necesito** delegar dos docentes evaluadores **para** que evalúen un anteproyecto.
 
-### Capacidad del Sistema
+**Funcionalidades:**
+- Selección de dos evaluadores del departamento
+- Notificación automática a los evaluadores designados
 
-#### Configuración Actual (Pruebas):
-- ✅ 100 usuarios concurrentes
-- ✅ 20 hilos por pool de conexiones
-- ✅ Tiempo de respuesta < 10s para operaciones complejas
+---
 
-#### Proyección de Escalabilidad:
-
-| Métrica | Instancia Única | 3 Instancias | 5 Instancias |
-|---------|----------------|--------------|--------------|
-| Usuarios Concurrentes | 100 | 300 | 500 |
-| Throughput (req/s) | ~10 | ~30 | ~50 |
-| Tiempo Respuesta | < 10s | < 5s | < 3s |
-
-#### Recomendaciones para Producción:
-
-1. **Infraestructura**:
-   - Mínimo 2 instancias por microservicio
-   - Load balancer (Nginx/HAProxy)
-   - RabbitMQ en cluster (3 nodos)
-   - PostgreSQL con réplicas de lectura
-
-2. **Configuración**:
-   - Aumentar pool de conexiones a BD (20-30)
-   - Configurar circuit breakers (Resilience4j)
-   - Implementar rate limiting en Gateway
-   - Habilitar caché distribuido (Redis)
-
-3. **Monitoreo**:
-   - Prometheus + Grafana para métricas
-   - ELK Stack para logs centralizados
-   - Alertas automáticas (CPU > 80%, Memory > 85%)
-
-## Estrategia de Branching
-
-### Ramas Principales
-
-#### `main`
-- **Propósito**: Versión estable del proyecto
-- **Importante**: Solo se actualiza con versiones probadas y listas para producción
-- **Protección**: Requiere pull request y revisión
-
-#### `develop`
-- **Propósito**: Integración de funciones nuevas
-- **Importante**: Aquí es donde se juntan y prueban todas las ramas antes de pasar a main
-- **Flujo**: Base para todas las ramas de desarrollo
-
-### Ramas de Desarrollo
-
-#### `feature/*`
-- **Propósito**: Desarrollo de nuevas funcionalidades
-- **Ejemplos**: 
-  - `feature/mejora-ui`
-  - `feature/nuevo-formato`
-  - `feature/nuevo-actor`
-- **Flujo**: Se crea desde `develop` y se fusiona de vuelta a `develop`
-
-#### `bugfix/*`
-- **Propósito**: Corrección de errores pequeños
-- **Importante**: Se solucionan fallos SIN AFECTAR otras partes del proyecto
-- **Ejemplos**: `bugfix/validacion-email`, `bugfix/formato-fecha`
-
-#### `hotfix/*`
-- **Propósito**: Correcciones urgentes en producción
-- **Importante**: Para arreglos rápidos directamente sobre `main`
-- **Flujo**: Se crea desde `main`, se fusiona a `main` y `develop`
-
-## Instalación y Ejecución
+## Instalación y Configuración
 
 ### Prerrequisitos
-- Java 17+
-- Maven 3.8+
-- PostgreSQL 14+
-- RabbitMQ 3.11+
 
-### Configuración de Base de Datos
+- **Java 17** o superior
+- **Maven 3.8+**
+- **PostgreSQL 14+**
+- **RabbitMQ 3.11+**
+- **Git**
+
+### 1. Clonar el Repositorio
+
+```bash
+git clone https://github.com/Julianste15/ProcessManagement.git
+cd ProcessManagement/ProccesManagementMicroservices
+```
+
+### 2. Configurar Bases de Datos
+
+Crear las siguientes bases de datos en PostgreSQL:
+
 ```sql
--- Crear bases de datos
-CREATE DATABASE user_db;
+CREATE DATABASE auth_db;
+CREATE DATABASE users_db;
 CREATE DATABASE formata_db;
+CREATE DATABASE coordination_db;
 CREATE DATABASE anteproject_db;
 CREATE DATABASE evaluation_db;
+CREATE DATABASE notification_db;
 ```
 
-### Ejecución de Servicios
+### 3. Configurar RabbitMQ
 
-1. **Iniciar Eureka Server**:
+Instalar y ejecutar RabbitMQ:
+
 ```bash
-cd eureka-server
+# En Windows (con Chocolatey)
+choco install rabbitmq
+
+# Iniciar el servicio
+rabbitmq-server
+```
+
+Acceder a la consola de administración: `http://localhost:15672` (usuario: guest, password: guest)
+
+### 4. Configurar Variables de Entorno
+
+Cada microservicio requiere configuración de base de datos. Editar los archivos `application.yml` en cada servicio:
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/[nombre_db]
+    username: [tu_usuario]
+    password: [tu_password]
+```
+
+### 5. Compilar el Proyecto
+
+```bash
+# Compilar todos los microservicios
+mvn clean install -DskipTests
+```
+
+### 6. Ejecutar los Servicios
+
+**Orden de inicio recomendado:**
+
+```bash
+# 1. Service Discovery
+cd discovery-service
 mvn spring-boot:run
-```
 
-2. **Iniciar API Gateway**:
-```bash
-cd api-gateway
+# 2. Gateway (en otra terminal)
+cd gateway-service
 mvn spring-boot:run
-```
 
-3. **Iniciar Microservicios** (en orden):
-```bash
+# 3. Microservicios de negocio (en terminales separadas)
+cd auth-service && mvn spring-boot:run
 cd user-service && mvn spring-boot:run
 cd format-a-service && mvn spring-boot:run
+cd coordination-service && mvn spring-boot:run
 cd anteproject-service && mvn spring-boot:run
 cd evaluation-service && mvn spring-boot:run
 cd notification-service && mvn spring-boot:run
-```
 
-4. **Iniciar Cliente JavaFX**:
-```bash
+# 4. Aplicación de escritorio
 cd presentation
 mvn javafx:run
 ```
 
-### Ejecución de Pruebas
+### 7. Verificar el Sistema
 
-```bash
-# Todas las pruebas
-mvn clean test
+- **Eureka Dashboard:** `http://localhost:8761`
+- **API Gateway:** `http://localhost:8080`
+- **RabbitMQ Management:** `http://localhost:15672`
 
-# Pruebas de un servicio específico
-cd anteproject-service
-mvn test
+---
 
-# Pruebas de carga específicas
-mvn test -Dtest=AnteprojectApplicationServiceTest#simulateConcurrentUsage_ShouldHandleMultipleUsers
+## Estructura del Proyecto
+
+```
+ProccesManagementMicroservices/
+├── discovery-service/          # Eureka Server
+├── gateway-service/            # API Gateway
+├── auth-service/               # Autenticación
+├── user-service/               # Gestión de usuarios
+├── format-a-service/           # Gestión de Formato A
+├── coordination-service/       # Coordinación y evaluación
+├── anteproject-service/        # Gestión de anteproyectos
+├── evaluation-service/         # Asignación de evaluadores
+├── notification-service/       # Notificaciones
+├── presentation/               # Aplicación JavaFX
+└── storage/                    # Almacenamiento de archivos
 ```
 
-## Endpoints Principales
+---
 
-### User Service (Puerto 8081)
-- `POST /api/users/register` - Registro de usuario
-- `POST /api/users/login` - Autenticación
-- `GET /api/users/{email}` - Obtener usuario
+## Seguridad
 
-### Format-A Service (Puerto 8082)
-- `POST /api/formata` - Enviar Formato A
-- `GET /api/formata/{id}` - Obtener Formato A
-- `PUT /api/formata/{id}/status` - Actualizar estado
+El sistema implementa las siguientes medidas de seguridad:
 
-### Anteproject Service (Puerto 8083)
-- `POST /api/anteprojects` - Crear anteproyecto
-- `POST /api/anteprojects/{id}/submit` - Enviar documento
-- `POST /api/anteprojects/{id}/assign-evaluators` - Asignar evaluadores
-- `GET /api/anteprojects/submitted` - Listar enviados
+- **Autenticación JWT:** Tokens seguros para autenticación stateless
+- **Validación de contraseñas:** Requisitos de complejidad (mínimo 6 caracteres, mayúsculas, dígitos, caracteres especiales)
+- **API Gateway:** Punto único de entrada con validación de tokens
+- **Roles y permisos:** Control de acceso basado en roles (TEACHER, COORDINATOR, DEPARTMENT_HEAD, STUDENT)
 
-### Evaluation Service (Puerto 8084)
-- `POST /api/evaluations` - Crear evaluación
-- `PUT /api/evaluations/{id}/submit` - Enviar evaluación
-- `GET /api/evaluations/project/{id}` - Evaluaciones por proyecto
+---
 
-## Contribución
+## Patrones y Buenas Prácticas
 
-1. Crear rama desde `develop`: `git checkout -b feature/nueva-funcionalidad`
-2. Realizar cambios y commits
-3. Ejecutar pruebas: `mvn test`
-4. Push y crear Pull Request a `develop`
-5. Esperar revisión y aprobación
+### Patrones Implementados
+- **API Gateway Pattern:** Punto de entrada único
+- **Service Discovery Pattern:** Registro dinámico de servicios
+- **Event-Driven Architecture:** Comunicación asíncrona con eventos
+- **Circuit Breaker Pattern:** Resiliencia ante fallos
+- **Database per Service:** Autonomía de datos por microservicio
 
-## Autores
+### Principios SOLID
+- **Single Responsibility:** Cada microservicio tiene una responsabilidad única
+- **Open/Closed:** Extensible mediante nuevos microservicios
+- **Dependency Inversion:** Uso de interfaces y abstracciones
 
-- Equipo de Desarrollo - Universidad del Cauca
-- Software II - 2024
+---
+
+## Testing
+
+```bash
+# Ejecutar tests unitarios
+mvn test
+
+# Ejecutar tests de un servicio específico
+cd [nombre-servicio]
+mvn test
+```
+
+---
+
+## Documentación de API
+
+El proyecto cuenta con documentación interactiva generada con **Swagger/OpenAPI**.
+
+### Acceso a la Documentación
+
+Una vez iniciados los microservicios, puedes acceder a la interfaz de Swagger UI para explorar y probar los endpoints:
+
+| Servicio | URL de Swagger UI |
+|----------|-------------------|
+| **format-a-service** | `http://localhost:8083/swagger-ui/index.html` |
+| *Otros servicios* | *Próximamente* |
+
+---
+
+## Roadmap y Mejoras Futuras
+
+- [ ] Implementación de tests de integración
+- [ ] Dashboard web con React/Angular
+- [ ] Notificaciones en tiempo real con WebSockets
+- [ ] Almacenamiento de archivos en la nube (AWS S3, Google Cloud Storage)
+- [ ] Métricas y monitoreo con Prometheus y Grafana
+- [ ] Containerización con Docker y orquestación con Kubernetes
+- [ ] CI/CD con GitHub Actions
+- [x] Documentación de API con Swagger/OpenAPI (Implementado en format-a-service)
+
+---
+
+## Equipo de Desarrollo
+
+Este proyecto fue desarrollado por estudiantes de Ingeniería de Sistemas de la Universidad del Cauca como parte del curso de Software II:
+
+| Nombre | Rol | GitHub |
+|--------|-----|--------|
+| **Julian Camacho** | Full Stack Developer | [@Julianste15](https://github.com/Julianste15) |
+| **Oscar Cabezas** | Backend Developer | - |
+| **Santiago Hurtado** | Backend Developer | - |
+
+### Contexto Académico
+
+**Universidad:** Universidad del Cauca  
+**Facultad:** Ingeniería Electrónica y Telecomunicaciones (FIET)  
+**Programa:** Ingeniería de Sistemas  
+**Curso:** Software II  
+**Año:** 2025
+
+---
 
 ## Licencia
 
-Este proyecto es de uso académico para la Universidad del Cauca.
+Este proyecto es de código abierto y está disponible bajo la licencia MIT.
+
+---
+
+## Contacto y Soporte
+
+Para preguntas, sugerencias o reportar problemas:
+
+- **Issues:** [GitHub Issues](https://github.com/Julianste15/ProcessManagement/issues)
+- **Email:** [Contactar al equipo]
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te fue útil, considera darle una estrella en GitHub ⭐**
+
+Desarrollado por estudiantes de la Universidad del Cauca
+
+</div>
