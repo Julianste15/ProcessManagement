@@ -216,4 +216,112 @@ public class FormatoA {
     public void initializeStateContext() {
         this.stateContext = new FormatoAStateContext(this);
     }
+
+    // ==========================================
+    // BUILDER PATTERN IMPLEMENTATION
+    // ==========================================
+
+    public static FormatoABuilder builder() {
+        return new FormatoABuilder();
+    }
+
+    public static class FormatoABuilder {
+        private String titulo;
+        private Modalidad modalidad;
+        private LocalDate fechaCreacion;
+        private String directorEmail;
+        private String codirectorEmail;
+        private String studentEmail;
+        private String objetivoGeneral;
+        private List<String> objetivosEspecificos = new ArrayList<>();
+        private String archivoPDF;
+        private String cartaAceptacionEmpresa;
+        private EstadoProyecto estado = EstadoProyecto.FORMATO_A_EN_EVALUACION; // Valor por defecto
+        private int intentos = 1; // Valor por defecto
+        private String observaciones;
+
+        public FormatoABuilder titulo(String titulo) {
+            this.titulo = titulo;
+            return this;
+        }
+
+        public FormatoABuilder modalidad(Modalidad modalidad) {
+            this.modalidad = modalidad;
+            return this;
+        }
+
+        public FormatoABuilder fechaCreacion(LocalDate fechaCreacion) {
+            this.fechaCreacion = fechaCreacion;
+            return this;
+        }
+
+        public FormatoABuilder directorEmail(String directorEmail) {
+            this.directorEmail = directorEmail;
+            return this;
+        }
+
+        public FormatoABuilder codirectorEmail(String codirectorEmail) {
+            this.codirectorEmail = codirectorEmail;
+            return this;
+        }
+
+        public FormatoABuilder studentEmail(String studentEmail) {
+            this.studentEmail = studentEmail;
+            return this;
+        }
+
+        public FormatoABuilder objetivoGeneral(String objetivoGeneral) {
+            this.objetivoGeneral = objetivoGeneral;
+            return this;
+        }
+
+        public FormatoABuilder objetivosEspecificos(List<String> objetivosEspecificos) {
+            this.objetivosEspecificos = objetivosEspecificos;
+            return this;
+        }
+
+        public FormatoABuilder archivoPDF(String archivoPDF) {
+            this.archivoPDF = archivoPDF;
+            return this;
+        }
+
+        public FormatoABuilder cartaAceptacionEmpresa(String cartaAceptacionEmpresa) {
+            this.cartaAceptacionEmpresa = cartaAceptacionEmpresa;
+            return this;
+        }
+
+        public FormatoABuilder estado(EstadoProyecto estado) {
+            this.estado = estado;
+            return this;
+        }
+
+        public FormatoABuilder intentos(int intentos) {
+            this.intentos = intentos;
+            return this;
+        }
+
+        public FormatoABuilder observaciones(String observaciones) {
+            this.observaciones = observaciones;
+            return this;
+        }
+
+        public FormatoA build() {
+            FormatoA formatoA = new FormatoA();
+            formatoA.titulo = this.titulo;
+            formatoA.modalidad = this.modalidad;
+            formatoA.fechaCreacion = this.fechaCreacion != null ? this.fechaCreacion : LocalDate.now();
+            formatoA.directorEmail = this.directorEmail;
+            formatoA.codirectorEmail = this.codirectorEmail;
+            formatoA.studentEmail = this.studentEmail;
+            formatoA.objetivoGeneral = this.objetivoGeneral;
+            formatoA.objetivosEspecificos = this.objetivosEspecificos;
+            formatoA.archivoPDF = this.archivoPDF;
+            formatoA.cartaAceptacionEmpresa = this.cartaAceptacionEmpresa;
+            formatoA.estado = this.estado;
+            formatoA.intentos = this.intentos;
+            formatoA.observaciones = this.observaciones;
+            formatoA.initializeStateContext(); // Importante: Inicializar el contexto
+            return formatoA;
+        }
+    }
 }
