@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import co.unicauca.formata.domain.state.FormatoAStateContext;
+
 @Entity
 @Table(name = "formatos_a")
 public class FormatoA {
@@ -55,6 +57,10 @@ public class FormatoA {
 
     @Column(name = "observaciones", length = 2000)
     private String observaciones;
+
+    // Patrón State - No se persiste en la base de datos
+    @Transient
+    private FormatoAStateContext stateContext;
 
     public FormatoA() {
     }
@@ -190,5 +196,24 @@ public class FormatoA {
 
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
+    }
+
+    /**
+     * Obtiene el contexto del patrón State.
+     * Si no existe, lo inicializa basado en el estado actual.
+     */
+    public FormatoAStateContext getStateContext() {
+        if (stateContext == null) {
+            stateContext = new FormatoAStateContext(this);
+        }
+        return stateContext;
+    }
+
+    /**
+     * Inicializa el contexto del patrón State.
+     * Debe llamarse después de cargar la entidad de la base de datos.
+     */
+    public void initializeStateContext() {
+        this.stateContext = new FormatoAStateContext(this);
     }
 }
