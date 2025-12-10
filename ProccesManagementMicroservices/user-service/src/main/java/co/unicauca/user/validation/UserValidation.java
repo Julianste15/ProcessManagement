@@ -70,7 +70,7 @@ public class UserValidation implements iValidator {
             atrException.addExceptionMessage(UserExceptionEnum.PASSWORD, "Debe contener por lo menos un dígito");
             hasError = true;
         }
-        if (!password.matches(".*[!@#$%^&*(){}+=-_,./?].*")) {
+        if (!password.matches(".*[!@#$%^&*(){}+=_ ,./?-].*")) {
             atrException.addExceptionMessage(UserExceptionEnum.PASSWORD,
                     "Debe contener por lo menos un caracter especial");
             hasError = true;

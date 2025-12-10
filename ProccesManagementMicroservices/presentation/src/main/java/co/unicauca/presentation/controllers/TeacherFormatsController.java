@@ -138,11 +138,8 @@ public class TeacherFormatsController {
                 user,
                 sessionService,
                 updatedUser -> {
-                    TeacherFormatsView newView = new TeacherFormatsView(stage, user, sessionService);
-                    Scene scene = new Scene(newView.getRoot(), 900, 700);
-                    scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
-                    stage.setScene(scene);
-                    stage.setTitle("Mis Formatos A");
+                    loadFormats();
+                    restoreView();
                 },
                 format.getId(),
                 format.getTitulo(),
@@ -173,18 +170,11 @@ public class TeacherFormatsController {
                 user,
                 sessionService,
                 updatedUser -> {
-                    TeacherFormatsView newView = new TeacherFormatsView(stage, user, sessionService);
-                    Scene scene = new Scene(newView.getRoot(), 900, 700);
-                    scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
-                    stage.setScene(scene);
-                    stage.setTitle("Mis Formatos A");
+                    loadFormats();
+                    restoreView();
                 },
                 () -> {
-                    TeacherFormatsView newView = new TeacherFormatsView(stage, user, sessionService);
-                    Scene scene = new Scene(newView.getRoot(), 900, 700);
-                    scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
-                    stage.setScene(scene);
-                    stage.setTitle("Mis Formatos A");
+                    restoreView();
                 },
                 format.getId(),
                 format.getTitulo(),
@@ -192,8 +182,21 @@ public class TeacherFormatsController {
         );
         anteprojectFormView.setDirectorEmail(user.getEmail());
         Scene scene = new Scene(anteprojectFormView.getRoot(), 900, 750);
+        // Asegurar que el CSS se aplique también al formulario
+        scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Crear Anteproyecto para Formato A");
+    }
+
+    /** Restaura la vista actual en el stage */
+    private void restoreView() {
+        Scene scene = view.getRoot().getScene();
+        if (scene == null) {
+             scene = new Scene(view.getRoot(), 900, 700);
+             scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
+        }
+        stage.setScene(scene);
+        stage.setTitle("Mis Formatos A");
     }
 
     /** Vuelve al dashboard */
