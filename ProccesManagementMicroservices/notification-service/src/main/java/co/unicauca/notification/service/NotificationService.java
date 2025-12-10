@@ -16,7 +16,7 @@ public class NotificationService {
     private EmailService emailService;
 
     @Autowired
-    private TemplateService templateService;
+    private co.unicauca.notification.factory.NotificationFactory notificationFactory;
 
     @Autowired
     private co.unicauca.notification.client.UserServiceClient userServiceClient;
@@ -32,12 +32,9 @@ public class NotificationService {
             return;
         }
         try {
-            String subject = "Nuevo Formato A Enviado - " + titulo;
-            String coordinatorEmail = "coordinador.sistemas@unicauca.edu.co";
-            String message = templateService.generateFormatoAEnviadoTemplate(
-                    formatoAId, titulo, directorEmail, modalidad, intento);
             logger.info("Notificando Formato A enviado a coordinador");
-            EmailMessage email = new EmailMessage(coordinatorEmail, subject, message);
+            EmailMessage email = notificationFactory.createFormatoASubmittedMessage(
+                    formatoAId, titulo, directorEmail, modalidad, intento);
             emailService.sendEmail(email);
         } catch (Exception e) {
             logger.severe("Error notificando Formato A enviado: " + e.getMessage());
@@ -52,20 +49,22 @@ public class NotificationService {
             return;
         }
         try {
-            String subject = "Formato A Evaluado - " + titulo;
-            String message = templateService.generateFormatoAEvaluadoTemplate(
-                    formatoAId, titulo, estado, observaciones);
-            logger.info("Notificando evaluación de Formato A al director" + directorEmail);
-            EmailMessage directorMail = new EmailMessage(directorEmail, subject, message);
+            logger.info("Notificando evaluación de Formato A al director: " + directorEmail);
+            EmailMessage directorMail = notificationFactory.createFormatoAEvaluatedMessage(
+                    directorEmail, formatoAId, titulo, estado, observaciones);
             emailService.sendEmail(directorMail);
+
             if (codirectorEmail != null && !codirectorEmail.isEmpty()) {
                 logger.info("Notificando evaluación de Formato A al codirector: " + codirectorEmail);
-                EmailMessage codirectorMail = new EmailMessage(codirectorEmail, subject, message);
+                EmailMessage codirectorMail = notificationFactory.createFormatoAEvaluatedMessage(
+                        codirectorEmail, formatoAId, titulo, estado, observaciones);
                 emailService.sendEmail(codirectorMail);
             }
+
             if (studentEmail != null && !studentEmail.isEmpty()) {
                 logger.info("Notificando evaluación de Formato A al estudiante: " + studentEmail);
-                EmailMessage studentMail = new EmailMessage(studentEmail, subject, message);
+                EmailMessage studentMail = notificationFactory.createFormatoAEvaluatedMessage(
+                        studentEmail, formatoAId, titulo, estado, observaciones);
                 emailService.sendEmail(studentMail);
             }
             logger.info("Notificaciones enviadas para Formato A: " + formatoAId);
@@ -82,12 +81,9 @@ public class NotificationService {
             return;
         }
         try {
-            String subject = "Formato A Reintentado - " + titulo;
-            String coordinatorEmail = "coordinador.sistemas@unicauca.edu.co";
-            String message = templateService.generateFormatoAReintentadoTemplate(
-                    formatoAId, titulo, directorEmail, intento);
             logger.info("Notificando reintento de Formato A a coordinador");
-            EmailMessage email = new EmailMessage(coordinatorEmail, subject, message);
+            EmailMessage email = notificationFactory.createFormatoARetryMessage(
+                    formatoAId, titulo, directorEmail, intento);
             emailService.sendEmail(email);
         } catch (Exception e) {
             logger.severe("Error notificando Formato A reintentado: " + e.getMessage());
@@ -116,27 +112,26 @@ public class NotificationService {
             return;
         }
         try {
-            String subject = "Asignación como Evaluador - " + event.getAnteprojectTitle();
-            String message = String.format(
-                    "Estimado docente,\n\n" +
-                            "Ha sido asignado como evaluador del anteproyecto '%s'.\n" +
-                            "Por favor ingrese a la plataforma para realizar la evaluación.\n\n" +
-                            "Atentamente,\nCoordinación de Sistemas",
-                    event.getAnteprojectTitle());
             logger.info("Notificando a evaluador 1: " + event.getEvaluator1Email());
-            emailService.sendEmail(new EmailMessage(event.getEvaluator1Email(), subject, message));
+            EmailMessage eval1Message = notificationFactory.createEvaluatorAssignmentMessage(
+                    event.getEvaluator1Email(), event.getAnteprojectTitle());
+            emailService.sendEmail(eval1Message);
+
             logger.info("Notificando a evaluador 2: " + event.getEvaluator2Email());
-            emailService.sendEmail(new EmailMessage(event.getEvaluator2Email(), subject, message));
+            EmailMessage eval2Message = notificationFactory.createEvaluatorAssignmentMessage(
+                    event.getEvaluator2Email(), event.getAnteprojectTitle());
+            emailService.sendEmail(eval2Message);
+
             // Opcional: notificar estudiante y director
-            String infoSubject = "Anteproyecto en Evaluación - " + event.getAnteprojectTitle();
-            String infoMessage = String.format(
-                    "El anteproyecto '%s' ha sido asignado a evaluadores y se encuentra en proceso de evaluación.",
-                    event.getAnteprojectTitle());
             if (event.getStudentEmail() != null) {
-                emailService.sendEmail(new EmailMessage(event.getStudentEmail(), infoSubject, infoMessage));
+                EmailMessage studentMessage = notificationFactory.createAnteprojectInEvaluationMessage(
+                        event.getStudentEmail(), event.getAnteprojectTitle());
+                emailService.sendEmail(studentMessage);
             }
             if (event.getDirectorEmail() != null) {
-                emailService.sendEmail(new EmailMessage(event.getDirectorEmail(), infoSubject, infoMessage));
+                EmailMessage directorMessage = notificationFactory.createAnteprojectInEvaluationMessage(
+                        event.getDirectorEmail(), event.getAnteprojectTitle());
+                emailService.sendEmail(directorMessage);
             }
         } catch (Exception e) {
             logger.severe("Error notificando asignación de evaluadores: " + e.getMessage());
@@ -156,23 +151,10 @@ public class NotificationService {
                 return;
             }
 
-            String subject = "Nuevo Anteproyecto Enviado - ID: " + event.getAnteprojectId();
-            String message = String.format(
-                    "Estimado Jefe de Departamento,\n\n" +
-                            "Se ha enviado un nuevo anteproyecto para su revisión.\n" +
-                            "ID: %d\n" +
-                            "Estudiante: %s\n" +
-                            "Fecha: %s\n" +
-                            "Documento: %s\n\n" +
-                            "Por favor ingrese a la plataforma para asignar evaluadores.\n\n" +
-                            "Atentamente,\nSistema de Gestión de Procesos",
-                    event.getAnteprojectId(),
-                    event.getStudentEmail(),
-                    event.getSubmissionDate(),
-                    event.getDocumentUrl());
-
             logger.info("Notificando a jefe de departamento: " + departmentHeadEmail);
-            emailService.sendEmail(new EmailMessage(departmentHeadEmail, subject, message));
+            EmailMessage message = notificationFactory.createDepartmentHeadNotificationMessage(
+                    departmentHeadEmail, event);
+            emailService.sendEmail(message);
         } catch (Exception e) {
             logger.severe("Error notificando a jefe de departamento: " + e.getMessage());
         }
