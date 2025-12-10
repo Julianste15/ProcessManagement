@@ -330,7 +330,7 @@ Replica 2 (Read) ← Reportes
 ##### c) Particionamiento
 ```sql
 -- Particionar por año académico
-CREATE TABLE anteprojects_2024 PARTITION OF anteprojects
+CREATE TABLE anteprojects_2025 PARTITION OF anteprojects
 FOR VALUES FROM ('2024-01-01') TO ('2025-01-01');
 ```
 
@@ -584,5 +584,5 @@ open target/site/jacoco/index.html
 
 ---
 
-**Última actualización**: Diciembre 2024  
+**Última actualización**: Diciembre 2025 
 **Autor**: Equipo de Desarrollo - Universidad del Cauca
