@@ -208,6 +208,7 @@ graph TB
 - **Spring Data JPA** - Persistencia de datos
 - **Spring AMQP** - Integración con RabbitMQ
 - **Spring Security** - Seguridad (en desarrollo)
+- **Arquitectura Hexagonal** - Ports & Adapters en anteproject-service
 
 ### Frontend
 - **JavaFX 21** - Framework para aplicaciones de escritorio
@@ -222,6 +223,10 @@ graph TB
 ### Autenticación
 - **JWT (JSON Web Tokens)** - Autenticación stateless
 - **JJWT 0.11.5** - Librería para manejo de JWT
+
+### Containerización y Despliegue
+- **Docker** - Containerización de servicios
+- **Docker Compose** - Orquestación de contenedores para desarrollo
 
 ### Herramientas de Desarrollo
 - **Maven** - Gestión de dependencias y build
@@ -410,6 +415,65 @@ mvn javafx:run
 
 ---
 
+## 🐳 Containerización con Docker
+
+El proyecto incluye soporte para Docker, facilitando el despliegue y la gestión de dependencias.
+
+### Servicios Dockerizados
+
+Actualmente dockerizados:
+- **PostgreSQL** - Base de datos principal (puerto 5432)
+- **User Service** - Servicio de gestión de usuarios (puerto 8081)
+
+### Ejecutar con Docker Compose
+
+```bash
+# Iniciar todos los servicios
+docker-compose up -d
+
+# Ver logs
+docker-compose logs -f
+
+# Ver logs de un servicio específico
+docker-compose logs -f user-service
+
+# Detener servicios
+docker-compose down
+
+# Reconstruir imágenes
+docker-compose up --build
+
+# Detener y eliminar volúmenes
+docker-compose down -v
+```
+
+### Configuración de Docker
+
+El archivo `docker-compose.yml` configura:
+- **Red de microservicios** (`microservices-network`) para comunicación entre contenedores
+- **Volúmenes persistentes** para PostgreSQL (`postgres-data`)
+- **Variables de entorno** para conexiones de base de datos
+- **Mapeo de puertos** para acceso desde el host
+
+### Dockerfile del User Service
+
+El Dockerfile utiliza:
+- **Imagen base**: `eclipse-temurin:17-jdk-alpine` (Java 17 optimizado)
+- **Build multi-stage** para optimización de tamaño
+- **Puerto expuesto**: 8082
+
+### Próximos Servicios a Dockerizar
+
+- [ ] format-a-service
+- [ ] anteproject-service
+- [ ] evaluation-service
+- [ ] notification-service
+- [ ] gateway-service
+- [ ] discovery-service
+- [ ] RabbitMQ (integración en docker-compose)
+
+---
+
 ## Estructura del Proyecto
 
 ```
@@ -442,17 +506,58 @@ El sistema implementa las siguientes medidas de seguridad:
 
 ## Patrones y Buenas Prácticas
 
-### Patrones Implementados
+### Patrones Arquitectónicos
 - **API Gateway Pattern:** Punto de entrada único
 - **Service Discovery Pattern:** Registro dinámico de servicios
 - **Event-Driven Architecture:** Comunicación asíncrona con eventos
 - **Circuit Breaker Pattern:** Resiliencia ante fallos
 - **Database per Service:** Autonomía de datos por microservicio
+- **Hexagonal Architecture (Ports & Adapters):** Implementado en anteproject-service
+
+### Patrones de Diseño Implementados
+
+El proyecto implementa **6 patrones de diseño** clásicos. Para documentación detallada, ver [DESIGN_PATTERNS.md](./DESIGN_PATTERNS.md).
+
+| Patrón | Microservicio | Propósito |
+|--------|---------------|----------|
+| **State** | format-a-service | Gestión del ciclo de vida de FormatoA |
+| **Builder** | user-service | Construcción de objetos User con validación |
+| **Adapter** | anteproject-service | Arquitectura hexagonal - adaptadores de entrada/salida |
+| **Decorator** | notification-service | Logging decorado en servicio de email |
+| **Factory** | notification-service | Creación centralizada de mensajes de email |
+| **Facade** | presentation | Simplificación de interacciones con backend |
+
+**Distribución por categoría:**
+- **Patrones de Comportamiento:** State (1)
+- **Patrones Creacionales:** Builder, Factory (2)
+- **Patrones Estructurales:** Adapter, Decorator, Facade (3)
+
+### Arquitectura Hexagonal
+
+El **anteproject-service** implementa arquitectura hexagonal completa:
+
+```
+domain/
+  ├── model/              # Entidades del dominio
+  └── ports/
+      ├── in/             # Casos de uso (puertos de entrada)
+      └── out/            # Interfaces de salida
+application/
+  └── service/            # Implementación de casos de uso
+infrastructure/
+  ├── input/              # Adaptadores de entrada (REST, Events)
+  └── output/             # Adaptadores de salida (DB, Clients, Events)
+```
+
+**Beneficios:**
+- ✅ Dominio independiente de frameworks
+- ✅ Testabilidad mejorada con mocks de puertos
+- ✅ Flexibilidad para cambiar tecnologías de infraestructura
 
 ### Principios SOLID
 - **Single Responsibility:** Cada microservicio tiene una responsabilidad única
-- **Open/Closed:** Extensible mediante nuevos microservicios
-- **Dependency Inversion:** Uso de interfaces y abstracciones
+- **Open/Closed:** Extensible mediante nuevos microservicios y patrones
+- **Dependency Inversion:** Uso de interfaces, puertos y abstracciones
 
 ---
 
@@ -486,14 +591,23 @@ Una vez iniciados los microservicios, puedes acceder a la interfaz de Swagger UI
 
 ## Roadmap y Mejoras Futuras
 
+### Completado ✅
+- [x] Documentación de API con Swagger/OpenAPI (Implementado en format-a-service)
+- [x] Containerización con Docker (PostgreSQL y user-service)
+- [x] Implementación de patrones de diseño (6 patrones implementados)
+- [x] Arquitectura hexagonal (anteproject-service)
+
+### En Progreso 🚧
+- [ ] Dockerización de servicios restantes (5 servicios pendientes)
 - [ ] Implementación de tests de integración
+
+### Planificado 📋
 - [ ] Dashboard web con React/Angular
 - [ ] Notificaciones en tiempo real con WebSockets
 - [ ] Almacenamiento de archivos en la nube (AWS S3, Google Cloud Storage)
 - [ ] Métricas y monitoreo con Prometheus y Grafana
-- [ ] Containerización con Docker y orquestación con Kubernetes
+- [ ] Orquestación con Kubernetes
 - [ ] CI/CD con GitHub Actions
-- [x] Documentación de API con Swagger/OpenAPI (Implementado en format-a-service)
 
 ---
 

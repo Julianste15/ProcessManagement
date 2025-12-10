@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Component
 public class AnteprojectPersistenceAdapter implements AnteprojectRepositoryPort {
 
     private final JpaAnteprojectRepository jpaRepository;
@@ -61,6 +60,11 @@ public class AnteprojectPersistenceAdapter implements AnteprojectRepositoryPort 
         return jpaRepository.findByStatusIn(statuses).stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void delete(Anteproject anteproject) {
+        jpaRepository.delete(mapper.toEntity(anteproject));
     }
 
     @Override
