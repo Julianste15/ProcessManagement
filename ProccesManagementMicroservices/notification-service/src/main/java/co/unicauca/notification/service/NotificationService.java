@@ -13,7 +13,7 @@ public class NotificationService {
     private static final Logger logger = Logger.getLogger(NotificationService.class.getName());
 
     @Autowired
-    private EmailServiceSimulado emailService;
+    private EmailService emailService;
 
     @Autowired
     private TemplateService templateService;
@@ -119,11 +119,10 @@ public class NotificationService {
             String subject = "Asignación como Evaluador - " + event.getAnteprojectTitle();
             String message = String.format(
                     "Estimado docente,\n\n" +
-                    "Ha sido asignado como evaluador del anteproyecto '%s'.\n" +
-                    "Por favor ingrese a la plataforma para realizar la evaluación.\n\n" +
-                    "Atentamente,\nCoordinación de Sistemas",
-                    event.getAnteprojectTitle()
-            );
+                            "Ha sido asignado como evaluador del anteproyecto '%s'.\n" +
+                            "Por favor ingrese a la plataforma para realizar la evaluación.\n\n" +
+                            "Atentamente,\nCoordinación de Sistemas",
+                    event.getAnteprojectTitle());
             logger.info("Notificando a evaluador 1: " + event.getEvaluator1Email());
             emailService.sendEmail(new EmailMessage(event.getEvaluator1Email(), subject, message));
             logger.info("Notificando a evaluador 2: " + event.getEvaluator2Email());
@@ -132,8 +131,7 @@ public class NotificationService {
             String infoSubject = "Anteproyecto en Evaluación - " + event.getAnteprojectTitle();
             String infoMessage = String.format(
                     "El anteproyecto '%s' ha sido asignado a evaluadores y se encuentra en proceso de evaluación.",
-                    event.getAnteprojectTitle()
-            );
+                    event.getAnteprojectTitle());
             if (event.getStudentEmail() != null) {
                 emailService.sendEmail(new EmailMessage(event.getStudentEmail(), infoSubject, infoMessage));
             }
@@ -161,18 +159,17 @@ public class NotificationService {
             String subject = "Nuevo Anteproyecto Enviado - ID: " + event.getAnteprojectId();
             String message = String.format(
                     "Estimado Jefe de Departamento,\n\n" +
-                    "Se ha enviado un nuevo anteproyecto para su revisión.\n" +
-                    "ID: %d\n" +
-                    "Estudiante: %s\n" +
-                    "Fecha: %s\n" +
-                    "Documento: %s\n\n" +
-                    "Por favor ingrese a la plataforma para asignar evaluadores.\n\n" +
-                    "Atentamente,\nSistema de Gestión de Procesos",
+                            "Se ha enviado un nuevo anteproyecto para su revisión.\n" +
+                            "ID: %d\n" +
+                            "Estudiante: %s\n" +
+                            "Fecha: %s\n" +
+                            "Documento: %s\n\n" +
+                            "Por favor ingrese a la plataforma para asignar evaluadores.\n\n" +
+                            "Atentamente,\nSistema de Gestión de Procesos",
                     event.getAnteprojectId(),
                     event.getStudentEmail(),
                     event.getSubmissionDate(),
-                    event.getDocumentUrl()
-            );
+                    event.getDocumentUrl());
 
             logger.info("Notificando a jefe de departamento: " + departmentHeadEmail);
             emailService.sendEmail(new EmailMessage(departmentHeadEmail, subject, message));
