@@ -116,9 +116,17 @@ public class FormatoAService {
         logger.info("Evaluando Formato A ID: " + id);
         FormatoA formatoA = formatoARepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Formato A no encontrado con ID: " + id));
-        formatoA.setEstado(request.getEstado());
-        formatoA.setObservaciones(request.getObservaciones());
+        
+        // Usar el patrón State para manejar la evaluación
+        try {
+            formatoA.getStateContext().evaluate(request);
+        } catch (IllegalStateException e) {
+            logger.severe("Error en transición de estado: " + e.getMessage());
+            throw new RuntimeException("Error evaluando Formato A: " + e.getMessage());
+        }
+        
         FormatoA updatedFormatoA = formatoARepository.save(formatoA);
+        
         if (request.getEstado() == EstadoProyecto.FORMATO_A_ACEPTADO) {
             assignEvaluatorsForAnteproyecto(updatedFormatoA);
         }
@@ -174,22 +182,19 @@ public class FormatoAService {
         logger.info("Reintentando Formato A ID: " + id);
         FormatoA formatoA = formatoARepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Formato A no encontrado con ID: " + id));
-        if (formatoA.getIntentos() >= 3) {
-            formatoA.setEstado(EstadoProyecto.FORMATO_A_RECHAZADO);
-            formatoARepository.save(formatoA);
-            throw new RuntimeException("Máximo de intentos alcanzado (3). No se puede reintentar.");
+        
+        // Resolver la ruta del PDF si es necesario
+        String archivoPdf = resolvePdfPath(request, formatoA.getArchivoPDF());
+        request.setArchivoPDF(archivoPdf);
+        
+        // Usar el patrón State para manejar el reenvío
+        try {
+            formatoA.getStateContext().resubmit(request);
+        } catch (IllegalStateException e) {
+            logger.severe("Error en reenvío: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
-        formatoA.setTitulo(request.getTitulo());
-        formatoA.setModalidad(request.getModalidad());
-        formatoA.setDirectorEmail(request.getDirectorEmail());
-        formatoA.setCodirectorEmail(request.getCodirectorEmail());
-        formatoA.setStudentEmail(request.getStudentEmail());
-        formatoA.setObjetivoGeneral(request.getObjetivoGeneral());
-        formatoA.setObjetivosEspecificos(request.getObjetivosEspecificos());
-        formatoA.setArchivoPDF(resolvePdfPath(request, formatoA.getArchivoPDF()));
-        formatoA.setFechaCreacion(LocalDate.now());
-        formatoA.setEstado(EstadoProyecto.FORMATO_A_EN_EVALUACION);
-        formatoA.incrementarIntentos();
+        
         FormatoA updatedFormatoA = formatoARepository.save(formatoA);
         eventPublisher.publishFormatoAReintentado(updatedFormatoA);
         logger.info("Formato A reintentado: " + id + " - Intento: " + updatedFormatoA.getIntentos());
