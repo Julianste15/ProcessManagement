@@ -28,10 +28,24 @@ public class AnteprojectService {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> assignEvaluators(Long anteprojectId, String evaluator1Email, String evaluator2Email) throws Exception {
+    public Map<String, Object> assignEvaluators(Long anteprojectId, String evaluator1Email, String evaluator2Email)
+            throws Exception {
         String url = String.format("/api/anteprojects/%d/assign-evaluators?evaluator1Email=%s&evaluator2Email=%s",
                 anteprojectId, evaluator1Email, evaluator2Email);
         logger.info("Asignando evaluadores para anteproyecto " + anteprojectId);
         return (Map<String, Object>) client.post(url, null, Map.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> getAnteprojectsByStudent(String studentEmail) throws Exception {
+        if (client == null) {
+            throw new IllegalStateException("No se ha inicializado el cliente para microservicios");
+        }
+        logger.info("Consultando anteproyectos para estudiante: " + studentEmail);
+        Object response = client.get("/api/anteprojects/student/" + studentEmail, List.class);
+        if (response instanceof List) {
+            return (List<Map<String, Object>>) response;
+        }
+        return List.of();
     }
 }
