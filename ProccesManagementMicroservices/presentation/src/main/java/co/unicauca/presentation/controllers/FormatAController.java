@@ -2,7 +2,7 @@ package co.unicauca.presentation.controllers;
 
 import co.unicauca.domain.entities.User;
 import co.unicauca.domain.enums.Modalidad;
-import co.unicauca.domain.services.FormatAService;
+import co.unicauca.domain.services.ProcessManagementFacade;
 import co.unicauca.domain.services.SessionService;
 import co.unicauca.presentation.views.FormatAFormView;
 import co.unicauca.presentation.views.LoginView;
@@ -29,7 +29,7 @@ public class FormatAController {
     private final SessionService sessionService;
     private final User user;
     private final Consumer<User> onSuccess;
-    private final FormatAService formatAService;
+    private final ProcessManagementFacade facade;
 
     public FormatAController(FormatAFormView view, Stage stage, SessionService sessionService, User user,
             Consumer<User> onSuccess) {
@@ -38,7 +38,7 @@ public class FormatAController {
         this.sessionService = sessionService;
         this.user = user;
         this.onSuccess = onSuccess;
-        this.formatAService = new FormatAService(sessionService != null ? sessionService.getClient() : null);
+        this.facade = new ProcessManagementFacade(sessionService != null ? sessionService.getClient() : null);
     }
 
     public void handleSubmit() {
@@ -64,11 +64,11 @@ public class FormatAController {
                 view.showError("Debe ingresar al menos un objetivo específico.");
                 return;
             }
-            
+
             // Validate PDF
             if (view.getSelectedPdfFile() == null && !view.isResubmitMode()) {
-                 view.showError("Debe adjuntar el archivo PDF del anteproyecto.");
-                 return;
+                view.showError("Debe adjuntar el archivo PDF del anteproyecto.");
+                return;
             }
 
             // Validate Carta Aceptacion for PRACTICA_PROFESIONAL
@@ -83,12 +83,12 @@ public class FormatAController {
             request.put("titulo", titulo);
             request.put("modalidad", modalidad.name());
             request.put("directorEmail", user.getEmail());
-            
+
             String codirector = view.getCodirectorEmail();
             if (!codirector.isEmpty()) {
                 request.put("codirectorEmail", codirector);
             }
-            
+
             String studentEmail = view.getStudentEmail();
             if (studentEmail.isEmpty()) {
                 view.showError("El correo del estudiante es obligatorio.");
@@ -101,26 +101,27 @@ public class FormatAController {
             request.put("studentEmail", studentEmail);
             request.put("objetivoGeneral", objetivoGeneral);
             request.put("objetivosEspecificos", objetivosEspecificos);
-            
+
             handlePdfPayload(request);
             handleCartaPayload(request);
-            
+
             Map<String, Object> response;
-            
+
             // Verificar si está en modo reenvío o creación
             if (view.isResubmitMode()) {
                 Long formatoAId = view.getFormatoAIdToResubmit();
                 logger.info("Reenviando Formato A ID: " + formatoAId + " para el docente: " + user.getEmail());
-                response = formatAService.resubmitFormatoA(formatoAId, request);
-                view.showInfo("Formato A reenviado exitosamente. El formato ha sido actualizado y está en revisión nuevamente.");
+                response = facade.resubmitFormatA(formatoAId, request);
+                view.showInfo(
+                        "Formato A reenviado exitosamente. El formato ha sido actualizado y está en revisión nuevamente.");
             } else {
                 logger.info("Enviando nuevo Formato A para el docente: " + user.getEmail());
-                response = formatAService.submitFormatoA(request);
+                response = facade.submitFormatA(request);
                 view.showInfo("Formato A enviado exitosamente. El estado actual es: " + user.getFormatoAEstado());
             }
-            
+
             actualizarEstadoUsuario(response);
-            
+
             if (onSuccess != null) {
                 onSuccess.accept(sessionService != null ? sessionService.getCurrentUser() : user);
             }
@@ -222,7 +223,7 @@ public class FormatAController {
             view.setSelectedPdfFile(selected);
         }
     }
-    
+
     public void handleSelectCarta() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Seleccionar Carta de Aceptación (PDF)");
@@ -257,7 +258,7 @@ public class FormatAController {
             request.put("archivoPDF", archivoPdf);
         }
     }
-    
+
     private void handleCartaPayload(Map<String, Object> request) throws IOException {
         File selectedCarta = view.getSelectedCartaFile();
         if (selectedCarta != null) {
