@@ -618,7 +618,7 @@ Este proyecto fue desarrollado por estudiantes de Ingeniería de Sistemas de la 
 | Nombre | Rol | GitHub |
 |--------|-----|--------|
 | **Julian Camacho** | Full Stack Developer | [@Julianste15](https://github.com/Julianste15) |
-| **Oscar Cabezas** | Backend Developer | - |
+| **Oscar Cabezas** | Backend Developer | [@Oscar-cm14](https://github.com/Oscar-cm14) |
 | **Santiago Hurtado** | Backend Developer | - |
 
 ### Contexto Académico
