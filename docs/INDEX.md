@@ -57,6 +57,24 @@ Contenido:
 
 ---
 
+### 4. [DESIGN_PATTERNS.md](../DESIGN_PATTERNS.md)
+**Patrones de Diseño Implementados**
+
+Contenido:
+- 🎯 6 patrones de diseño implementados
+- 📋 State Pattern en format-a-service
+- 🏭 Builder Pattern en user-service
+- 🔌 Adapter Pattern en anteproject-service (Hexagonal Architecture)
+- 🎨 Decorator Pattern en notification-service
+- 🏭 Factory Pattern en notification-service
+- 🎭 Facade Pattern en presentation layer
+- 📊 Distribución de patrones por categoría
+- 🎓 Mejores prácticas demostradas
+
+**Audiencia**: Desarrolladores, arquitectos, estudiantes de patrones de diseño
+
+---
+
 ## 🖼️ Diagramas
 
 Todos los diagramas están ubicados en la carpeta [`diagrams/`](./diagrams/)
@@ -143,12 +161,14 @@ Muestra:
 - **Mensajería**: RabbitMQ
 - **Frontend**: JavaFX
 - **Testing**: JUnit 5, Mockito
+- **Containerización**: Docker, Docker Compose
 
 ### Arquitectura
 - **Patrón**: Microservicios + Arquitectura Hexagonal
 - **Comunicación**: REST (síncrona) + Events (asíncrona)
 - **Escalabilidad**: Horizontal (stateless services)
 - **Resiliencia**: Event-driven, Service Discovery
+- **Patrones de Diseño**: 6 patrones implementados (State, Builder, Adapter, Decorator, Factory, Facade)
 
 ### Capacidad Demostrada
 - ✅ **100 usuarios concurrentes** sin errores
@@ -185,6 +205,15 @@ Muestra:
 ---
 
 ## 📝 Historial de Cambios
+
+### Versión 2.1 (Diciembre 2024)
+- ✅ Implementados 6 patrones de diseño (State, Builder, Adapter, Decorator, Factory, Facade)
+- ✅ Arquitectura hexagonal en anteproject-service
+- ✅ Dockerización de user-service y PostgreSQL
+- ✅ Configuración de docker-compose para desarrollo
+- ✅ Documentación completa de patrones (DESIGN_PATTERNS.md)
+- ✅ Adaptadores para comunicación entre servicios
+- ✅ Actualización de documentación de arquitectura
 
 ### Versión 2.0 (Diciembre 2024)
 - ✅ Agregados diagramas C4 completos
