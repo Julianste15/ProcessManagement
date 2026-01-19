@@ -7,11 +7,66 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=userdb
+      - POSTGRES_DB=postgres
     ports:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - microservices-network
+
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - microservices-network
+
+  discovery-service:
+    build: 
+      context: ./ProccesManagementMicroservices/discovery-service
+      dockerfile: Dockerfile
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    networks:
+      - microservices-network
+
+  gateway-service:
+    build: 
+      context: ./ProccesManagementMicroservices/gateway-service
+      dockerfile: Dockerfile
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - discovery-service
+    networks:
+      - microservices-network
+
+  auth-service:
+    build: 
+      context: ./ProccesManagementMicroservices/auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - USER_SERVICE_URL=http://user-service:8082/api/users
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - discovery-service
+      - user-service
     networks:
       - microservices-network
 
@@ -21,15 +76,132 @@ services:
       dockerfile: Dockerfile
     container_name: user-service
     ports:
-      - "8081:8082"
+      - "8082:8082"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/userdb
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
-      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
-      - EUREKA_CLIENT_FETCH_REGISTRY=false
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - postgres-db
+      - discovery-service
+    networks:
+      - microservices-network
+
+  anteproject-service:
+    build: 
+      context: ./ProccesManagementMicroservices/anteproject-service
+      dockerfile: Dockerfile
+    container_name: anteproject-service
+    ports:
+      - "8086:8086"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/anteprojectdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - postgres-db
+      - discovery-service
+    networks:
+      - microservices-network
+
+  coordination-service:
+    build: 
+      context: ./ProccesManagementMicroservices/coordination-service
+      dockerfile: Dockerfile
+    container_name: coordination-service
+    ports:
+      - "8087:8087"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/coordinationdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - postgres-db
+      - discovery-service
+    networks:
+      - microservices-network
+
+  evaluation-service:
+    build: 
+      context: ./ProccesManagementMicroservices/evaluation-service
+      dockerfile: Dockerfile
+    container_name: evaluation-service
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/evaluationdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - postgres-db
+      - discovery-service
+    networks:
+      - microservices-network
+
+  format-a-service:
+    build: 
+      context: ./ProccesManagementMicroservices/format-a-service
+      dockerfile: Dockerfile
+    container_name: format-a-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/formatoadb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - USER_SERVICE_URL=http://user-service:8082/api/users
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - postgres-db
+      - discovery-service
+      - rabbitmq
+      - user-service
+    volumes:
+      - ./storage:/app/storage
+    networks:
+      - microservices-network
+
+  notification-service:
+    build: 
+      context: ./ProccesManagementMicroservices/notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/notificationdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - EMAIL_PASSWORD=changeme
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - postgres-db
+      - discovery-service
+      - rabbitmq
     networks:
       - microservices-network
 

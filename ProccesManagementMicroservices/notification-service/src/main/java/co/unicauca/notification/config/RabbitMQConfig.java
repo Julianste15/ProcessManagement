@@ -34,6 +34,16 @@ public class RabbitMQConfig {
     @Bean
     public Queue evaluationsQueue() {
         return new Queue(EVALUATIONS_QUEUE, true, false, false);
+    }
+
+    @Bean
+    public Queue anteprojectNotificationQueue() {
+        return new Queue("anteproject.notification.queue", true, false, false);
+    }
+
+    @Bean
+    public Queue anteprojectSubmittedQueue() {
+        return new Queue("anteproject.submitted.queue", true, false, false);
     }    
     /**
      * Binding para notificaciones de formatos enviados

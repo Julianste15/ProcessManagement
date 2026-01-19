@@ -1,4 +1,4 @@
-# Sistema de Gestión de Trabajos de Grado - FIET
+# Graduate Project Management System - FIET
 
 <div align="center">
 
@@ -8,68 +8,68 @@
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-Messaging-orange?style=for-the-badge&logo=rabbitmq)
 ![Microservices](https://img.shields.io/badge/Architecture-Microservices-blueviolet?style=for-the-badge)
 
-**Sistema integral para la gestión del proceso de trabajos de grado en la Facultad de Ingeniería Electrónica y Telecomunicaciones (FIET) de la Universidad del Cauca**
+**Comprehensive system for managing the graduate project process at the Faculty of Electronics and Telecommunications Engineering (FIET) of the University of Cauca**
 
-[Características](#-características-principales) •
-[Arquitectura](#-arquitectura-del-sistema) •
-[Tecnologías](#-stack-tecnológico) •
-[Instalación](#-instalación-y-configuración) •
-[Equipo](#-equipo-de-desarrollo)
+[Features](#-main-features) •
+[Architecture](#-system-architecture) •
+[Technologies](#-technology-stack) •
+[Installation](#-installation-and-configuration) •
+[Team](#-development-team)
 
 </div>
 
 ---
 
-## Descripción del Proyecto
+## Project Description
 
-El **Sistema de Gestión de Trabajos de Grado** es una plataforma completa diseñada para digitalizar y optimizar el flujo de trabajo de proyectos de grado en la FIET. El sistema permite a docentes, estudiantes, coordinadores y jefes de departamento gestionar eficientemente todo el ciclo de vida de un proyecto de grado, desde la presentación inicial del Formato A hasta la evaluación del anteproyecto.
+The **Graduate Project Management System** is a complete platform designed to digitalize and optimize the workflow of degree projects at FIET. The system allows teachers, students, coordinators, and department heads to efficiently manage the entire lifecycle of a degree project, from the initial submission of Format A to the evaluation of the anteproject.
 
-### Objetivos
+### Objectives
 
-- **Digitalizar** el proceso de gestión de trabajos de grado
-- **Automatizar** las notificaciones y el flujo de aprobaciones
-- **Centralizar** la información de proyectos en una plataforma única
-- **Facilitar** la comunicación entre todos los actores del proceso
-- **Garantizar** la trazabilidad y el seguimiento de cada proyecto
-
----
-
-## Características Principales
-
-### Para Docentes
-- Registro en el sistema con validación de credenciales institucionales
-- Presentación del Formato A con información completa del proyecto
-- Reenvío de Formato A rechazado (hasta 3 intentos)
-- Carga de anteproyectos una vez aprobado el Formato A
-- Visualización del estado de sus proyectos
-
-### Para Estudiantes
-- Consulta del estado de su proyecto de grado en tiempo real
-- Recepción de notificaciones sobre evaluaciones
-- Seguimiento del progreso del proyecto
-
-### Para Coordinadores de Programa
-- Evaluación de Formatos A presentados
-- Aprobación o rechazo con observaciones detalladas
-- Listado completo de proyectos y sus estados
-- Notificaciones automáticas de nuevos envíos
-
-### Para Jefes de Departamento
-- Visualización de anteproyectos enviados
-- Asignación de evaluadores del departamento
-- Notificación automática a evaluadores designados
+- **Digitalize** the graduate project management process
+- **Automate** notifications and approval flows
+- **Centralize** project information in a single platform
+- **Facilitate** communication between all process actors
+- **Guarantee** traceability and tracking of each project
 
 ---
 
-## Arquitectura del Sistema
+## Main Features
 
-El sistema está construido siguiendo una **arquitectura de microservicios**, lo que garantiza escalabilidad, mantenibilidad y desacoplamiento de responsabilidades.
+### For Teachers
+- Registration in the system with institutional credential validation
+- Submission of Format A with complete project information
+- Resubmission of rejected Format A (up to 3 attempts)
+- Anteproject upload once Format A is approved
+- Project status visualization
 
-### Diagrama de Arquitectura
+### For Students
+- Real-time consultation of their project status
+- Reception of notifications about evaluations
+- Project progress tracking
+
+### For Program Coordinators
+- Evaluation of submitted Format A
+- Approval or rejection with detailed observations
+- Complete list of projects and their statuses
+- Automatic notifications of new submissions
+
+### For Department Heads
+- Visualization of submitted anteprojects
+- Assignment of department evaluators
+- Automatic notification to designated evaluators
+
+---
+
+## System Architecture
+
+The system is built following a **microservices architecture**, ensuring scalability, maintainability, and decoupling of responsibilities.
+
+### Architecture Diagram
 
 ```mermaid
 graph TB
-    subgraph "Capa de Presentación"
+    subgraph "Presentation Layer"
         UI[JavaFX Desktop Application]
     end
     
@@ -81,7 +81,7 @@ graph TB
         EUREKA[Eureka Server<br/>Port: 8761<br/>Service Registry]
     end
     
-    subgraph "Microservicios de Negocio"
+    subgraph "Business Microservices"
         AUTH[Auth Service<br/>Port: 8081<br/>Authentication & JWT]
         USER[User Service<br/>Port: 8082<br/>User Management]
         FORMATA[Format-A Service<br/>Port: 8083<br/>Format A Workflow]
@@ -95,7 +95,7 @@ graph TB
         RABBIT[RabbitMQ<br/>Asynchronous Events]
     end
     
-    subgraph "Bases de Datos"
+    subgraph "Databases"
         DB1[(PostgreSQL<br/>Auth DB)]
         DB2[(PostgreSQL<br/>Users DB)]
         DB3[(PostgreSQL<br/>Format-A DB)]
@@ -154,502 +154,447 @@ graph TB
     style NOTIF fill:#e1ffe1
 ```
 
-### Componentes del Sistema
+### System Components
 
 #### 1. **Presentation Layer** (JavaFX)
-- Aplicación de escritorio desarrollada con JavaFX 21
-- Interfaz gráfica intuitiva para todos los roles de usuario
-- Comunicación con microservicios a través del API Gateway
+- Desktop application developed with JavaFX 21
+- Intuitive graphical interface for all user roles
+- Communication with microservices via API Gateway
 
 #### 2. **API Gateway** (Spring Cloud Gateway)
-- Punto de entrada único para todas las peticiones
-- Autenticación y autorización con JWT
-- Enrutamiento dinámico a microservicios
-- Circuit breaker con Resilience4j
+- Single entry point for all requests
+- Authentication and authorization with JWT
+- Dynamic routing to microservices
+- Circuit breaker with Resilience4j
 
 #### 3. **Service Discovery** (Eureka)
-- Registro y descubrimiento de servicios
-- Balanceo de carga automático
-- Alta disponibilidad de servicios
+- Service registration and discovery
+- Automatic load balancing
+- High availability of services
 
-#### 4. **Microservicios de Negocio**
+#### 4. **Business Microservices**
 
-| Servicio | Puerto | Responsabilidad |
+| Service | Port | Responsibility |
 |----------|--------|-----------------|
-| **auth-service** | 8081 | Autenticación de usuarios, generación de tokens JWT |
-| **user-service** | 8082 | Gestión de usuarios (docentes, estudiantes, coordinadores) |
-| **format-a-service** | 8083 | Gestión del Formato A, validaciones, control de intentos |
-| **coordination-service** | 8084 | Evaluación de Formatos A, aprobaciones/rechazos |
-| **anteproject-service** | 8085 | Gestión de anteproyectos, carga de documentos |
-| **evaluation-service** | 8086 | Asignación de evaluadores, gestión de evaluaciones |
-| **notification-service** | 8087 | Envío de notificaciones por email (asíncrono) |
+| **auth-service** | 8081 | User authentication, JWT token generation |
+| **user-service** | 8082 | User management (teachers, students, coordinators) |
+| **format-a-service** | 8083 | Format A management, validations, attempt control |
+| **coordination-service** | 8084 | Format A evaluation, approvals/rejections |
+| **anteproject-service** | 8085 | Anteproject management, document upload |
+| **evaluation-service** | 8086 | Evaluator assignment, evaluation management |
+| **notification-service** | 8087 | Email sending (asynchronous) |
 
 #### 5. **Message Broker** (RabbitMQ)
-- Comunicación asíncrona entre microservicios
-- Patrón de eventos para notificaciones
-- Desacoplamiento de servicios
+- Asynchronous communication between microservices
+- Event pattern for notifications
+- Service decoupling
 
-#### 6. **Bases de Datos** (PostgreSQL)
-- Base de datos independiente por microservicio
-- Aislamiento de datos y autonomía de servicios
+#### 6. **Databases** (PostgreSQL)
+- Independent database per microservice
+- Data isolation and service autonomy
 
 ---
 
-## Stack Tecnológico
+## Technology Stack
 
 ### Backend
-- **Java 17** - Lenguaje de programación
-- **Spring Boot 3.2.0** - Framework principal
-- **Spring Cloud 2023.0.0** - Microservicios y patrones cloud-native
+- **Java 17** - Programming language
+- **Spring Boot 3.2.0** - Main framework
+- **Spring Cloud 2023.0.0** - Microservices and cloud-native patterns
   - Spring Cloud Gateway - API Gateway
   - Spring Cloud Netflix Eureka - Service Discovery
-  - Spring Cloud OpenFeign - Client HTTP declarativo
+  - Spring Cloud OpenFeign - Declarative HTTP Client
   - Resilience4j - Circuit Breaker
-- **Spring Data JPA** - Persistencia de datos
-- **Spring AMQP** - Integración con RabbitMQ
-- **Spring Security** - Seguridad (en desarrollo)
-- **Arquitectura Hexagonal** - Ports & Adapters en anteproject-service
+- **Spring Data JPA** - Data persistence
+- **Spring AMQP** - RabbitMQ integration
+- **Spring Security** - Security
+- **Hexagonal Architecture** - Ports & Adapters in anteproject-service
 
 ### Frontend
-- **JavaFX 21** - Framework para aplicaciones de escritorio
-- **Jackson** - Serialización/deserialización JSON
+- **JavaFX 21** - Framework for desktop applications
+- **Jackson** - JSON serialization/deserialization
 
-### Bases de Datos
-- **PostgreSQL** - Base de datos relacional
+### Databases
+- **PostgreSQL** - Relational database
 
-### Mensajería
-- **RabbitMQ** - Message broker para comunicación asíncrona
+### Messaging
+- **RabbitMQ** - Message broker for asynchronous communication
 
-### Autenticación
-- **JWT (JSON Web Tokens)** - Autenticación stateless
-- **JJWT 0.11.5** - Librería para manejo de JWT
+### Authentication
+- **JWT (JSON Web Tokens)** - Stateless authentication
+- **JJWT 0.11.5** - Library for JWT handling
 
-### Containerización y Despliegue
-- **Docker** - Containerización de servicios
-- **Docker Compose** - Orquestación de contenedores para desarrollo
+### Containerization and Deployment
+- **Docker** - Service containerization
+- **Docker Compose** - Container orchestration for development
 
-### Herramientas de Desarrollo
-- **Maven** - Gestión de dependencias y build
-- **Git** - Control de versiones
-- **Lombok** - Reducción de código boilerplate
-
----
-
-## Requisitos Funcionales
-
-El sistema implementa los siguientes requisitos funcionales de alto valor:
-
-### RF-01: Registro de Docentes
-**Como** docente **necesito** registrarme en el sistema **para** iniciar el flujo de un proyecto de grado.
-
-**Datos requeridos:**
-- Nombres y apellidos
-- Celular (opcional)
-- Programa académico (Ingeniería de Sistemas, Ingeniería Electrónica y Telecomunicaciones, Automática Industrial, Tecnología en Telemática)
-- Email institucional
-- Contraseña (mínimo 6 caracteres, al menos un dígito, un carácter especial y una mayúscula)
-
-### RF-02: Presentación del Formato A
-**Como** docente **necesito** subir el Formato A **para** comenzar el proceso de proyecto de grado.
-
-**Datos del formulario:**
-- Título del proyecto
-- Modalidad (Investigación, Práctica Profesional)
-- Fecha actual
-- Director del proyecto
-- Codirector del proyecto
-- Objetivo general
-- Objetivos específicos
-- Archivo PDF adjunto
-- Carta de aceptación de empresa (si es Práctica Profesional)
-
-> **Nota:** El sistema envía una notificación asíncrona al coordinador al enviar el Formato A.
-
-### RF-03: Evaluación del Formato A
-**Como** coordinador **necesito** evaluar un Formato A **para** aprobar, rechazar o dejar observaciones.
-
-**Funcionalidades:**
-- Listado de proyectos con su estado
-- Evaluación con opciones: Aprobado, Rechazado
-- Campo de observaciones
-- Notificación automática a docentes y estudiantes implicados
-
-### RF-04: Reenvío del Formato A
-**Como** docente **necesito** subir una nueva versión del Formato A **para** continuar con el proceso tras un rechazo.
-
-**Reglas de negocio:**
-- Control de intentos (máximo 3)
-- Rechazo definitivo después del tercer intento
-- Notificación asíncrona al coordinador en cada reenvío
-
-### RF-05: Consulta de Estado (Estudiante)
-**Como** estudiante **necesito** ver el estado de mi proyecto **para** hacer seguimiento del proceso.
-
-**Estados posibles:**
-- En primera evaluación Formato A
-- En segunda evaluación Formato A
-- En tercera evaluación Formato A
-- Formato A aceptado
-- Formato A rechazado
-
-### RF-06: Carga de Anteproyecto
-**Como** docente **necesito** subir el anteproyecto **para** continuar con el proceso tras la aprobación del Formato A.
-
-**Funcionalidades:**
-- Carga de documento de anteproyecto
-- Registro de fecha de envío
-- Notificación asíncrona al jefe de departamento
-
-### RF-07: Listado de Anteproyectos
-**Como** jefe de departamento **necesito** ver los anteproyectos enviados **para** proceder con la asignación de evaluadores.
-
-**Funcionalidades:**
-- Visualización de anteproyectos pendientes
-- Información del proyecto y docente director
-
-### RF-08: Asignación de Evaluadores
-**Como** jefe de departamento **necesito** delegar dos docentes evaluadores **para** que evalúen un anteproyecto.
-
-**Funcionalidades:**
-- Selección de dos evaluadores del departamento
-- Notificación automática a los evaluadores designados
+### Development Tools
+- **Maven** - Dependency management and build
+- **Git** - Version control
+- **Lombok** - Boilerplate code reduction
 
 ---
 
-## Instalación y Configuración
+## Functional Requirements
 
-### Prerrequisitos
+The system implements the following high-value functional requirements:
 
-- **Java 17** o superior
-- **Maven 3.8+**
-- **PostgreSQL 14+**
-- **RabbitMQ 3.11+**
-- **Git**
+### FR-01: Teacher Registration
+**As a** teacher **I need** to register in the system **to** start a degree project flow.
 
-### 1. Clonar el Repositorio
+**Required data:**
+- Names and surnames
+- Mobile phone (optional)
+- Academic program (Systems Engineering, Electronics and Telecommunications Engineering, Industrial Automation, Telematics Technology)
+- Institutional email
+- Password (minimum 6 characters, at least one digit, one special character, and one uppercase letter)
+
+### FR-02: Format A Submission
+**As a** teacher **I need** to upload Format A **to** begin the degree project process.
+
+**Form data:**
+- Project title
+- Modality (Research, Professional Practice)
+- Current date
+- Project director
+- Project codirector
+- General objective
+- Specific objectives
+- Attached PDF file
+- Company acceptance letter (if Professional Practice)
+
+> **Note:** The system sends an asynchronous notification to the coordinator upon Format A submission.
+
+### FR-03: Format A Evaluation
+**As a** coordinator **I need** to evaluate a Format A **to** approve, reject, or leave observations.
+
+**Functionalities:**
+- List of projects with their status
+- Evaluation with options: Approved, Rejected
+- Observations field
+- Automatic notification to involved teachers and students
+
+### FR-04: Format A Resubmission
+**As a** teacher **I need** to upload a new version of Format A **to** continue the process after a rejection.
+
+**Business rules:**
+- Attempt control (maximum 3)
+- Definitive rejection after the third attempt
+- Asynchronous notification to the coordinator on each resubmission
+
+### FR-05: Status Consultation (Student)
+**As a** student **I need** to view the status of my project **to** track the process.
+
+**Possible statuses:**
+- In first Format A evaluation
+- In second Format A evaluation
+- In third Format A evaluation
+- Format A accepted
+- Format A rejected
+
+### FR-06: Anteproject Upload
+**As a** teacher **I need** to upload the anteproject **to** continue the process after Format A approval.
+
+**Functionalities:**
+- Upload of anteproject document
+- Submission date registration
+- Asynchronous notification to the department head
+
+### FR-07: Anteproject List
+**As a** department head **I need** to view submitted anteprojects **to** proceed with evaluator assignment.
+
+**Functionalities:**
+- Visualization of pending anteprojects
+- Project information and director teacher
+
+### FR-08: Evaluator Assignment
+**As a** department head **I need** to delegate two evaluator teachers **to** evaluate an anteproject.
+
+**Functionalities:**
+- Selection of two evaluators from the department
+- Automatic notification to designated evaluators
+
+---
+
+## Installation and Configuration
+
+### Prerequisites
+
+- **Docker Desktop** installed and running
+- **Java 17** (to run the desktop application)
+- **Maven** (to run the desktop application)
+
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/Julianste15/ProcessManagement.git
-cd ProcessManagement/ProccesManagementMicroservices
+cd ProcessManagement
 ```
 
-### 2. Configurar Bases de Datos
+### 2. Run with Docker Compose
 
-Crear las siguientes bases de datos en PostgreSQL:
-
-```sql
-CREATE DATABASE auth_db;
-CREATE DATABASE users_db;
-CREATE DATABASE formata_db;
-CREATE DATABASE coordination_db;
-CREATE DATABASE anteproject_db;
-CREATE DATABASE evaluation_db;
-CREATE DATABASE notification_db;
-```
-
-### 3. Configurar RabbitMQ
-
-Instalar y ejecutar RabbitMQ:
+This single command will build all microservices, start the databases, RabbitMQ, and register everything in Eureka.
 
 ```bash
-# En Windows (con Chocolatey)
-choco install rabbitmq
-
-# Iniciar el servicio
-rabbitmq-server
+docker-compose up -d --build
 ```
 
-Acceder a la consola de administración: `http://localhost:15672` (usuario: guest, password: guest)
+**Verify services are running:**
+- **Eureka Dashboard:** `http://localhost:8761`
+- **Gateway:** `http://localhost:8080`
+- **RabbitMQ:** `http://localhost:15672` (guest/guest)
 
-### 4. Configurar Variables de Entorno
+### 3. Run Desktop Application
 
-Cada microservicio requiere configuración de base de datos. Editar los archivos `application.yml` en cada servicio:
-
-```yaml
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/[nombre_db]
-    username: [tu_usuario]
-    password: [tu_password]
-```
-
-### 5. Compilar el Proyecto
+Once the microservices are up, open a new terminal and run the presentation layer:
 
 ```bash
-# Compilar todos los microservicios
-mvn clean install -DskipTests
-```
-
-### 6. Ejecutar los Servicios
-
-**Orden de inicio recomendado:**
-
-```bash
-# 1. Service Discovery
-cd discovery-service
-mvn spring-boot:run
-
-# 2. Gateway (en otra terminal)
-cd gateway-service
-mvn spring-boot:run
-
-# 3. Microservicios de negocio (en terminales separadas)
-cd auth-service && mvn spring-boot:run
-cd user-service && mvn spring-boot:run
-cd format-a-service && mvn spring-boot:run
-cd coordination-service && mvn spring-boot:run
-cd anteproject-service && mvn spring-boot:run
-cd evaluation-service && mvn spring-boot:run
-cd notification-service && mvn spring-boot:run
-
-# 4. Aplicación de escritorio
-cd presentation
+cd ProccesManagementMicroservices/presentation
 mvn javafx:run
 ```
 
-### 7. Verificar el Sistema
-
-- **Eureka Dashboard:** `http://localhost:8761`
-- **API Gateway:** `http://localhost:8080`
-- **RabbitMQ Management:** `http://localhost:15672`
-
 ---
 
-## 🐳 Containerización con Docker
+## 🐳 Dockerization
 
-El proyecto incluye soporte para Docker, facilitando el despliegue y la gestión de dependencias.
+The project is fully dockerized to ensure a consistent development environment.
 
-### Servicios Dockerizados
+### Dockerized Services
 
-Actualmente dockerizados:
-- **PostgreSQL** - Base de datos principal (puerto 5432)
-- **User Service** - Servicio de gestión de usuarios (puerto 8081)
+All components are containerized:
+- **Infrastructure:**
+    - PostgreSQL (Database)
+    - RabbitMQ (Message Broker)
+    - Eureka Server (Service Discovery)
+    - API Gateway
+- **Microservices:**
+    - Auth Service
+    - User Service
+    - Format-A Service
+    - Coordination Service
+    - Anteproject Service
+    - Evaluation Service
+    - Notification Service
 
-### Ejecutar con Docker Compose
+### Docker Commands
 
 ```bash
-# Iniciar todos los servicios
+# Start all services
 docker-compose up -d
 
-# Ver logs
+# View logs
 docker-compose logs -f
 
-# Ver logs de un servicio específico
+# View logs of specific service
 docker-compose logs -f user-service
 
-# Detener servicios
+# Stop services
 docker-compose down
 
-# Reconstruir imágenes
+# Rebuild images
 docker-compose up --build
 
-# Detener y eliminar volúmenes
+# Stop and remove volumes (database reset)
 docker-compose down -v
 ```
 
-### Configuración de Docker
+### Docker Configuration
 
-El archivo `docker-compose.yml` configura:
-- **Red de microservicios** (`microservices-network`) para comunicación entre contenedores
-- **Volúmenes persistentes** para PostgreSQL (`postgres-data`)
-- **Variables de entorno** para conexiones de base de datos
-- **Mapeo de puertos** para acceso desde el host
+The `docker-compose.yml` file handles:
+- **Network:** `microservices-network` for internal communication.
+- **Volúmenes:** Persistent storage for PostgreSQL (`postgres-data`) and file uploads (`./storage`).
+- **init.sql:** Automatic creation of all required databases on startup.
+- **Environment Variables:** Automatic injection of DB credentials and service URLs.
 
-### Dockerfile del User Service
+### Dockerization Status
 
-El Dockerfile utiliza:
-- **Imagen base**: `eclipse-temurin:17-jdk-alpine` (Java 17 optimizado)
-- **Build multi-stage** para optimización de tamaño
-- **Puerto expuesto**: 8082
-
-### Próximos Servicios a Dockerizar
-
-- [ ] format-a-service
-- [ ] anteproject-service
-- [ ] evaluation-service
-- [ ] notification-service
-- [ ] gateway-service
-- [ ] discovery-service
-- [ ] RabbitMQ (integración en docker-compose)
+- [x] format-a-service
+- [x] anteproject-service
+- [x] evaluation-service
+- [x] notification-service
+- [x] gateway-service
+- [x] discovery-service
+- [x] RabbitMQ
+- [x] auth-service
+- [x] application.yml configuration for Docker profiles
 
 ---
 
-## Estructura del Proyecto
+## Project Structure
 
 ```
 ProccesManagementMicroservices/
 ├── discovery-service/          # Eureka Server
 ├── gateway-service/            # API Gateway
-├── auth-service/               # Autenticación
-├── user-service/               # Gestión de usuarios
-├── format-a-service/           # Gestión de Formato A
-├── coordination-service/       # Coordinación y evaluación
-├── anteproject-service/        # Gestión de anteproyectos
-├── evaluation-service/         # Asignación de evaluadores
-├── notification-service/       # Notificaciones
-├── presentation/               # Aplicación JavaFX
-└── storage/                    # Almacenamiento de archivos
+├── auth-service/               # Authentication
+├── user-service/               # User Management
+├── format-a-service/           # Format A Management
+├── coordination-service/       # Coordination & Evaluation
+├── anteproject-service/        # Anteproject Management
+├── evaluation-service/         # Evaluator Assignment
+├── notification-service/       # Notifications
+├── presentation/               # JavaFX Application
+└── storage/                    # File Storage
 ```
 
 ---
 
-## Seguridad
+## Security
 
-El sistema implementa las siguientes medidas de seguridad:
+The system implements the following security measures:
 
-- **Autenticación JWT:** Tokens seguros para autenticación stateless
-- **Validación de contraseñas:** Requisitos de complejidad (mínimo 6 caracteres, mayúsculas, dígitos, caracteres especiales)
-- **API Gateway:** Punto único de entrada con validación de tokens
-- **Roles y permisos:** Control de acceso basado en roles (TEACHER, COORDINATOR, DEPARTMENT_HEAD, STUDENT)
+- **JWT Authentication:** Secure tokens for stateless authentication
+- **Password Validation:** Complexity requirements (minimum 6 characters, uppercase, digits, special characters)
+- **API Gateway:** Single entry point with token validation
+- **Roles and Permissions:** Role-based access control (TEACHER, COORDINATOR, DEPARTMENT_HEAD, STUDENT)
 
 ---
 
-## Patrones y Buenas Prácticas
+## Patterns and Best Practices
 
-### Patrones Arquitectónicos
-- **API Gateway Pattern:** Punto de entrada único
-- **Service Discovery Pattern:** Registro dinámico de servicios
-- **Event-Driven Architecture:** Comunicación asíncrona con eventos
-- **Circuit Breaker Pattern:** Resiliencia ante fallos
-- **Database per Service:** Autonomía de datos por microservicio
-- **Hexagonal Architecture (Ports & Adapters):** Implementado en anteproject-service
+### Architectural Patterns
+- **API Gateway Pattern:** Single entry point
+- **Service Discovery Pattern:** Dynamic service registration
+- **Event-Driven Architecture:** Asynchronous communication with events
+- **Circuit Breaker Pattern:** Resilience against failures
+- **Database per Service:** Data autonomy per microservice
+- **Hexagonal Architecture (Ports & Adapters):** Implemented in anteproject-service
 
-### Patrones de Diseño Implementados
+### Design Patterns Implemented
 
-El proyecto implementa **6 patrones de diseño** clásicos. Para documentación detallada, ver [DESIGN_PATTERNS.md](./DESIGN_PATTERNS.md).
+The project implements **6 classic design patterns**. For detailed documentation, see [DESIGN_PATTERNS.md](./DESIGN_PATTERNS.md).
 
-| Patrón | Microservicio | Propósito |
+| Pattern | Microservice | Purpose |
 |--------|---------------|----------|
-| **State** | format-a-service | Gestión del ciclo de vida de FormatoA |
-| **Builder** | user-service | Construcción de objetos User con validación |
-| **Adapter** | anteproject-service | Arquitectura hexagonal - adaptadores de entrada/salida |
-| **Decorator** | notification-service | Logging decorado en servicio de email |
-| **Factory** | notification-service | Creación centralizada de mensajes de email |
-| **Facade** | presentation | Simplificación de interacciones con backend |
+| **State** | format-a-service | FormatA lifecycle management |
+| **Builder** | user-service | User object construction with validation |
+| **Adapter** | anteproject-service | Hexagonal architecture - input/output adapters |
+| **Decorator** | notification-service | Decorated logging in email service |
+| **Factory** | notification-service | Centralized email message creation |
+| **Facade** | presentation | Simplification of backend interactions |
 
-**Distribución por categoría:**
-- **Patrones de Comportamiento:** State (1)
-- **Patrones Creacionales:** Builder, Factory (2)
-- **Patrones Estructurales:** Adapter, Decorator, Facade (3)
+**Distribution by category:**
+- **Behavioral Patterns:** State (1)
+- **Creational Patterns:** Builder, Factory (2)
+- **Structural Patterns:** Adapter, Decorator, Facade (3)
 
-### Arquitectura Hexagonal
+### Hexagonal Architecture
 
-El **anteproject-service** implementa arquitectura hexagonal completa:
+The **anteproject-service** implements full hexagonal architecture:
 
 ```
 domain/
-  ├── model/              # Entidades del dominio
+  ├── model/              # Domain entities
   └── ports/
-      ├── in/             # Casos de uso (puertos de entrada)
-      └── out/            # Interfaces de salida
+      ├── in/             # Use cases (input ports)
+      └── out/            # Output interfaces
 application/
-  └── service/            # Implementación de casos de uso
+  └── service/            # Use case implementation
 infrastructure/
-  ├── input/              # Adaptadores de entrada (REST, Events)
-  └── output/             # Adaptadores de salida (DB, Clients, Events)
+  ├── input/              # Input adapters (REST, Events)
+  └── output/             # Output adapters (DB, Clients, Events)
 ```
 
-**Beneficios:**
-- ✅ Dominio independiente de frameworks
-- ✅ Testabilidad mejorada con mocks de puertos
-- ✅ Flexibilidad para cambiar tecnologías de infraestructura
+**Benefits:**
+- ✅ Domain independent of frameworks
+- ✅ Improved testability with port mocks
+- ✅ Flexibility to change infrastructure technologies
 
-### Principios SOLID
-- **Single Responsibility:** Cada microservicio tiene una responsabilidad única
-- **Open/Closed:** Extensible mediante nuevos microservicios y patrones
-- **Dependency Inversion:** Uso de interfaces, puertos y abstracciones
+### SOLID Principles
+- **Single Responsibility:** Each microservice has a unique responsibility
+- **Open/Closed:** Extensible through new microservices and patterns
+- **Dependency Inversion:** Use of interfaces, ports, and abstractions
 
 ---
 
 ## Testing
 
 ```bash
-# Ejecutar tests unitarios
+# Run unit tests
 mvn test
 
-# Ejecutar tests de un servicio específico
-cd [nombre-servicio]
+# Run tests for a specific service
+cd [service-name]
 mvn test
 ```
 
 ---
 
-## Documentación de API
+## API Documentation
 
-El proyecto cuenta con documentación interactiva generada con **Swagger/OpenAPI**.
+The project includes interactive documentation generated with **Swagger/OpenAPI**.
 
-### Acceso a la Documentación
+### Accessing Documentation
 
-Una vez iniciados los microservicios, puedes acceder a la interfaz de Swagger UI para explorar y probar los endpoints:
+Once microservices are started, you can access the Swagger UI interface to explore and test endpoints:
 
-| Servicio | URL de Swagger UI |
+| Service | Swagger UI URL |
 |----------|-------------------|
 | **format-a-service** | `http://localhost:8083/swagger-ui/index.html` |
-| *Otros servicios* | *Próximamente* |
+| *Other services* | *Coming soon* |
 
 ---
 
-## Roadmap y Mejoras Futuras
+## Roadmap and Future Improvements
 
-### Completado ✅
-- [x] Documentación de API con Swagger/OpenAPI (Implementado en format-a-service)
-- [x] Containerización con Docker (PostgreSQL y user-service)
-- [x] Implementación de patrones de diseño (6 patrones implementados)
-- [x] Arquitectura hexagonal (anteproject-service)
+### Completed ✅
+- [x] API Documentation with Swagger/OpenAPI (Implemented in format-a-service)
+- [x] Containerization with Docker (All services)
+- [x] Implementation of design patterns (6 patterns implemented)
+- [x] Hexagonal Architecture (anteproject-service)
 
-### En Progreso 🚧
-- [ ] Dockerización de servicios restantes (5 servicios pendientes)
-- [ ] Implementación de tests de integración
+### In Progress 🚧
+- [ ] Integration tests implementation
 
-### Planificado 📋
-- [ ] Dashboard web con React/Angular
-- [ ] Notificaciones en tiempo real con WebSockets
-- [ ] Almacenamiento de archivos en la nube (AWS S3, Google Cloud Storage)
-- [ ] Métricas y monitoreo con Prometheus y Grafana
-- [ ] Orquestación con Kubernetes
-- [ ] CI/CD con GitHub Actions
+### Planned 📋
+- [ ] Web Dashboard with React/Angular
+- [ ] Real-time notifications with WebSockets
+- [ ] Cloud file storage (AWS S3, Google Cloud Storage)
+- [ ] Metrics and monitoring with Prometheus and Grafana
+- [ ] Orchestration with Kubernetes
+- [ ] CI/CD with GitHub Actions
 
 ---
 
-## Equipo de Desarrollo
+## Development Team
 
-Este proyecto fue desarrollado por estudiantes de Ingeniería de Sistemas de la Universidad del Cauca como parte del curso de Software II:
+This project was developed by Systems Engineering students at the University of Cauca as part of the Software II course:
 
-| Nombre | Rol | GitHub |
+| Name | Role | GitHub |
 |--------|-----|--------|
 | **Julian Camacho** | Full Stack Developer | [@Julianste15](https://github.com/Julianste15) |
 | **Oscar Cabezas** | Backend Developer | [@Oscar-cm14](https://github.com/Oscar-cm14) |
 | **Santiago Hurtado** | Backend Developer | - |
 
-### Contexto Académico
+### Academic Context
 
-**Universidad:** Universidad del Cauca  
-**Facultad:** Ingeniería Electrónica y Telecomunicaciones (FIET)  
-**Programa:** Ingeniería de Sistemas  
-**Curso:** Software II  
-**Año:** 2025
-
----
-
-## Licencia
-
-Este proyecto es de código abierto y está disponible bajo la licencia MIT.
+**University:** University of Cauca
+**Faculty:** Faculty of Electronics and Telecommunications Engineering (FIET)
+**Program:** Systems Engineering
+**Course:** Software II
+**Year:** 2025
 
 ---
 
-## Contacto y Soporte
+## License
 
-Para preguntas, sugerencias o reportar problemas:
+This project is open source and available under the MIT license.
+
+---
+
+## Contact and Support
+
+For questions, suggestions, or to report issues:
 
 - **Issues:** [GitHub Issues](https://github.com/Julianste15/ProcessManagement/issues)
-- **Email:** [Contactar al equipo]
+- **Email:** [Contact team]
 
 ---
 
 <div align="center">
 
-**⭐ Si este proyecto te fue útil, considera darle una estrella en GitHub ⭐**
+**⭐ If this project was useful to you, consider giving it a star on GitHub ⭐**
 
-Desarrollado por estudiantes de la Universidad del Cauca
+Developed by students of the University of Cauca
 
 </div>
