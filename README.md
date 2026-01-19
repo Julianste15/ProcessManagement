@@ -547,9 +547,6 @@ Once microservices are started, you can access the Swagger UI interface to explo
 - [ ] Integration tests implementation
 
 ### Planned 📋
-- [ ] Web Dashboard with React/Angular
-- [ ] Real-time notifications with WebSockets
-- [ ] Cloud file storage (AWS S3, Google Cloud Storage)
 - [ ] Metrics and monitoring with Prometheus and Grafana
 - [ ] Orchestration with Kubernetes
 - [ ] CI/CD with GitHub Actions
