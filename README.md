@@ -1,5 +1,13 @@
 # Graduate Project Management System - FIET
 
+> Plataforma integral de microservicios que gestiona todo el ciclo de trabajos de grado en la FIET (Universidad del Cauca): desde el Formato A hasta la evaluación del anteproyecto.
+
+**🇪🇸 Español:** JavaFX como cliente de escritorio, 7 microservicios Spring Boot (auth, usuarios, Formato A, coordinación, anteproyecto, evaluación, notificaciones), cada uno con su PostgreSQL, comunicación asíncrona por RabbitMQ, autenticación JWT vía Gateway y resiliencia con Resilience4j. Desplegable con Docker Compose.
+
+**🇺🇸 English:** Spring Boot microservices with a JavaFX desktop client, per-service PostgreSQL databases, RabbitMQ async messaging, JWT auth through an API Gateway and Resilience4j circuit breaker. Deployable with a single Docker Compose command.
+
+---
+
 <div align="center">
 
 ![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=java)
