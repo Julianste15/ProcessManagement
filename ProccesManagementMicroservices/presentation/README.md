@@ -1,120 +1,85 @@
-# 🖥️ Aplicación de Escritorio JavaFX
+# Cliente de escritorio JavaFX
 
-Aplicación de escritorio JavaFX que se conecta con microservicios para gestión de trabajos de grado.
+Aplicación de escritorio que consume los microservicios del sistema de gestión de trabajos de grado a través del API Gateway.
 
-## 🎯 Funcionalidades
+## Funcionalidades
 
-- ✅ **Login**: Autenticación de usuarios
-- ✅ **Registro**: Registro de nuevos usuarios
-- ✅ **Dashboard**: Panel principal después del login
+- **Inicio de sesión** con correo institucional (`@unicauca.edu.co`).
+- **Registro** de estudiantes, docentes y coordinadores.
+- **Dashboards** por rol: docente, estudiante, coordinador y jefe de departamento.
+- **Formato A**: diligenciar, reenviar (máximo 3 intentos) y consultar estado.
+- **Anteproyecto**: creación y carga del documento.
+- **Evaluación**: aprobación/rechazo y asignación de evaluadores.
 
-## 🚀 Cómo Ejecutar
+## Requisitos
 
-### 1. Iniciar Microservicios
+- Java 17 o superior.
+- Maven 3.9+.
+- Backend en ejecución (ver el README principal).
 
-```powershell
-cd ..\..
-.\start-services.ps1
+## Cómo ejecutar
+
+### 1. Levantar el backend
+
+Desde la raíz del repositorio:
+
+```bash
+docker compose up -d --build
 ```
 
-Asegúrate de que estén corriendo:
-- Discovery Service (puerto 8761)
-- Gateway Service (puerto 8080)
-- Auth Service
-- User Service
+Verifica que Eureka (`http://localhost:8761`) y el gateway (`http://localhost:8080`) estén disponibles.
 
-### 2. Compilar la Aplicación
+### 2. Ejecutar el cliente
 
-```powershell
-cd presentation
-mvn clean compile
-```
-
-### 3. Ejecutar
-
-#### Opción A: Con Maven (Recomendado)
-```powershell
+```bash
+cd ProccesManagementMicroservices/presentation
 mvn javafx:run
 ```
 
-#### Opción B: Con Java directamente
+También puedes usar los scripts incluidos:
+
 ```powershell
-mvn clean package
-java --module-path "C:\path\to\javafx-sdk\lib" --add-modules javafx.controls,javafx.fxml -jar target/presentation-1.0-SNAPSHOT.jar
+.\run-javafx.ps1
+# Alternativa si hay problemas con el module-path:
+.\run-javafx-simple.ps1
 ```
 
-## 📁 Estructura del Proyecto
+> El JAR generado con `mvn package` incluye las dependencias, pero **no** los módulos nativos de JavaFX. Para ejecutarlo directamente hay que indicar el `--module-path` de JavaFX; por eso se recomienda `mvn javafx:run`.
+
+## Configuración
+
+La URL del gateway se define en `src/main/resources/microservice.properties`:
+
+```properties
+gateway.url=http://localhost:8080
+connection.timeout=5000
+read.timeout=10000
+```
+
+## Estructura
 
 ```
 presentation/
 ├── src/main/java/co/unicauca/
-│   ├── domain/              # Capa de dominio
-│   │   ├── entities/        # Entidades (User)
-│   │   ├── enums/          # Enumeraciones (Role, Career)
-│   │   ├── services/       # Servicios (SessionService, UserService)
-│   │   └── exceptions/     # Excepciones
-│   ├── infrastructure/      # Capa de infraestructura
-│   │   ├── client/         # Cliente HTTP (MicroserviceClient)
-│   │   └── config/         # Configuración
-│   └── presentation/       # Capa de presentación
-│       ├── JavaFXApplication.java  # Clase principal
-│       ├── controllers/    # Controladores
-│       └── views/          # Vistas JavaFX
-└── src/main/resources/
-    ├── microservice.properties  # Configuración Gateway
-    └── styles/
-        └── application.css      # Estilos CSS
+│   ├── domain/           # Entidades, enums, servicios de dominio
+│   ├── infrastructure/   # Cliente HTTP y configuración
+│   └── presentation/     # Aplicación, controladores y vistas JavaFX
+├── src/main/resources/
+│   ├── images/
+│   ├── styles/
+│   └── microservice.properties
+├── run-javafx.ps1
+└── run-javafx-simple.ps1
 ```
 
-## 🎨 Pantallas
+## Pantallas
 
-### Login
-- Email institucional (@unicauca.edu.co)
-- Contraseña
-- Botón para ir a registro
+- **Login**: correo institucional y contraseña.
+- **Registro**: nombres, apellidos, correo, contraseña, teléfono, carrera y rol.
+- **Dashboard docente**: estado del Formato A y accesos a diligenciar/consultar.
+- **Formato A**: título, modalidad, director, codirector, estudiante, objetivos y PDF.
+- **Dashboard coordinador**: formatos pendientes con acciones de aprobar/rechazar.
+- **Dashboard jefe de departamento**: anteproyectos recibidos y asignación de evaluadores.
+- **Vista estudiante**: estado del proyecto y observaciones.
 
-### Registro
-- Nombres y apellidos
-- Email institucional
-- Contraseña
-- Teléfono (opcional)
-- Carrera
-- Rol (Estudiante/Profesor)
-
-### Dashboard
-- Información del usuario
-- Mensaje de bienvenida
-- Botón de logout
-
-## ⚙️ Configuración
-
-El archivo `src/main/resources/microservice.properties` contiene la URL del Gateway:
-
-```properties
-gateway.url=http://localhost:8080
-```
-
-## 🔧 Requisitos
-
-- Java 17 o superior
-- Maven 3.6+
-- JavaFX 21 (incluido en las dependencias)
-
-## 🐛 Solución de Problemas
-
-### Error: "JavaFX runtime components are missing"
-- Asegúrate de usar `mvn javafx:run` o tener JavaFX instalado
-
-### Error de conexión
-- Verifica que el Gateway esté corriendo en el puerto 8080
-- Verifica que los microservicios estén registrados en Eureka
-
-### La aplicación no inicia
-- Verifica que Java 17 esté instalado: `java -version`
-- Verifica que Maven esté instalado: `mvn -version`
-- Revisa los logs en la consola
-
----
-
-**¡Listo para usar!** 🎉
-
+Las capturas de cada pantalla están en [`docs/screenshots`](../../docs/screenshots).

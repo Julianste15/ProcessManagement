@@ -1,4 +1,19 @@
-/target/
-/ProccesManagementMicroservices/coordination-service/target/
-/frontend/nbproject/private/
-/ProccesManagementMicroservices/presentation/target/
+# Maven
+**/target/
+dependency-reduced-pom.xml
+
+# Entornos y secretos
+.env
+.env.local
+
+# Logs
+*.log
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
