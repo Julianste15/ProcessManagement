@@ -93,6 +93,15 @@ Todas las capturas fueron tomadas ejecutando el sistema completo en local (Postg
 
 > Las capturas se pueden regenerar ejecutando el sistema localmente; ver [Ejecución local](#-ejecución-local).
 
+### 🎬 Demo y evolución
+
+| Versión | Demo | Qué muestra |
+|---|---|---|
+| **Primer corte** (sep-2025) | [Ver vídeo](https://youtu.be/y80yM8LkPVI) | Frontend en **Java Swing** y backend monolítico modular: el primer entregable del curso. |
+| **Versión actual** | [Ver capturas](#-capturas-de-la-aplicación) | Cliente **JavaFX** y arquitectura de microservicios. |
+
+> El vídeo del primer corte se conserva para mostrar la evolución: el producto empezó como un monolito con cliente Swing y hoy es un sistema de microservicios con cliente JavaFX. La grabación de una demo actual está planificada en el [backlog](https://github.com/Julianste15/ProcessManagement/issues).
+
 ---
 
 ## 📋 Descripción
