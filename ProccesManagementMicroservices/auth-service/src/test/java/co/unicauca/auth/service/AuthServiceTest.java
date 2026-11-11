@@ -7,8 +7,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import java.util.List;
 import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -38,13 +42,27 @@ class AuthServiceTest {
                 "names", "Juan",
                 "surnames", "Pérez");
         ResponseEntity<Map> userResponse = ResponseEntity.ok(userBody);
+        ResponseEntity<List<Map<String, Object>>> formatosResponse = ResponseEntity.ok(
+                List.of(Map.<String, Object>of("id", 5, "estado", "FORMATO_A_ACEPTADO")));
 
-        when(restTemplate.postForEntity(
+        doReturn(userResponse).when(restTemplate).exchange(
                 eq("http://user-service/api/users/validate-credentials"),
-                any(Map.class),
-                eq(Map.class))).thenReturn(userResponse);
+                eq(HttpMethod.POST),
+                any(HttpEntity.class),
+                any(ParameterizedTypeReference.class));
 
-        
+        doReturn(formatosResponse).when(restTemplate).exchange(
+                eq("http://format-a-service/api/format-a/user/teacher@unicauca.edu.co"),
+                eq(HttpMethod.GET),
+                isNull(),
+                any(ParameterizedTypeReference.class));
+
+        doReturn(ResponseEntity.ok("other@unicauca.edu.co")).when(restTemplate).getForEntity(
+                eq("http://user-service/api/department-head/current"),
+                eq(String.class));
+
+        when(jwtService.generateToken("teacher@unicauca.edu.co", "TEACHER", false))
+                .thenReturn("jwt-token-123");
 
         AuthResponse response = authService.authenticate(request);
 
