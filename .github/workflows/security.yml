@@ -23,6 +23,6 @@ jobs:
           sudo install gitleaks /usr/local/bin/gitleaks
 
       # Escanea el árbol actual (no el historial): el historial contiene
-      # placeholders antiguos como "changeme", pero el árbol ya no.
+      # placeholders antiguos, pero el árbol actual ya no.
       - name: Scan working tree
-        run: gitleaks detect --source . --no-git --redact --verbose
+        run: gitleaks detect --source . --no-git --redact --verbose --config .gitleaks.toml
