@@ -463,6 +463,10 @@ The system implements the following security measures:
 - **Password Validation:** Complexity requirements (minimum 6 characters, uppercase, digits, special characters)
 - **API Gateway:** Single entry point with token validation
 - **Roles and Permissions:** Role-based access control (TEACHER, COORDINATOR, DEPARTMENT_HEAD, STUDENT)
+- **Secrets:** `JWT_SECRET` and SMTP settings come from environment variables; no credentials are committed.
+- **CORS:** centralized allowlist in the gateway. The JavaFX desktop client does not send `Origin` headers, so it does not need a wide CORS policy.
+- **Identity headers:** the gateway removes any client-supplied `X-User-*` header and rebuilds it from the validated JWT.
+- **Network exposure:** only the gateway (`8080`), Eureka (`8761`) and the RabbitMQ console (`15672`) are published by Docker Compose.
 
 ---
 
