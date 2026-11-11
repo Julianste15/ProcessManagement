@@ -7,9 +7,12 @@ spring:
   cloud:
     gateway:
       globalcors:
+        add-to-simple-url-handler-mapping: true
         cors-configurations:
-          '[/**]': 
-            allowed-origins: "http://localhost:5173"
+          '[/**]':
+            # El cliente de escritorio (JavaFX) no usa CORS. Solo se permite
+            # explícitamente lo que se configure aquí (nunca "*" con credenciales).
+            allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8080}
             allowed-methods:
               - GET
               - POST
@@ -18,6 +21,7 @@ spring:
               - OPTIONS
             allowed-headers: "*"
             allow-credentials: true
+            max-age: 3600
             
       routes:
 
@@ -87,7 +91,7 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 
 jwt:
-  secret: mi-clave-secreta-muy-segura-para-el-proyecto-de-grado-2025-fiet-unicauca
+  secret: ${JWT_SECRET}
 
 logging:
   level:
