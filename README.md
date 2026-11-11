@@ -561,6 +561,29 @@ Once microservices are started, you can access the Swagger UI interface to explo
 
 ---
 
+## Process Documentation
+
+The requirements engineering and product-evolution artifacts are documented in
+Spanish under [`docs/proceso/`](./docs/proceso/):
+
+| Artifact | Description |
+|---|---|
+| [`docs/user-stories.md`](./docs/user-stories.md) | 6 epics, 21 user stories, 63 acceptance criteria and 68 story points. |
+| [`docs/proceso/trazabilidad.md`](./docs/proceso/trazabilidad.md) | Traceability matrix: user story → acceptance criterion → endpoint → test. |
+| [`docs/proceso/guia-historias-de-usuario.md`](./docs/proceso/guia-historias-de-usuario.md) | Standard for writing user stories and BDD acceptance criteria. |
+| [`docs/proceso/usabilidad.md`](./docs/proceso/usabilidad.md) | Usability test with two participants, results and findings. |
+| [`docs/proceso/demo.md`](./docs/proceso/demo.md) | First-cut demo video (Swing version, 2025-09-29) and product evolution. |
+| [`docs/proceso/prototipo.md`](./docs/proceso/prototipo.md) | Navigable Figma prototype and its mapping to the implementation. |
+| [`docs/adr/0003-arquitectura-inicial.md`](./docs/adr/0003-arquitectura-inicial.md) | Initial architecture decision: modular monolith with a Swing client. |
+| [`docs/proceso/historias-de-usuario.xlsx`](./docs/proceso/historias-de-usuario.xlsx) | Spreadsheet version of the backlog and traceability matrix. |
+
+The backlog follows a canonical format (`As a [role] / I want [single verb] /
+so that [verifiable benefit]`), BDD criteria (`Given / When / Then`) and a
+**2 positive + 1 negative** balance per story. Coverage gaps are reported
+honestly in the traceability matrix and tracked as GitHub issues.
+
+---
+
 ## Development Team
 
 This project was developed by Systems Engineering students at the University of Cauca as part of the Software II course:
