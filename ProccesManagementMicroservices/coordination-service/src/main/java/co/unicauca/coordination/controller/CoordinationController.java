@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.logging.Logger;
 @RestController
 @RequestMapping("/api/coordination")
-@CrossOrigin(origins = "*")
 public class CoordinationController {    
     private static final Logger logger = Logger.getLogger(CoordinationController.class.getName());    
     @Autowired

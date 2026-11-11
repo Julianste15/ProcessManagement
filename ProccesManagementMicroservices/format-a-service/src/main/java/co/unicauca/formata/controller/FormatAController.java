@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/format-a")
-@CrossOrigin(origins = "*")
 @Tag(name = "Format A Controller", description = "API for managing Format A submissions and evaluations")
 public class FormatAController {    
     private static final Logger logger = Logger.getLogger(FormatAController.class.getName());    

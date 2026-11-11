@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import java.util.logging.Logger;
 @RestController
 @RequestMapping("/api/notifications")
-@CrossOrigin(origins = "*")
 public class NotificationController {
     private static final Logger logger = Logger.getLogger(NotificationController.class.getName());
     @Autowired

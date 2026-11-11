@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/anteprojects")
-@CrossOrigin(origins = "*")
 public class AnteprojectRestController {
     private static final Logger logger = Logger.getLogger(AnteprojectRestController.class.getName());
 

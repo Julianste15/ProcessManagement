@@ -2,3 +2,6 @@
 /ProccesManagementMicroservices/coordination-service/target/
 /frontend/nbproject/private/
 /ProccesManagementMicroservices/presentation/target/
+/ProccesManagementMicroservices/*/target/
+.env
+.env.local

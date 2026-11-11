@@ -339,12 +339,19 @@ git clone https://github.com/Julianste15/ProcessManagement.git
 cd ProcessManagement
 ```
 
-### 2. Run with Docker Compose
+### 2. Configure secrets and run with Docker Compose
 
-This single command will build all microservices, start the databases, RabbitMQ, and register everything in Eureka.
+Docker Compose requires a `JWT_SECRET` (there is no default). Copy the template and set a random value of at least 32 characters:
 
 ```bash
-docker-compose up -d --build
+cp .env.example .env        # Windows: copy .env.example .env
+openssl rand -base64 48     # paste the output as JWT_SECRET in .env
+```
+
+Then build and start all services:
+
+```bash
+docker compose up -d --build
 ```
 
 **Verify services are running:**
@@ -388,31 +395,32 @@ All components are containerized:
 
 ```bash
 # Start all services
-docker-compose up -d
+docker compose up -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # View logs of specific service
-docker-compose logs -f user-service
+docker compose logs -f user-service
 
 # Stop services
-docker-compose down
+docker compose down
 
 # Rebuild images
-docker-compose up --build
+docker compose up --build
 
 # Stop and remove volumes (database reset)
-docker-compose down -v
+docker compose down -v
 ```
 
 ### Docker Configuration
 
 The `docker-compose.yml` file handles:
 - **Network:** `microservices-network` for internal communication.
+- **Ports:** only the Gateway (`8080`), Eureka (`8761`) and the RabbitMQ console (`15672`) are published. Databases and internal services are not reachable from the host.
 - **Volúmenes:** Persistent storage for PostgreSQL (`postgres-data`) and file uploads (`./storage`).
 - **init.sql:** Automatic creation of all required databases on startup.
-- **Environment Variables:** Automatic injection of DB credentials and service URLs.
+- **Environment Variables:** DB credentials and service URLs are injected by Compose. `JWT_SECRET` and `CORS_ALLOWED_ORIGINS` come from your local `.env` (see `.env.example`); `.env` is ignored by Git.
 
 ### Dockerization Status
 

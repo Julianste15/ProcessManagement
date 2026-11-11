@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import java.util.logging.Logger;
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
 public class AuthController {    
     private static final Logger logger = Logger.getLogger(AuthController.class.getName());    
     @Autowired
