@@ -80,6 +80,7 @@ Contenido:
 
 Contenido:
 - [ADR-0001: Retirar `coordination-service` del stack](./adr/0001-retirar-coordination-service.md)
+- [ADR-0002: Defensa en profundidad para las cabeceras de identidad](./adr/0002-cabeceras-de-identidad.md)
 - Contexto, decisión, consecuencias y alternativas consideradas
 
 **Audiencia**: Desarrolladores, arquitectos, revisores técnicos
