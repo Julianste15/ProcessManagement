@@ -20,6 +20,7 @@ import java.util.Base64;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -125,6 +126,9 @@ public class FormatoAServiceTest {
             formatoAService.submitFormatoA(request));
         
         assertTrue(exception.getMessage().contains("El archivo PDF supera el tamaño máximo permitido"));
+
+        // El tamaño debe validarse antes de consultar el user-service
+        verifyNoInteractions(restTemplate);
     }
 
     @Test
