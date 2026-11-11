@@ -75,6 +75,58 @@ Contenido:
 
 ---
 
+## 📋 Documentación del Proceso
+
+Artefactos de ingeniería de requisitos, validación con usuarios y evolución del
+producto. El índice detallado está en
+[`proceso/README.md`](./proceso/README.md).
+
+### 5. [user-stories.md](./user-stories.md)
+**Backlog de Historias de Usuario y Criterios de Aceptación**
+
+- 6 épicas, 21 historias y 63 criterios (2P + 1N por HU).
+- Formato canónico, roles del dominio y estimación Fibonacci.
+- Correspondencia con el backlog original del primer corte.
+
+### 6. [proceso/trazabilidad.md](./proceso/trazabilidad.md)
+**Matriz de Trazabilidad**
+
+- HU → CA → endpoint → prueba.
+- Estado de cobertura: cubierto, parcial, manual y dependiente de #55.
+- Brechas de cobertura enlazadas a issues.
+
+### 7. [proceso/guia-historias-de-usuario.md](./proceso/guia-historias-de-usuario.md)
+**Guía de Redacción de HU y CA**
+
+- Formato canónico y verbos rectores.
+- Fórmulas BDD y balance 2P + 1N.
+- Escala de estimación y checklist de aceptación.
+
+### 8. [proceso/usabilidad.md](./proceso/usabilidad.md)
+**Prueba de Usabilidad**
+
+- Dos participantes (estudiante y docente).
+- Escenarios, resultados Likert y hallazgos.
+- Mejoras incorporadas al producto.
+
+### 9. [proceso/demo.md](./proceso/demo.md) y [proceso/prototipo.md](./proceso/prototipo.md)
+**Demostración y Prototipo**
+
+- Vídeo del primer corte (versión Swing).
+- Prototipo navegable en Figma.
+- Comparación entre la versión inicial y la actual.
+
+### 10. [adr/0003-arquitectura-inicial.md](./adr/0003-arquitectura-inicial.md)
+**ADR-0003: Arquitectura Inicial**
+
+- Monolito modular con frontend Swing y SQLite.
+- Consecuencias y evolución hacia microservicios.
+
+**Audiencia**: Reclutadores, revisores de portafolio, docentes, QA y nuevos
+integrantes del equipo
+
+---
+
 ## 🖼️ Diagramas
 
 Todos los diagramas están ubicados en la carpeta [`diagrams/`](./diagrams/)
