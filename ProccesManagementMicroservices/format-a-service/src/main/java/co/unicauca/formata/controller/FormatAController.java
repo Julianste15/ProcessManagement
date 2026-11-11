@@ -7,6 +7,7 @@ import co.unicauca.formata.service.FormatoAService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.logging.Logger;
@@ -46,19 +47,36 @@ public class FormatAController {
     }    
     
     /**
-     * Evalúa un Formato A (aprobado/rechazado)
+     * Evalúa un Formato A (aprobado/rechazado).
+     *
+     * Regla de negocio: solo el Coordinador puede aprobar o rechazar un
+     * Formato A. El estudiante y el docente no pueden evaluar, ni siquiera
+     * su propio proyecto.
      */
     @Operation(summary = "Evaluate Format A", description = "Allows a coordinator to approve or reject a Format A")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Format A evaluated successfully"),
-        @ApiResponse(responseCode = "400", description = "Evaluation failed")
+        @ApiResponse(responseCode = "400", description = "Evaluation failed"),
+        @ApiResponse(responseCode = "403", description = "Only COORDINATOR role is allowed")
     })
     @PutMapping("/{id}/evaluate")
     public ResponseEntity<?> evaluateFormatoA(
             @PathVariable Long id,
-            @Valid @RequestBody EvaluationRequest request) {
+            @Valid @RequestBody EvaluationRequest request,
+            HttpServletRequest httpRequest) {
+        String userRole = httpRequest.getHeader("X-User-Role");
+        String currentUser = httpRequest.getHeader("X-User-Email");
+
+        if (!"COORDINATOR".equals(userRole)) {
+            logger.warning("Acceso denegado: " + currentUser + " (rol " + userRole
+                    + ") intentó evaluar el Formato A " + id);
+            return ResponseEntity.status(403)
+                    .body("Acceso denegado: Se requiere rol COORDINATOR para evaluar un Formato A");
+        }
+
         try {
-            logger.info("Evaluando Formato A ID: " + id + " - Estado: " + request.getEstado());            
+            logger.info("Evaluando Formato A ID: " + id + " - Estado: " + request.getEstado()
+                    + " - Coordinador: " + currentUser);            
             FormatAResponse response = formatoAService.evaluateFormatoA(id, request);            
             logger.info("Formato A evaluado: " + id);
             return ResponseEntity.ok(response);            

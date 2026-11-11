@@ -86,12 +86,13 @@ public class AnteprojectRestController {
 
             logger.info("Asignando evaluadores - Usuario: " + currentUser + ", Rol: " + userRole + ", Es Jefe: " + isDeptHead);
 
-            boolean isCoordinator = "COORDINATOR".equals(userRole);
+            // Regla de negocio: los evaluadores los asigna únicamente el Jefe de
+            // Departamento (permanente o temporal). El coordinador no asigna.
             boolean isDepartmentHead = "TEACHER".equals(userRole) && "true".equalsIgnoreCase(isDeptHead);
 
-            if (!isCoordinator && !isDepartmentHead) {
+            if (!isDepartmentHead) {
                 return ResponseEntity.status(403)
-                        .body("Acceso denegado: Se requiere ser Coordinador o Jefe de Departamento");
+                        .body("Acceso denegado: Solo el Jefe de Departamento puede asignar evaluadores");
             }
 
             Anteproject anteproject = manageAnteprojectUseCase.assignEvaluators(id, evaluator1Email, evaluator2Email, currentUser);
@@ -174,6 +175,22 @@ public class AnteprojectRestController {
                                           HttpServletRequest httpRequest) {
         try {
             String currentUser = httpRequest.getHeader("X-User-Email");
+            String userRole = httpRequest.getHeader("X-User-Role");
+            String isDeptHead = httpRequest.getHeader("X-User-IsDepartmentHead");
+
+            // Regla de negocio: el estado del anteproyecto solo lo cambian el
+            // Coordinador o el Jefe de Departamento. Un estudiante nunca puede
+            // aprobar su propio proyecto.
+            boolean isCoordinator = "COORDINATOR".equals(userRole);
+            boolean isDepartmentHead = "TEACHER".equals(userRole) && "true".equalsIgnoreCase(isDeptHead);
+
+            if (!isCoordinator && !isDepartmentHead) {
+                logger.warning("Acceso denegado: " + currentUser + " (rol " + userRole
+                        + ") intentó cambiar el estado del anteproyecto " + id);
+                return ResponseEntity.status(403)
+                        .body("Acceso denegado: Se requiere ser Coordinador o Jefe de Departamento para cambiar el estado");
+            }
+
             Anteproject anteproject = manageAnteprojectUseCase.updateStatus(id, status, currentUser);
             AnteprojectDTO dto = convertToDTO(anteproject);
             return ResponseEntity.ok(dto);
