@@ -2,9 +2,9 @@
 
 > Plataforma integral de microservicios que gestiona todo el ciclo de trabajos de grado en la FIET (Universidad del Cauca): desde el Formato A hasta la evaluación del anteproyecto.
 
-**🇪🇸 Español:** JavaFX como cliente de escritorio, 7 microservicios Spring Boot (auth, usuarios, Formato A, coordinación, anteproyecto, evaluación, notificaciones), cada uno con su PostgreSQL, comunicación asíncrona por RabbitMQ, autenticación JWT vía Gateway y resiliencia con Resilience4j. Desplegable con Docker Compose.
+**🇪🇸 Español:** JavaFX como cliente de escritorio, 6 microservicios Spring Boot (auth, usuarios, Formato A, anteproyecto, evaluación, notificaciones), cada uno con su PostgreSQL, comunicación asíncrona por RabbitMQ y autenticación JWT vía Gateway. Desplegable con Docker Compose.
 
-**🇺🇸 English:** Spring Boot microservices with a JavaFX desktop client, per-service PostgreSQL databases, RabbitMQ async messaging, JWT auth through an API Gateway and Resilience4j circuit breaker. Deployable with a single Docker Compose command.
+**🇺🇸 English:** Spring Boot microservices with a JavaFX desktop client, per-service PostgreSQL databases, RabbitMQ async messaging and JWT auth through an API Gateway. Deployable with a single Docker Compose command.
 
 ---
 
@@ -93,10 +93,9 @@ graph TB
         AUTH[Auth Service<br/>Port: 8081<br/>Authentication & JWT]
         USER[User Service<br/>Port: 8082<br/>User Management]
         FORMATA[Format-A Service<br/>Port: 8083<br/>Format A Workflow]
-        COORD[Coordination Service<br/>Port: 8084<br/>Evaluation & Coordination]
-        ANTE[Anteproject Service<br/>Port: 8085<br/>Anteproject Management]
-        EVAL[Evaluation Service<br/>Port: 8086<br/>Evaluator Assignment]
-        NOTIF[Notification Service<br/>Port: 8087<br/>Email Notifications]
+        ANTE[Anteproject Service<br/>Port: 8086<br/>Anteproject Management]
+        EVAL[Evaluation Service<br/>Port: 8085<br/>Evaluator Assignment]
+        NOTIF[Notification Service<br/>Port: 8084<br/>Email Notifications]
     end
     
     subgraph "Message Broker"
@@ -107,7 +106,6 @@ graph TB
         DB1[(PostgreSQL<br/>Auth DB)]
         DB2[(PostgreSQL<br/>Users DB)]
         DB3[(PostgreSQL<br/>Format-A DB)]
-        DB4[(PostgreSQL<br/>Coordination DB)]
         DB5[(PostgreSQL<br/>Anteproject DB)]
         DB6[(PostgreSQL<br/>Evaluation DB)]
         DB7[(PostgreSQL<br/>Notification DB)]
@@ -118,20 +116,17 @@ graph TB
     GW --> AUTH
     GW --> USER
     GW --> FORMATA
-    GW --> COORD
     GW --> ANTE
     GW --> EVAL
     
     AUTH --> EUREKA
     USER --> EUREKA
     FORMATA --> EUREKA
-    COORD --> EUREKA
     ANTE --> EUREKA
     EVAL --> EUREKA
     NOTIF --> EUREKA
     
     FORMATA -.->|Events| RABBIT
-    COORD -.->|Events| RABBIT
     ANTE -.->|Events| RABBIT
     EVAL -.->|Events| RABBIT
     RABBIT -.->|Consume| NOTIF
@@ -139,13 +134,11 @@ graph TB
     AUTH --> DB1
     USER --> DB2
     FORMATA --> DB3
-    COORD --> DB4
     ANTE --> DB5
     EVAL --> DB6
     NOTIF --> DB7
     
     FORMATA -->|Feign Client| USER
-    COORD -->|Feign Client| USER
     ANTE -->|Feign Client| FORMATA
     EVAL -->|Feign Client| USER
 
@@ -156,7 +149,6 @@ graph TB
     style AUTH fill:#e1ffe1
     style USER fill:#e1ffe1
     style FORMATA fill:#e1ffe1
-    style COORD fill:#e1ffe1
     style ANTE fill:#e1ffe1
     style EVAL fill:#e1ffe1
     style NOTIF fill:#e1ffe1
@@ -173,7 +165,7 @@ graph TB
 - Single entry point for all requests
 - Authentication and authorization with JWT
 - Dynamic routing to microservices
-- Circuit breaker with Resilience4j
+- Identity header hardening and role-based route filtering
 
 #### 3. **Service Discovery** (Eureka)
 - Service registration and discovery
@@ -186,11 +178,10 @@ graph TB
 |----------|--------|-----------------|
 | **auth-service** | 8081 | User authentication, JWT token generation |
 | **user-service** | 8082 | User management (teachers, students, coordinators) |
-| **format-a-service** | 8083 | Format A management, validations, attempt control |
-| **coordination-service** | 8084 | Format A evaluation, approvals/rejections |
-| **anteproject-service** | 8085 | Anteproject management, document upload |
-| **evaluation-service** | 8086 | Evaluator assignment, evaluation management |
-| **notification-service** | 8087 | Email sending (asynchronous) |
+| **format-a-service** | 8083 | Format A management, validations, attempt control, coordinator approval |
+| **anteproject-service** | 8086 | Anteproject management, document upload |
+| **evaluation-service** | 8085 | Evaluator assignment, evaluation management |
+| **notification-service** | 8084 | Email sending (asynchronous, event-driven) |
 
 #### 5. **Message Broker** (RabbitMQ)
 - Asynchronous communication between microservices
@@ -212,7 +203,6 @@ graph TB
   - Spring Cloud Gateway - API Gateway
   - Spring Cloud Netflix Eureka - Service Discovery
   - Spring Cloud OpenFeign - Declarative HTTP Client
-  - Resilience4j - Circuit Breaker
 - **Spring Data JPA** - Data persistence
 - **Spring AMQP** - RabbitMQ integration
 - **Spring Security** - Security
@@ -386,7 +376,6 @@ All components are containerized:
     - Auth Service
     - User Service
     - Format-A Service
-    - Coordination Service
     - Anteproject Service
     - Evaluation Service
     - Notification Service
@@ -445,7 +434,6 @@ ProccesManagementMicroservices/
 ├── auth-service/               # Authentication
 ├── user-service/               # User Management
 ├── format-a-service/           # Format A Management
-├── coordination-service/       # Coordination & Evaluation
 ├── anteproject-service/        # Anteproject Management
 ├── evaluation-service/         # Evaluator Assignment
 ├── notification-service/       # Notifications
@@ -476,7 +464,7 @@ The system implements the following security measures:
 - **API Gateway Pattern:** Single entry point
 - **Service Discovery Pattern:** Dynamic service registration
 - **Event-Driven Architecture:** Asynchronous communication with events
-- **Circuit Breaker Pattern:** Resilience against failures
+- **Defense in Depth:** the gateway validates the JWT and each service re-validates its own role rules
 - **Database per Service:** Data autonomy per microservice
 - **Hexagonal Architecture (Ports & Adapters):** Implemented in anteproject-service
 
@@ -567,6 +555,7 @@ Once microservices are started, you can access the Swagger UI interface to explo
 - [ ] Integration tests implementation
 
 ### Planned 📋
+- [ ] Real resilience: HTTP timeouts, circuit breakers and fallbacks ([#56](https://github.com/Julianste15/ProcessManagement/issues/56))
 - [ ] Metrics and monitoring with Prometheus and Grafana
 - [ ] Orchestration with Kubernetes
 - [ ] CI/CD with GitHub Actions
