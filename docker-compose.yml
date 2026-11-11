@@ -103,25 +103,6 @@ services:
     networks:
       - microservices-network
 
-  coordination-service:
-    build: 
-      context: ./ProccesManagementMicroservices/coordination-service
-      dockerfile: Dockerfile
-    container_name: coordination-service
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/coordinationdb
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
-      - SPRING_PROFILES_ACTIVE=docker
-    depends_on:
-      - postgres-db
-      - discovery-service
-    networks:
-      - microservices-network
-
   evaluation-service:
     build: 
       context: ./ProccesManagementMicroservices/evaluation-service
