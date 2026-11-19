@@ -170,6 +170,25 @@ services:
     networks:
       - microservices-network
 
+  # Servicio opcional: no arranca con `docker compose up` normal.
+  # Uso: docker compose --profile seed run --rm seed-demo
+  seed-demo:
+    image: python:3.12-alpine
+    container_name: seed-demo
+    profiles: ["seed"]
+    working_dir: /workspace
+    volumes:
+      - ./scripts:/workspace/scripts:ro
+    environment:
+      - DEMO_SEED_BASE_URL=http://gateway-service:8080
+      - DEMO_SEED_WAIT_SECONDS=180
+      - SPRING_PROFILES_ACTIVE=docker
+    command: ["python3", "scripts/seed-demo.py"]
+    depends_on:
+      - gateway-service
+    networks:
+      - microservices-network
+
 volumes:
   postgres-data:
 

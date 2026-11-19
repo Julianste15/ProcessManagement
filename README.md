@@ -358,6 +358,42 @@ cd ProccesManagementMicroservices/presentation
 mvn javafx:run
 ```
 
+### 4. Seed demo data (optional)
+
+A fresh stack starts empty. To populate users and a full project flow, run:
+
+```bash
+docker compose --profile seed run --rm seed-demo
+```
+
+Or, from the host (Python 3 required, no extra dependencies):
+
+```bash
+python scripts/seed-demo.py        # Windows: .\scripts\seed-demo.ps1 (or ./scripts/seed-demo.sh)
+```
+
+The script is **idempotent** (a second run does not duplicate records), waits for
+the gateway to be ready, and **refuses to run** if a production profile is
+detected in `SPRING_PROFILES_ACTIVE`, `APP_ENV`, `ENVIRONMENT` or `NODE_ENV`.
+
+It creates users for all four roles and three Formato A records: one accepted,
+one under evaluation and one rejected after two attempts. The accepted format is
+linked to an anteproject with two evaluators assigned by the department head.
+All demo users share the password `Demo123!`:
+
+| Role | Email |
+|---|---|
+| Coordinator | `coordinador.demo@unicauca.edu.co` |
+| Department head / director (teacher) | `director.demo@unicauca.edu.co` |
+| Evaluator 1 (teacher) | `evaluador1.demo@unicauca.edu.co` |
+| Evaluator 2 (teacher) | `evaluador2.demo@unicauca.edu.co` |
+| Administrator | `administrador.demo@unicauca.edu.co` |
+| Students (one per Formato A state) | `estudiante1.demo@unicauca.edu.co`, `estudiante2.demo@unicauca.edu.co`, `estudiante3.demo@unicauca.edu.co` |
+
+To override the target, set `DEMO_SEED_BASE_URL` (default `http://localhost:8080`),
+`DEMO_SEED_WAIT_SECONDS` (default `120`) or pass `--base-url` / `--wait-seconds`.
+**Do not use these credentials outside a local demo stack.**
+
 ---
 
 ## 🐳 Dockerization
@@ -564,6 +600,7 @@ Once microservices are started, you can access the Swagger UI interface to explo
 ### Completed ✅
 - [x] API Documentation with Swagger/OpenAPI (Implemented in format-a-service)
 - [x] Containerization with Docker (All services)
+- [x] Idempotent demo seed script with production guard ([#45](https://github.com/Julianste15/ProcessManagement/issues/45))
 - [x] Implementation of design patterns (6 patterns implemented)
 - [x] Hexagonal Architecture (anteproject-service)
 
