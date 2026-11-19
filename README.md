@@ -528,6 +528,20 @@ cd [service-name]
 mvn test
 ```
 
+### Encoding check
+
+All source files are UTF-8 without a BOM. Before committing, verify the tracked
+text files:
+
+```bash
+python scripts/check-utf8.py
+```
+
+The script fails if a file is not valid UTF-8, contains a BOM, has replacement
+characters (`U+FFFD`) or shows mojibake sequences. All Maven modules declare
+`project.build.sourceEncoding=UTF-8`, so accents compile and compare the same on
+every machine.
+
 ---
 
 ## API Documentation

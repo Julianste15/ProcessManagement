@@ -5,3 +5,7 @@
 /ProccesManagementMicroservices/*/target/
 .env
 .env.local
+
+# Local Maven logs: contain machine-specific paths and UTF-8 BOMs
+/ProccesManagementMicroservices/*/build.txt
+/ProccesManagementMicroservices/*/run.txt
