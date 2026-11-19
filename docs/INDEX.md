@@ -75,6 +75,18 @@ Contenido:
 
 ---
 
+### 5. [Decisiones de arquitectura (ADRs)](./adr/)
+**Registro de decisiones arquitectónicas**
+
+Contenido:
+- [ADR-0001: Retirar `coordination-service` del stack](./adr/0001-retirar-coordination-service.md)
+- [ADR-0002: Defensa en profundidad para las cabeceras de identidad](./adr/0002-cabeceras-de-identidad.md)
+- Contexto, decisión, consecuencias y alternativas consideradas
+
+**Audiencia**: Desarrolladores, arquitectos, revisores técnicos
+
+---
+
 ## 🖼️ Diagramas
 
 Todos los diagramas están ubicados en la carpeta [`diagrams/`](./diagrams/)

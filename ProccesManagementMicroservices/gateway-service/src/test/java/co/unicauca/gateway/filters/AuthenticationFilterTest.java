@@ -11,17 +11,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class AuthenticationFilterTest {
 
-    private static final String JWT_SECRET = "mi-clave-secreta-muy-segura-para-el-proyecto-de-grado-2025-fiet-unicauca";
+    private static final String JWT_SECRET = "unit-test-jwt-secret-key-0123456789abcdef";
     private AuthenticationFilter filter;
 
     @BeforeEach
@@ -182,6 +184,59 @@ class AuthenticationFilterTest {
         gatewayFilter.filter(exchange, chain).block();
 
         assertEquals(HttpStatus.UNAUTHORIZED, exchange.getResponse().getStatusCode());
+    }
+
+    @Test
+    void protectedEndpoint_ignoresClientSuppliedIdentityHeaders() {
+        // El cliente intenta hacerse pasar por coordinador
+        String token = generateToken("student@unicauca.edu.co", "STUDENT");
+        GatewayFilter gatewayFilter = filter.apply(new AuthenticationFilter.Config());
+
+        MockServerHttpRequest request = MockServerHttpRequest
+                .get("/api/format-a/some-endpoint")
+                .header("Authorization", "Bearer " + token)
+                .header("X-User-Email", "attacker@unicauca.edu.co")
+                .header("X-User-Role", "COORDINATOR")
+                .header("X-User-IsDepartmentHead", "true")
+                .build();
+        MockServerWebExchange exchange = MockServerWebExchange.from(request);
+
+        AtomicReference<ServerWebExchange> forwarded = new AtomicReference<>();
+        GatewayFilterChain chain = ex -> {
+            forwarded.set(ex);
+            return Mono.empty();
+        };
+
+        gatewayFilter.filter(exchange, chain).block();
+
+        assertNotNull(forwarded.get());
+        assertEquals("student@unicauca.edu.co", forwarded.get().getRequest().getHeaders().getFirst("X-User-Email"));
+        assertEquals("STUDENT", forwarded.get().getRequest().getHeaders().getFirst("X-User-Role"));
+        assertEquals("false", forwarded.get().getRequest().getHeaders().getFirst("X-User-IsDepartmentHead"));
+    }
+
+    @Test
+    void publicEndpoint_stripsClientSuppliedIdentityHeaders() {
+        GatewayFilter gatewayFilter = filter.apply(new AuthenticationFilter.Config());
+
+        MockServerHttpRequest request = MockServerHttpRequest
+                .get("/api/users/register")
+                .header("X-User-Email", "attacker@unicauca.edu.co")
+                .header("X-User-Role", "COORDINATOR")
+                .build();
+        MockServerWebExchange exchange = MockServerWebExchange.from(request);
+
+        AtomicReference<ServerWebExchange> forwarded = new AtomicReference<>();
+        GatewayFilterChain chain = ex -> {
+            forwarded.set(ex);
+            return Mono.empty();
+        };
+
+        gatewayFilter.filter(exchange, chain).block();
+
+        assertNotNull(forwarded.get());
+        assertNull(forwarded.get().getRequest().getHeaders().getFirst("X-User-Email"));
+        assertNull(forwarded.get().getRequest().getHeaders().getFirst("X-User-Role"));
     }
 
     /**

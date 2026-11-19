@@ -85,10 +85,9 @@ graph TB
         AUTH[Auth Service<br/>Port: 8081<br/>Authentication & JWT]
         USER[User Service<br/>Port: 8082<br/>User Management]
         FORMATA[Format-A Service<br/>Port: 8083<br/>Format A Workflow]
-        COORD[Coordination Service<br/>Port: 8084<br/>Evaluation & Coordination]
-        ANTE[Anteproject Service<br/>Port: 8085<br/>Anteproject Management]
-        EVAL[Evaluation Service<br/>Port: 8086<br/>Evaluator Assignment]
-        NOTIF[Notification Service<br/>Port: 8087<br/>Email Notifications]
+        ANTE[Anteproject Service<br/>Port: 8086<br/>Anteproject Management]
+        EVAL[Evaluation Service<br/>Port: 8085<br/>Evaluator Assignment]
+        NOTIF[Notification Service<br/>Port: 8084<br/>Email Notifications]
     end
     
     subgraph "Message Broker"
@@ -99,7 +98,6 @@ graph TB
         DB1[(PostgreSQL<br/>Auth DB)]
         DB2[(PostgreSQL<br/>Users DB)]
         DB3[(PostgreSQL<br/>Format-A DB)]
-        DB4[(PostgreSQL<br/>Coordination DB)]
         DB5[(PostgreSQL<br/>Anteproject DB)]
         DB6[(PostgreSQL<br/>Evaluation DB)]
         DB7[(PostgreSQL<br/>Notification DB)]
@@ -110,20 +108,17 @@ graph TB
     GW --> AUTH
     GW --> USER
     GW --> FORMATA
-    GW --> COORD
     GW --> ANTE
     GW --> EVAL
     
     AUTH --> EUREKA
     USER --> EUREKA
     FORMATA --> EUREKA
-    COORD --> EUREKA
     ANTE --> EUREKA
     EVAL --> EUREKA
     NOTIF --> EUREKA
     
     FORMATA -.->|Events| RABBIT
-    COORD -.->|Events| RABBIT
     ANTE -.->|Events| RABBIT
     EVAL -.->|Events| RABBIT
     RABBIT -.->|Consume| NOTIF
@@ -131,13 +126,11 @@ graph TB
     AUTH --> DB1
     USER --> DB2
     FORMATA --> DB3
-    COORD --> DB4
     ANTE --> DB5
     EVAL --> DB6
     NOTIF --> DB7
     
     FORMATA -->|Feign Client| USER
-    COORD -->|Feign Client| USER
     ANTE -->|Feign Client| FORMATA
     EVAL -->|Feign Client| USER
 
@@ -148,7 +141,6 @@ graph TB
     style AUTH fill:#e1ffe1
     style USER fill:#e1ffe1
     style FORMATA fill:#e1ffe1
-    style COORD fill:#e1ffe1
     style ANTE fill:#e1ffe1
     style EVAL fill:#e1ffe1
     style NOTIF fill:#e1ffe1
@@ -165,7 +157,7 @@ graph TB
 - Punto de entrada único para todas las peticiones
 - Autenticación y autorización con JWT
 - Enrutamiento dinámico a microservicios
-- Circuit breaker con Resilience4j
+- Filtrado de rutas por rol y saneamiento de cabeceras de identidad
 
 #### 3. **Service Discovery** (Eureka)
 - Registro y descubrimiento de servicios
@@ -178,11 +170,10 @@ graph TB
 |----------|--------|-----------------|
 | **auth-service** | 8081 | Autenticación de usuarios, generación de tokens JWT |
 | **user-service** | 8082 | Gestión de usuarios (docentes, estudiantes, coordinadores) |
-| **format-a-service** | 8083 | Gestión del Formato A, validaciones, control de intentos |
-| **coordination-service** | 8084 | Evaluación de Formatos A, aprobaciones/rechazos |
-| **anteproject-service** | 8085 | Gestión de anteproyectos, carga de documentos |
-| **evaluation-service** | 8086 | Asignación de evaluadores, gestión de evaluaciones |
-| **notification-service** | 8087 | Envío de notificaciones por email (asíncrono) |
+| **format-a-service** | 8083 | Gestión del Formato A, validaciones, control de intentos, aprobación del coordinador |
+| **anteproject-service** | 8086 | Gestión de anteproyectos, carga de documentos |
+| **evaluation-service** | 8085 | Asignación de evaluadores, gestión de evaluaciones |
+| **notification-service** | 8084 | Envío de notificaciones por email (asíncrono, event-driven) |
 
 #### 5. **Message Broker** (RabbitMQ)
 - Comunicación asíncrona entre microservicios
@@ -204,7 +195,6 @@ graph TB
   - Spring Cloud Gateway - API Gateway
   - Spring Cloud Netflix Eureka - Service Discovery
   - Spring Cloud OpenFeign - Client HTTP declarativo
-  - Resilience4j - Circuit Breaker
 - **Spring Data JPA** - Persistencia de datos
 - **Spring AMQP** - Integración con RabbitMQ
 - **Spring Security** - Seguridad (en desarrollo)
@@ -333,13 +323,11 @@ cd ProcessManagement/ProccesManagementMicroservices
 Crear las siguientes bases de datos en PostgreSQL:
 
 ```sql
-CREATE DATABASE auth_db;
-CREATE DATABASE users_db;
-CREATE DATABASE formata_db;
-CREATE DATABASE coordination_db;
-CREATE DATABASE anteproject_db;
-CREATE DATABASE evaluation_db;
-CREATE DATABASE notification_db;
+CREATE DATABASE userdb;
+CREATE DATABASE formatoadb;
+CREATE DATABASE anteprojectdb;
+CREATE DATABASE evaluationdb;
+CREATE DATABASE notificationdb;
 ```
 
 ### 3. Configurar RabbitMQ
@@ -392,7 +380,6 @@ mvn spring-boot:run
 cd auth-service && mvn spring-boot:run
 cd user-service && mvn spring-boot:run
 cd format-a-service && mvn spring-boot:run
-cd coordination-service && mvn spring-boot:run
 cd anteproject-service && mvn spring-boot:run
 cd evaluation-service && mvn spring-boot:run
 cd notification-service && mvn spring-boot:run
@@ -419,7 +406,6 @@ ProccesManagementMicroservices/
 ├── auth-service/               # Autenticación
 ├── user-service/               # Gestión de usuarios
 ├── format-a-service/           # Gestión de Formato A
-├── coordination-service/       # Coordinación y evaluación
 ├── anteproject-service/        # Gestión de anteproyectos
 ├── evaluation-service/         # Asignación de evaluadores
 ├── notification-service/       # Notificaciones
@@ -446,7 +432,7 @@ El sistema implementa las siguientes medidas de seguridad:
 - **API Gateway Pattern:** Punto de entrada único
 - **Service Discovery Pattern:** Registro dinámico de servicios
 - **Event-Driven Architecture:** Comunicación asíncrona con eventos
-- **Circuit Breaker Pattern:** Resiliencia ante fallos
+- **Defense in Depth:** el gateway valida el JWT y cada servicio revalida sus reglas de rol
 - **Database per Service:** Autonomía de datos por microservicio
 
 ### Principios SOLID
@@ -490,6 +476,7 @@ Una vez iniciados los microservicios, puedes acceder a la interfaz de Swagger UI
 - [ ] Dashboard web con React/Angular
 - [ ] Notificaciones en tiempo real con WebSockets
 - [ ] Almacenamiento de archivos en la nube (AWS S3, Google Cloud Storage)
+- [ ] Resiliencia real: timeouts, circuit breakers y fallbacks ([#56](https://github.com/Julianste15/ProcessManagement/issues/56))
 - [ ] Métricas y monitoreo con Prometheus y Grafana
 - [ ] Containerización con Docker y orquestación con Kubernetes
 - [ ] CI/CD con GitHub Actions

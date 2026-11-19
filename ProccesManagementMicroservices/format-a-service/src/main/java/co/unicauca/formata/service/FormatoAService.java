@@ -44,6 +44,8 @@ public class FormatoAService {
      */
     public FormatAResponse submitFormatoA(FormatARequest request) throws FormatoAException {
         logger.info("Procesando envío de Formato A: " + request.getTitulo());
+        // Validar el adjunto antes de cualquier llamada remota (fail fast)
+        validatePdfPayload(request.getArchivoPdfContenido());
         // Regla de negocio: Validar si el estudiante puede crear un nuevo formato
         if (!canStudentCreateFormatA(request.getStudentEmail())) {
             throw new FormatoAException(
@@ -259,6 +261,36 @@ public class FormatoAService {
         response.setObservaciones(formatoA.getObservaciones());
         return response;
     }
+    /**
+     * Valida el PDF en base64 antes de llamar a otros servicios.
+     * Evita llamadas remotas innecesarias cuando el adjunto es inválido.
+     */
+    private void validatePdfPayload(String base64Content) {
+        if (base64Content == null || base64Content.isBlank()) {
+            return;
+        }
+        byte[] pdfBytes;
+        try {
+            pdfBytes = Base64.getDecoder().decode(base64Content);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("El contenido del archivo PDF es inválido.");
+        }
+        validateDecodedPdf(pdfBytes);
+    }
+
+    /**
+     * Reglas de validación comunes para un PDF ya decodificado.
+     */
+    private void validateDecodedPdf(byte[] pdfBytes) {
+        if (pdfBytes.length == 0) {
+            throw new RuntimeException("El archivo PDF está vacío.");
+        }
+        if (pdfBytes.length > maxPdfSizeBytes) {
+            throw new RuntimeException("El archivo PDF supera el tamaño máximo permitido ("
+                    + (maxPdfSizeBytes / (1024 * 1024)) + " MB).");
+        }
+    }
+
     private String resolvePdfPath(FormatARequest request, String currentPath) {
         if (request == null) {
             return currentPath;
@@ -277,13 +309,7 @@ public class FormatoAService {
     private String storePdfFile(String originalName, String base64Content) {
         try {
             byte[] pdfBytes = Base64.getDecoder().decode(base64Content);
-            if (pdfBytes.length == 0) {
-                throw new RuntimeException("El archivo PDF está vacío.");
-            }
-            if (pdfBytes.length > maxPdfSizeBytes) {
-                throw new RuntimeException("El archivo PDF supera el tamaño máximo permitido ("
-                        + (maxPdfSizeBytes / (1024 * 1024)) + " MB).");
-            }
+            validateDecodedPdf(pdfBytes);
             Path directory = Paths.get(storagePath).toAbsolutePath();
             Files.createDirectories(directory);
             String sanitizedName = sanitizeFileName(Optional.ofNullable(originalName).orElse("formato_a.pdf"));
