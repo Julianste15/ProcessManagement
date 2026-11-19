@@ -76,29 +76,46 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 .getBody();
     }
     
-    private void populateRequestWithHeaders(ServerWebExchange exchange, String token) {
+    private ServerHttpRequest populateRequestWithHeaders(ServerHttpRequest request, String token) {
         Claims claims = getAllClaimsFromToken(token);
         String isDeptHead = claims.get("isDepartmentHead", Boolean.class) != null 
             && claims.get("isDepartmentHead", Boolean.class) ? "true" : "false";
         
-        exchange.getRequest().mutate()
+        return request.mutate()
                 .header("X-User-Email", claims.getSubject())
                 .header("X-User-Role", claims.get("role", String.class))
                 .header("X-User-IsDepartmentHead", isDeptHead)
+                .build();
+    }
+
+    /**
+     * Elimina cualquier cabecera de identidad que venga del cliente.
+     * Solo el gateway puede decidir quién es el usuario, a partir del JWT.
+     */
+    private ServerHttpRequest stripIdentityHeaders(ServerHttpRequest request) {
+        return request.mutate()
+                .headers(headers -> {
+                    headers.remove("X-User-Email");
+                    headers.remove("X-User-Role");
+                    headers.remove("X-User-IsDepartmentHead");
+                })
                 .build();
     }
     
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
+            // Nunca confiar en cabeceras de identidad enviadas por el cliente:
+            // el gateway las elimina y solo las reconstruye a partir del JWT.
+            ServerHttpRequest request = stripIdentityHeaders(exchange.getRequest());
+            ServerWebExchange sanitizedExchange = exchange.mutate().request(request).build();
             String path = request.getPath().toString();
             
             logger.info("Procesando ruta: " + path);
             
             if (isPublicEndpoint(path)) {
                 logger.info("Endpoint público, omitiendo autenticación: " + path);
-                return chain.filter(exchange);
+                return chain.filter(sanitizedExchange);
             }
             
             if (isAuthMissing(request)) {
@@ -139,10 +156,11 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 }
             }
             
-            populateRequestWithHeaders(exchange, token);
+            ServerHttpRequest authenticatedRequest = populateRequestWithHeaders(request, token);
+            ServerWebExchange authenticatedExchange = sanitizedExchange.mutate().request(authenticatedRequest).build();
             
             logger.info("Autenticación exitosa para: " + getAllClaimsFromToken(token).getSubject());
-            return chain.filter(exchange);
+            return chain.filter(authenticatedExchange);
         };
     }
 

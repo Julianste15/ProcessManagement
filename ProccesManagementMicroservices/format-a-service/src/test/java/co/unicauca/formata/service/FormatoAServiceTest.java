@@ -20,10 +20,13 @@ import java.util.Base64;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class FormatoAServiceTest {
+
+    private static final long MAX_PDF_SIZE_BYTES = 10485760L;
 
     @Mock
     private FormatARepository formatoARepository;
@@ -44,8 +47,8 @@ public class FormatoAServiceTest {
     void setUp() {
         ReflectionTestUtils.setField(formatoAService, "userServiceUrl", "http://user-service/api/users");
         ReflectionTestUtils.setField(formatoAService, "storagePath", "./target/storage/formata");
-        // Set limit to 10MB as per new config
-        ReflectionTestUtils.setField(formatoAService, "maxPdfSizeBytes", 10485760L);
+        // Límite único de 10 MB, alineado con spring.servlet.multipart y con application.yml
+        ReflectionTestUtils.setField(formatoAService, "maxPdfSizeBytes", MAX_PDF_SIZE_BYTES);
     }
 
     @Test
@@ -125,6 +128,53 @@ public class FormatoAServiceTest {
             formatoAService.submitFormatoA(request));
         
         assertTrue(exception.getMessage().contains("El archivo PDF supera el tamaño máximo permitido"));
+
+        // El tamaño debe validarse antes de consultar el user-service
+        verifyNoInteractions(restTemplate);
+    }
+
+    @Test
+    void submitFormatoA_WithPdfExactlyAtLimit_ShouldSuccess() throws Exception {
+        FormatARequest request = new FormatARequest();
+        request.setTitulo("Boundary Project");
+        request.setModalidad(Modalidad.INVESTIGACION);
+        request.setDirectorEmail("director@test.com");
+        request.setStudentEmail("student@test.com");
+        request.setObjetivoGeneral("General Objective");
+        request.setArchivoPdfNombre("boundary.pdf");
+        request.setArchivoPdfContenido(Base64.getEncoder()
+                .encodeToString(new byte[(int) MAX_PDF_SIZE_BYTES]));
+
+        when(restTemplate.getForObject(anyString(), any())).thenReturn(new Object());
+        when(formatoARepository.save(any(FormatoA.class))).thenAnswer(invocation -> {
+            FormatoA f = invocation.getArgument(0);
+            f.setId(3L);
+            return f;
+        });
+
+        var response = formatoAService.submitFormatoA(request);
+
+        assertNotNull(response);
+        assertEquals("Boundary Project", response.getTitulo());
+    }
+
+    @Test
+    void submitFormatoA_WithPdfOneByteOverLimit_ThrowsException() {
+        FormatARequest request = new FormatARequest();
+        request.setTitulo("Over Boundary Project");
+        request.setModalidad(Modalidad.INVESTIGACION);
+        request.setDirectorEmail("director@test.com");
+        request.setStudentEmail("student@test.com");
+        request.setObjetivoGeneral("General Objective");
+        request.setArchivoPdfNombre("over-boundary.pdf");
+        request.setArchivoPdfContenido(Base64.getEncoder()
+                .encodeToString(new byte[(int) MAX_PDF_SIZE_BYTES + 1]));
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> formatoAService.submitFormatoA(request));
+
+        assertTrue(exception.getMessage().contains("El archivo PDF supera el tamaño máximo permitido"));
+        verifyNoInteractions(restTemplate);
     }
 
     @Test

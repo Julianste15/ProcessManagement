@@ -1,0 +1,12 @@
+# Configuración de gitleaks para el repositorio.
+#
+# Se extiende la configuración por defecto y se añade una única excepción:
+# el JWT falso que usa CorsConfigurationTest para arrancar el contexto de
+# Spring en pruebas. No es una credencial real y nunca se usa fuera de tests.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "JWT falso de CorsConfigurationTest (solo el valor exacto)"
+regexes = ['''test-secret-key-0123456789abcdef0123456789''']

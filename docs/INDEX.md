@@ -75,7 +75,7 @@ Contenido:
 
 ---
 
-## 📋 Documentación del Proceso
+## 📋 Documentación del Proceso y Decisiones
 
 Artefactos de ingeniería de requisitos, validación con usuarios y evolución del
 producto. El índice detallado está en
@@ -116,14 +116,16 @@ producto. El índice detallado está en
 - Prototipo navegable en Figma.
 - Comparación entre la versión inicial y la actual.
 
-### 10. [adr/0003-arquitectura-inicial.md](./adr/0003-arquitectura-inicial.md)
-**ADR-0003: Arquitectura Inicial**
+### 10. [Decisiones de arquitectura (ADRs)](./adr/)
+**Registro de decisiones arquitectónicas**
 
-- Monolito modular con frontend Swing y SQLite.
-- Consecuencias y evolución hacia microservicios.
+Contenido:
+- [ADR-0001: Retirar `coordination-service` del stack](./adr/0001-retirar-coordination-service.md)
+- [ADR-0002: Defensa en profundidad para las cabeceras de identidad](./adr/0002-cabeceras-de-identidad.md)
+- [ADR-0003: Arquitectura inicial](./adr/0003-arquitectura-inicial.md) — monolito modular con frontend Swing y SQLite.
+- Contexto, decisión, consecuencias y alternativas consideradas.
 
-**Audiencia**: Reclutadores, revisores de portafolio, docentes, QA y nuevos
-integrantes del equipo
+**Audiencia**: Reclutadores, desarrolladores, arquitectos, docentes, QA y nuevos integrantes del equipo
 
 ---
 

@@ -23,10 +23,10 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
 
 eureka:
   client:
@@ -51,7 +51,12 @@ logging:
     co.unicauca.formata: DEBUG
     org.springframework.cloud.openfeign: DEBUG
 
+event:
+  exchange: formato_events_exchange
+  routing-key: formato.a.enviado
+
 format-a:
   storage:
     path: ./storage/formata
-    max-size-bytes: 5242880
+    # Límite único de tamaño del PDF (10 MB). Debe coincidir con el multipart.
+    max-size-bytes: 10485760

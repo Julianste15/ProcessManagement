@@ -59,7 +59,7 @@ class AuthControllerTest {
     void validateToken_validToken_returnsTrue() throws Exception {
         when(authService.validateToken("abc")).thenReturn(true);
 
-        mockMvc.perform(get("/api/auth/validate-token")
+        mockMvc.perform(get("/api/auth/validate")
                 .header("Authorization", "Bearer abc"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"));

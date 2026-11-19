@@ -11,7 +11,7 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 
 jwt:
-  secret: mi-clave-secreta-muy-segura-para-el-proyecto-de-grado-2025-fiet-unicauca
+  secret: ${JWT_SECRET}
   expiration: 86400000
 
 logging:

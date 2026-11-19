@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/evaluation-assignments")
-@CrossOrigin(origins = "*")
 public class EvaluationAssignmentController {    
     private static final Logger logger = Logger.getLogger(EvaluationAssignmentController.class.getName());    
     @Autowired
