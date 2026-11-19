@@ -6,7 +6,7 @@ Falla (exit code 1) si encuentra:
 - bytes que no decodifican como UTF-8;
 - BOM UTF-8 (``EF BB BF``);
 - caracteres de reemplazo ``U+FFFD``;
-- secuencias típicas de mojibake (``Ã``, ``Â``, ``â€``, ``ï¿½``).
+- secuencias típicas de texto mal decodificado (ver ``MOJIBAKE_MARKERS``).
 
 Solo revisa archivos rastreados por Git con extensiones de texto, de modo que
 binarios como PNG, DOCX o XLSX quedan fuera del análisis.
@@ -47,10 +47,10 @@ BOM = b"\xef\xbb\xbf"
 # mojibake al analizarse.
 REPLACEMENT_CHARACTER = "\ufffd"
 MOJIBAKE_MARKERS = (
-    "\u00c3",          # Ã
-    "\u00c2",          # Â
-    "\u00e2\u20ac",    # â€
-    "\u00ef\u00bf\u00bd",  # ï¿½
+    "\u00c3",              # U+00C3
+    "\u00c2",              # U+00C2
+    "\u00e2\u20ac",        # U+00E2 U+20AC
+    "\u00ef\u00bf\u00bd",  # U+00EF U+00BF U+00BD
 )
 
 
